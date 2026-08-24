@@ -1,0 +1,45 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Antena -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M54,38 L68,26 L64,18" />
+    <!-- Bola antena -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M64,18m-5.5,0a5.5,5.5 0 1,1 11,0a5.5,5.5 0 1,1 -11,0" />
+    <!-- Oreja Izquierda -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M31,54m-7,0a7,7 0 1,1 14,0a7,7 0 1,1 -14,0" />
+    <!-- Oreja Derecha -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M77,54m-7,0a7,7 0 1,1 14,0a7,7 0 1,1 -14,0" />
+    <!-- Cabeza Blanca -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,36 C37,36 28,45 28,56 C28,67 37,76 54,76 C71,76 80,67 80,56 C80,45 71,36 54,36 Z" />
+    <!-- Ojo Izquierdo Naranja -->
+    <path
+        android:fillColor="#FF4500"
+        android:pathData="M43.5,54m-4.2,0a4.2,4.2 0 1,1 8.4,0a4.2,4.2 0 1,1 -8.4,0" />
+    <!-- Ojo Derecho Naranja -->
+    <path
+        android:fillColor="#FF4500"
+        android:pathData="M64.5,54m-4.2,0a4.2,4.2 0 1,1 8.4,0a4.2,4.2 0 1,1 -8.4,0" />
+    <!-- Sonrisa Naranja -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF4500"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M45,64.5 C49,69 59,69 63,64.5" />
+</vector>

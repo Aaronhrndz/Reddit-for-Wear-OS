@@ -4,7 +4,11 @@
         "source": "com.reddit.wearos.wear-main-81:/drawable/ic_reddit_logo.xml"
     },
     {
-        "merged": "com.reddit.wearos.wear-debug-79:/drawable_tile_preview.xml.flat",
-        "source": "com.reddit.wearos.wear-main-81:/drawable/tile_preview.xml"
+        "merged": "C:\\Users\\aaron\\.gradle\\daemon\\8.7\\com.reddit.wearos.wear-debug-79:\\drawable_ic_reddit_logo.xml.flat",
+        "source": "C:\\Users\\aaron\\.gradle\\daemon\\8.7\\com.reddit.wearos.wear-main-81:\\drawable\\ic_reddit_logo.xml"
+    },
+    {
+        "merged": "C:\\Users\\aaron\\.gradle\\daemon\\8.7\\com.reddit.wearos.wear-debug-79:\\drawable_tile_preview.xml.flat",
+        "source": "C:\\Users\\aaron\\.gradle\\daemon\\8.7\\com.reddit.wearos.wear-main-81:\\drawable\\tile_preview.xml"
     }
 ]
