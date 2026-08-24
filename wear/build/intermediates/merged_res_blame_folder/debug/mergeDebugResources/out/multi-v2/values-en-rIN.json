@@ -1,0 +1,96 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.reddit.wearos.wear-mergeDebugResources-77:/values-en-rIN/values-en-rIN.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\b7e9a5a3bb07e13e11bbb0961b94926e\\transformed\\foundation-release\\res\\values-en-rIN\\values-en-rIN.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,141",
+                        "endColumns": "85,84",
+                        "endOffsets": "136,221"
+                    },
+                    "to": {
+                        "startLines": "44,45",
+                        "startColumns": "4,4",
+                        "startOffsets": "3526,3612",
+                        "endColumns": "85,84",
+                        "endOffsets": "3607,3692"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\a38b5fb92876919991e009033b75bf98\\transformed\\core-1.13.1\\res\\values-en-rIN\\values-en-rIN.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,151,253,352,451,555,658,774",
+                        "endColumns": "95,101,98,98,103,102,115,100",
+                        "endOffsets": "146,248,347,446,550,653,769,870"
+                    },
+                    "to": {
+                        "startLines": "14,15,16,17,18,19,20,40",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "765,861,963,1062,1161,1265,1368,3161",
+                        "endColumns": "95,101,98,98,103,102,115,100",
+                        "endOffsets": "856,958,1057,1156,1260,1363,1479,3257"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\be2028ccaf358b4e6ce694981337bab5\\transformed\\compose-material3-1.0.0-alpha24\\res\\values-en-rIN\\values-en-rIN.xml",
+                    "from": {
+                        "startLines": "2,6,10,14,15,16,17,18",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,271,493,715,832,921,1014,1107",
+                        "endLines": "5,9,13,14,15,16,17,18",
+                        "endColumns": "14,14,14,116,88,92,92,92",
+                        "endOffsets": "266,488,710,827,916,1009,1102,1195"
+                    },
+                    "to": {
+                        "startLines": "2,6,10,46,47,48,49,50",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,321,543,3697,3814,3903,3996,4089",
+                        "endLines": "5,9,13,46,47,48,49,50",
+                        "endColumns": "14,14,14,116,88,92,92,92",
+                        "endOffsets": "316,538,760,3809,3898,3991,4084,4177"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\bf80abbd46d333c73814ee9e2315cb9f\\transformed\\ui-release\\res\\values-en-rIN\\values-en-rIN.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,197,279,373,472,559,641,730,819,903,981,1063,1136,1220,1296,1368,1438,1515,1581",
+                        "endColumns": "91,81,93,98,86,81,88,88,83,77,81,72,83,75,71,69,76,65,120",
+                        "endOffsets": "192,274,368,467,554,636,725,814,898,976,1058,1131,1215,1291,1363,1433,1510,1576,1697"
+                    },
+                    "to": {
+                        "startLines": "21,22,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41,42,43",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "1484,1576,2002,2096,2195,2282,2364,2453,2542,2626,2704,2786,2859,2943,3019,3091,3262,3339,3405",
+                        "endColumns": "91,81,93,98,86,81,88,88,83,77,81,72,83,75,71,69,76,65,120",
+                        "endOffsets": "1571,1653,2091,2190,2277,2359,2448,2537,2621,2699,2781,2854,2938,3014,3086,3156,3334,3400,3521"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\40421361d6c94e4d077295d2b0c287d6\\transformed\\wear-1.3.0\\res\\values-en-rIN\\values-en-rIN.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "55,164,287,399,508",
+                        "endColumns": "108,122,111,108,115",
+                        "endOffsets": "159,282,394,503,619"
+                    },
+                    "to": {
+                        "startLines": "23,24,25,51,52",
+                        "startColumns": "4,4,4,4,4",
+                        "startOffsets": "1658,1767,1890,4182,4291",
+                        "endColumns": "108,122,111,108,115",
+                        "endOffsets": "1762,1885,1997,4286,4402"
+                    }
+                }
+            ]
+        }
+    ]
+}

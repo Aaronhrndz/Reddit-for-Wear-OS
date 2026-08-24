@@ -1,0 +1,41 @@
+name: Build Reddit for Wear & Companion
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew || true
+
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload Wear OS APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: reddit-for-wear-watch-apk
+          path: wear/build/outputs/apk/debug/wear-debug.apk
+
+      - name: Upload Mobile Companion APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: reddit-for-wear-companion-mobile-apk
+          path: mobile/build/outputs/apk/debug/mobile-debug.apk

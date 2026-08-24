@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="reddit_orange">#FF4500</color>
+    <color name="reddit_blue">#0079D3</color>
+    <color name="reddit_upvote">#FF5722</color>
+    <color name="reddit_downvote">#7193FF</color>
+    <color name="background_dark">#000000</color>
+    <color name="surface_dark">#121212</color>
+    <color name="surface_variant">#1E1E1E</color>
+</resources>

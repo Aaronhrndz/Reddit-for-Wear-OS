@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="one">%d hora</item>
+    <item quantity="other">%d horas</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="one">%d minuto</item>
+    <item quantity="other">%d minutos</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="one">%d segundo</item>
+    <item quantity="other">%d segundos</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="many">%d horas</item>
+      <item quantity="other">%d horas</item>
+      <item quantity="one">%d hora</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="many">%d minutos</item>
+      <item quantity="other">%d minutos</item>
+      <item quantity="one">%d minuto</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="many">%d segundos</item>
+      <item quantity="other">%d segundos</item>
+      <item quantity="one">%d segundo</item>
+    </plurals>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Atender"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Vídeo"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Recusar"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Desligar"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Chamada recebida"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Chamada em curso"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"A filtrar uma chamada recebida…"</string>
+    <string msgid="406453423630273620" name="close_drawer">"Fechar menu de navegação"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"Fechar folha"</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Ativar</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">O %1$s não funciona enquanto não ativar os serviços do Google Play.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Ativar serviços do Google Play</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">Instalar</string>
+    <string name="common_google_play_services_install_text">O %1$s não é executado sem os Serviços do Google Play, os quais estão em falta no seu dispositivo.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Obter serviços do Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Disponibilidade Serviços do Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Erro dos Serviços do Google Play</string>
+    <string name="common_google_play_services_unknown_issue">%1$s está a ter problemas com os Serviços do Google Play. Tente novamente.</string>
+    <string name="common_google_play_services_unsupported_text">Não é possível executar o %1$s sem os Serviços do Google Play, os quais não são compatíveis com o seu dispositivo.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">Atualizar</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">O %1$s não é executado enquanto não atualizar os serviços do Google Play.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Atualizar serviços do Google Play</string>
+    <string name="common_google_play_services_updating_text">O %1$s não é executado sem os serviços do Google Play, os quais estão a ser atualizados.</string>
+    <string name="common_google_play_services_wear_update_text">É necessária uma nova versão dos serviços do Google Play. Esta será atualizada automaticamente em breve.</string>
+    <string name="common_open_on_phone">Abrir no telemóvel</string>
+    <string name="common_signin_button_text">Iniciar sessão</string>
+    <string name="common_signin_button_text_long">Iniciar sessão com o Google</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"Falha"</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"Aberto no seu telemóvel"</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"Êxito"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"Entrada inválida"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"Janela pop-up"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"Menu pendente"</string>
+    <string name="horologist_picker_confirm_button_content_description">Confirmar</string>
+    <string name="horologist_picker_day">Dia</string>
+    <string name="horologist_picker_month">Mês</string>
+    <string name="horologist_picker_next_button_content_description">Seguinte</string>
+    <string name="horologist_picker_year">Ano</string>
+    <string name="horologist_placeholderchip_content_description">A carregar</string>
+    <string name="horologist_split_toggle_chip_off_state_description">Desativado</string>
+    <string name="horologist_split_toggle_chip_on_state_description">Ativado</string>
+    <string name="horologist_stepper_decrease_content_description">Diminuir</string>
+    <string name="horologist_stepper_increase_content_description">Aumentar</string>
+    <string name="horologist_time_picker_hour">Hora</string>
+    <string name="horologist_time_picker_min">Min</string>
+    <string name="horologist_time_picker_minute">Minuto</string>
+    <string name="horologist_time_picker_period">Período</string>
+    <string name="horologist_time_picker_second">Segundo</string>
+    <string name="horologist_toggle_button_off_state_description">Desativado</string>
+    <string name="horologist_toggle_button_on_state_description">Ativado</string>
+    <string name="horologist_toggle_chip_off_state_description">Desativado</string>
+    <string name="horologist_toggle_chip_on_state_description">Ativado</string>
+    <string msgid="6827826412747255547" name="in_progress">"Em curso"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"Parcialmente selecionada"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"Menu de navegação"</string>
+    <string msgid="6610465462668679431" name="not_selected">"Não selecionado"</string>
+    <string msgid="5941395253238309765" name="range_end">"Fim do intervalo"</string>
+    <string msgid="7097486360902471446" name="range_start">"Início do intervalo"</string>
+    <string msgid="6043586758067023" name="selected">"Selecionado"</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"Alerta"</string>
+    <string msgid="4139871816613051306" name="state_empty">"Vazio"</string>
+    <string msgid="5834637030682409883" name="state_off">"Desativado"</string>
+    <string msgid="1490883874751719580" name="state_on">"Ativado"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="2561197295334830845" name="switch_role">"Mudar"</string>
+    <string msgid="1672349317127674378" name="tab">"Separador"</string>
+    <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g> por cento."</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"sugestão"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"mostrar sugestão"</string>
+    <string msgid="8932770593644830235" name="wear_m3c_date_picker_day">"Dia"</string>
+    <string msgid="5962969526377479136" name="wear_m3c_date_picker_month">"Mês"</string>
+    <string msgid="4697690064312147449" name="wear_m3c_date_picker_year">"Ano"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"Confirmar"</string>
+    <string msgid="3346011303652897029" name="wear_m3c_picker_next_button_content_description">"Seguinte"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"Hora"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"Minuto"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"Período"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"Segundo"</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"Gaveta de ações"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"Gaveta de navegação"</string>
+</resources>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="one">%d घण्टा</item>
+    <item quantity="other">%d घण्टा</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="one">%d मिनेट</item>
+    <item quantity="other">%d मिनेट</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="one">%d सेकेन्ड</item>
+    <item quantity="other">%d सेकेन्ड</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="other">%d घण्टा</item>
+      <item quantity="one">%d घण्टा</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="other">%d मिनेट</item>
+      <item quantity="one">%d मिनेट</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="other">%d सेकेन्ड</item>
+      <item quantity="one">%d सेकेन्ड</item>
+    </plurals>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"जवाफ दिनुहोस्"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"भिडियो"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"काट्नुहोस्"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"फोन राख्नुहोस्"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"आगमन कल"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"भइरहेको कल"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"आगमन कल जाँचिँदै छ"</string>
+    <string msgid="406453423630273620" name="close_drawer">"नेभिगेसन मेनु बन्द गर्नुहोस्"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"पाना बन्द गर्नुहोस्"</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">अन गर्नुहोस्</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">%1$s ले तपाईँले Google Play सेवाहरू सक्षम नगरेसम्म काम गर्दैन।</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Google Play सेवाहरू सक्षम पार्नुहोस्</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">स्थापना गर्नुहोस्</string>
+    <string name="common_google_play_services_install_text">%1$s Google Play services बिना सञ्चालन हुने छैन र तपाईँको यन्त्रमा Google Play services उपलब्ध छैनन्।</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Google Play सेवाहरू प्राप्त गर्नुहोस्</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play सेवाको उपलब्धता</string>
+    <string name="common_google_play_services_notification_ticker">Google Play सेवाहरूका त्रुटि</string>
+    <string name="common_google_play_services_unknown_issue">%1$s लाई Google Play services सँग सहकार्य गर्न समस्या भइरहेको छ। कृपया फेरि प्रयास गर्नुहोस्।</string>
+    <string name="common_google_play_services_unsupported_text">%1$s Google Play services बिना सञ्चालन हुने छैन र तपाईँको यन्त्रले Google Play services लाई समर्थन गर्दैन।</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">अपडेट गर्नुहोस्</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">%1$s तपाईंले Google प्ले सेवाहरू अद्यावधिक नगरेसम्म सञ्चालन हुँदैन।</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Google Play सेवाहरू अपडेट गर्नुहोस्</string>
+    <string name="common_google_play_services_updating_text">Google Play सेवाहरू %1$s बिना सञ्‍चालन हुँदैन, जुन हाल अद्यावधिक भइरहेका छन्।</string>
+    <string name="common_google_play_services_wear_update_text">Google Play सेवाहरूको नयाँ संस्करण आवश्यक छ। यो आफै छिट्टै नै अद्यावधिक हुनेछ।</string>
+    <string name="common_open_on_phone">फोनमा खोल्नुहोस्</string>
+    <string name="common_signin_button_text">साइन इन गर्नुहोस्</string>
+    <string name="common_signin_button_text_long">Google मार्फत साइन‍ इन गर्नुहोस्</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"सफल भएन"</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"तपाईंको फोनमा खोलिएको छ"</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"सफल भयो"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"अवैद्य इन्पुट"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"पपअप विन्डो"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"ड्रपडाउन मेनु"</string>
+    <string name="horologist_picker_confirm_button_content_description">पुष्टि गर्नुहोस्</string>
+    <string name="horologist_picker_day">दिन</string>
+    <string name="horologist_picker_month">महिना</string>
+    <string name="horologist_picker_next_button_content_description">अर्को</string>
+    <string name="horologist_picker_year">साल</string>
+    <string name="horologist_placeholderchip_content_description">लोड गरिँदै छ</string>
+    <string name="horologist_split_toggle_chip_off_state_description">अफ छ</string>
+    <string name="horologist_split_toggle_chip_on_state_description">अन छ</string>
+    <string name="horologist_stepper_decrease_content_description">घटाउनुहोस्</string>
+    <string name="horologist_stepper_increase_content_description">बढाउनुहोस्</string>
+    <string name="horologist_time_picker_hour">घण्टा</string>
+    <string name="horologist_time_picker_min">मिनेट</string>
+    <string name="horologist_time_picker_minute">मिनेट</string>
+    <string name="horologist_time_picker_period">अवधि</string>
+    <string name="horologist_time_picker_second">सेकेन्ड</string>
+    <string name="horologist_toggle_button_off_state_description">अफ छ</string>
+    <string name="horologist_toggle_button_on_state_description">अन छ</string>
+    <string name="horologist_toggle_chip_off_state_description">अफ छ</string>
+    <string name="horologist_toggle_chip_on_state_description">अन छ</string>
+    <string msgid="6827826412747255547" name="in_progress">"काम हुँदै छ"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"आंशिक रूपमा जाँच गरिएको"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"नेभिगेसन मेनु"</string>
+    <string msgid="6610465462668679431" name="not_selected">"चयन गरिएको छैन"</string>
+    <string msgid="5941395253238309765" name="range_end">"दायराको अन्तिम बिन्दु"</string>
+    <string msgid="7097486360902471446" name="range_start">"दायराको सुरुवात बिन्दु"</string>
+    <string msgid="6043586758067023" name="selected">"चयन गरिएको छ"</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"अलर्ट"</string>
+    <string msgid="4139871816613051306" name="state_empty">"खाली"</string>
+    <string msgid="5834637030682409883" name="state_off">"अफ छ"</string>
+    <string msgid="1490883874751719580" name="state_on">"अन छ"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"९९९+"</string>
+    <string msgid="2561197295334830845" name="switch_role">"बदल्नुहोस्"</string>
+    <string msgid="1672349317127674378" name="tab">"ट्याब"</string>
+    <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g> प्रतिशत।"</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"टुलटिप"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"टुलटिप देखाउनुहोस्"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"पुष्टि गर्नुहोस्"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"घण्टा"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"मिनेट"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"अवधि"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"सेकेन्ड"</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"कारबाहीसम्बन्धी ड्रअर"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"नेभिगेसन ड्रअर"</string>
+</resources>

@@ -1,0 +1,23 @@
+R_DEF: Internal format may change without notice
+local
+color background_dark
+color reddit_blue
+color reddit_downvote
+color reddit_orange
+color reddit_upvote
+color surface_dark
+color surface_variant
+drawable ic_reddit_logo
+drawable tile_preview
+string app_name
+string client_id_label
+string comments_empty
+string feed_empty
+string login_button_phone
+string login_desc
+string login_guest
+string login_title
+string logout
+string settings_title
+string tile_name
+style MainActivityTheme.Starting

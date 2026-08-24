@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2" xmlns:ns2="http://schemas.android.com/tools">
+    <array name="circular_progress_layout_color_scheme_colors">
+        <item>@color/circular_progress_layout_red</item>
+        <item>@color/circular_progress_layout_yellow</item>
+        <item>@color/circular_progress_layout_green</item>
+        <item>@color/circular_progress_layout_blue</item>
+    </array>
+    <attr format="float" name="anchorAngleDegrees"/>
+    <attr format="enum" name="anchorPosition">
+        <enum name="start" value="0"/>
+        <enum name="center" value="1"/>
+        <enum name="end" value="2"/>
+    </attr>
+    <attr format="boolean" name="clockwise"/>
+    <attr format="reference" name="nestedScrollViewStyle"/>
+    <attr format="reference" name="recyclerViewStyle"/>
+    <color name="androidx_core_ripple_material_light">#1f000000</color>
+    <color name="androidx_core_secondary_text_default_material_light">#8a000000</color>
+    <color name="background_dark">#000000</color>
+    <color name="call_notification_answer_color">#1d873b</color>
+    <color name="call_notification_decline_color">#d93025</color>
+    <color name="circular_progress_layout_background_color">#00000000</color>
+    <color name="circular_progress_layout_blue">#FF2196F3</color>
+    <color name="circular_progress_layout_green">#FF4CAF50</color>
+    <color name="circular_progress_layout_red">#FFF44336</color>
+    <color name="circular_progress_layout_yellow">#FFFFEB3B</color>
+    <color name="common_google_signin_btn_text_dark_default">@android:color/white</color>
+    <color name="common_google_signin_btn_text_dark_disabled">#1F000000</color>
+    <color name="common_google_signin_btn_text_dark_focused">@android:color/black</color>
+    <color name="common_google_signin_btn_text_dark_pressed">@android:color/white</color>
+    <color name="common_google_signin_btn_text_light_default">#90000000</color>
+    <color name="common_google_signin_btn_text_light_disabled">#1F000000</color>
+    <color name="common_google_signin_btn_text_light_focused">#90000000</color>
+    <color name="common_google_signin_btn_text_light_pressed">#DE000000</color>
+    <color name="notification_action_color_filter">#ffffffff</color>
+    <color name="notification_icon_bg_color">#ff9e9e9e</color>
+    <color name="reddit_blue">#0079D3</color>
+    <color name="reddit_downvote">#7193FF</color>
+    <color name="reddit_orange">#FF4500</color>
+    <color name="reddit_upvote">#FF5722</color>
+    <color name="surface_dark">#121212</color>
+    <color name="surface_variant">#1E1E1E</color>
+    <dimen name="circular_progress_layout_stroke_width">4dp</dimen>
+    <dimen name="compat_button_inset_horizontal_material">4dp</dimen>
+    <dimen name="compat_button_inset_vertical_material">6dp</dimen>
+    <dimen name="compat_button_padding_horizontal_material">8dp</dimen>
+    <dimen name="compat_button_padding_vertical_material">4dp</dimen>
+    <dimen name="compat_control_corner_material">2dp</dimen>
+    <dimen name="compat_notification_large_icon_max_height">320dp</dimen>
+    <dimen name="compat_notification_large_icon_max_width">320dp</dimen>
+    <dimen name="confirmation_overlay_image_bottom_margin">8dp</dimen>
+    <dimen name="confirmation_overlay_image_size">48dp</dimen>
+    <dimen name="confirmation_overlay_text_bottom_margin">16dp</dimen>
+    <item format="float" name="confirmation_overlay_text_letter_spacing" type="dimen">0.01</item>
+    <dimen name="confirmation_overlay_text_line_height">20sp</dimen>
+    <dimen name="confirmation_overlay_text_size">16sp</dimen>
+    <dimen name="fastscroll_default_thickness">8dp</dimen>
+    <dimen name="fastscroll_margin">0dp</dimen>
+    <dimen name="fastscroll_minimum_range">50dp</dimen>
+    <dimen name="item_touch_helper_max_drag_scroll_per_frame">20dp</dimen>
+    <dimen name="item_touch_helper_swipe_escape_max_velocity">800dp</dimen>
+    <dimen name="item_touch_helper_swipe_escape_velocity">120dp</dimen>
+    <dimen name="notification_action_icon_size">32dp</dimen>
+    <dimen name="notification_action_text_size">13sp</dimen>
+    <dimen name="notification_big_circle_margin">12dp</dimen>
+    <dimen name="notification_content_margin_start">8dp</dimen>
+    <dimen name="notification_large_icon_height">64dp</dimen>
+    <dimen name="notification_large_icon_width">64dp</dimen>
+    <dimen name="notification_main_column_padding_top">10dp</dimen>
+    <dimen name="notification_media_narrow_margin">@dimen/notification_content_margin_start</dimen>
+    <dimen name="notification_right_icon_size">16dp</dimen>
+    <dimen name="notification_right_side_padding_top">4dp</dimen>
+    <dimen name="notification_small_icon_background_padding">3dp</dimen>
+    <dimen name="notification_small_icon_size_as_large">24dp</dimen>
+    <dimen name="notification_subtext_size">13sp</dimen>
+    <dimen name="notification_top_pad">10dp</dimen>
+    <dimen name="notification_top_pad_large_text">5dp</dimen>
+    <dimen name="ws_action_drawer_expand_icon_top_margin">-3dp</dimen>
+    <dimen name="ws_action_drawer_item_bottom_padding">8dp</dimen>
+    <dimen name="ws_action_drawer_item_icon_padding">7dp</dimen>
+    <dimen name="ws_action_drawer_item_icon_right_margin">8dp</dimen>
+    <dimen name="ws_action_drawer_item_icon_size">36dp</dimen>
+    <dimen name="ws_action_drawer_item_text_size">14sp</dimen>
+    <dimen name="ws_action_drawer_item_top_padding">8dp</dimen>
+    <dimen name="ws_action_drawer_peek_top_padding">2dp</dimen>
+    <dimen name="ws_action_drawer_peek_view_height">43dp</dimen>
+    <item format="float" name="ws_action_drawer_title_body_weight" type="dimen">.7</item>
+    <item format="float" name="ws_action_drawer_title_end_weight" type="dimen">.15</item>
+    <item format="float" name="ws_action_drawer_title_start_weight" type="dimen">.15</item>
+    <dimen name="ws_drawer_view_edge_size">38dp</dimen>
+    <item format="float" name="ws_nav_drawer_bottom_text_box_weight" type="dimen">.25</item>
+    <item format="float" name="ws_nav_drawer_items_weight" type="dimen">.50</item>
+    <dimen name="ws_nav_drawer_single_page_circle_radius">24dp</dimen>
+    <dimen name="ws_nav_drawer_single_page_half_icon_size">14dp</dimen>
+    <dimen name="ws_nav_drawer_single_page_icon_padding">6dp</dimen>
+    <dimen name="ws_nav_drawer_single_page_icon_size">28dp</dimen>
+    <dimen name="ws_nav_drawer_text_size">12sp</dimen>
+    <item format="float" name="ws_nav_drawer_three_item_row_end_space_weight" type="dimen">.125</item>
+    <item format="float" name="ws_nav_drawer_three_item_row_item_weight" type="dimen">.25</item>
+    <item format="float" name="ws_nav_drawer_three_item_row_start_space_weight" type="dimen">.125</item>
+    <item format="float" name="ws_nav_drawer_top_space_weight" type="dimen">.25</item>
+    <item format="float" name="ws_nav_drawer_two_item_row_end_space_weight" type="dimen">.274</item>
+    <item format="float" name="ws_nav_drawer_two_item_row_item_weight" type="dimen">.226</item>
+    <item format="float" name="ws_nav_drawer_two_item_row_start_space_weight" type="dimen">.274</item>
+    <dimen name="ws_peek_view_bottom_padding">8dp</dimen>
+    <dimen name="ws_peek_view_icon_size">22dp</dimen>
+    <dimen name="ws_peek_view_top_padding">8dp</dimen>
+    <dimen name="ws_switch_size">40dp</dimen>
+    <dimen name="ws_wearable_drawer_view_elevation">12dp</dimen>
+    <dimen name="ws_wrv_curve_default_x_offset">24dp</dimen>
+    <drawable name="notification_template_icon_bg">#3333B5E5</drawable>
+    <drawable name="notification_template_icon_low_bg">#0cffffff</drawable>
+    <item name="confirmation_overlay_text_inset_margin" type="fraction">2.8%</item>
+    <item name="ws_action_drawer_item_first_item_top_padding" type="fraction">15%</item>
+    <item name="ws_action_drawer_item_last_item_bottom_padding" type="fraction">15%</item>
+    <item name="ws_action_drawer_item_left_padding" type="fraction">15%</item>
+    <item name="ws_action_drawer_item_right_padding" type="fraction">10%</item>
+    <item name="accessibility_action_clickable_span" type="id"/>
+    <item name="accessibility_custom_action_0" type="id"/>
+    <item name="accessibility_custom_action_1" type="id"/>
+    <item name="accessibility_custom_action_10" type="id"/>
+    <item name="accessibility_custom_action_11" type="id"/>
+    <item name="accessibility_custom_action_12" type="id"/>
+    <item name="accessibility_custom_action_13" type="id"/>
+    <item name="accessibility_custom_action_14" type="id"/>
+    <item name="accessibility_custom_action_15" type="id"/>
+    <item name="accessibility_custom_action_16" type="id"/>
+    <item name="accessibility_custom_action_17" type="id"/>
+    <item name="accessibility_custom_action_18" type="id"/>
+    <item name="accessibility_custom_action_19" type="id"/>
+    <item name="accessibility_custom_action_2" type="id"/>
+    <item name="accessibility_custom_action_20" type="id"/>
+    <item name="accessibility_custom_action_21" type="id"/>
+    <item name="accessibility_custom_action_22" type="id"/>
+    <item name="accessibility_custom_action_23" type="id"/>
+    <item name="accessibility_custom_action_24" type="id"/>
+    <item name="accessibility_custom_action_25" type="id"/>
+    <item name="accessibility_custom_action_26" type="id"/>
+    <item name="accessibility_custom_action_27" type="id"/>
+    <item name="accessibility_custom_action_28" type="id"/>
+    <item name="accessibility_custom_action_29" type="id"/>
+    <item name="accessibility_custom_action_3" type="id"/>
+    <item name="accessibility_custom_action_30" type="id"/>
+    <item name="accessibility_custom_action_31" type="id"/>
+    <item name="accessibility_custom_action_4" type="id"/>
+    <item name="accessibility_custom_action_5" type="id"/>
+    <item name="accessibility_custom_action_6" type="id"/>
+    <item name="accessibility_custom_action_7" type="id"/>
+    <item name="accessibility_custom_action_8" type="id"/>
+    <item name="accessibility_custom_action_9" type="id"/>
+    <item name="action_list" type="id"/>
+    <item name="androidx_compose_ui_view_composition_context" type="id"/>
+    <item name="coil_request_manager" type="id"/>
+    <item name="compose_view_saveable_id_tag" type="id"/>
+    <item name="consume_window_insets_tag" type="id"/>
+    <item name="fragment_container_view_tag" type="id"/>
+    <item name="hide_graphics_layer_in_inspector_tag" type="id"/>
+    <item name="hide_in_inspector_tag" type="id"/>
+    <item name="inspection_slot_table_set" type="id"/>
+    <item name="is_pooling_container_tag" type="id"/>
+    <item name="item_touch_helper_previous_elevation" type="id"/>
+    <item name="line1" type="id"/>
+    <item name="line3" type="id"/>
+    <item name="nav_controller_view_tag" type="id"/>
+    <item name="pooling_container_listener_holder_tag" type="id"/>
+    <item name="report_drawn" type="id"/>
+    <item name="tag_accessibility_actions" type="id"/>
+    <item name="tag_accessibility_clickable_spans" type="id"/>
+    <item name="tag_accessibility_heading" type="id"/>
+    <item name="tag_accessibility_pane_title" type="id"/>
+    <item name="tag_on_apply_window_listener" type="id"/>
+    <item name="tag_on_receive_content_listener" type="id"/>
+    <item name="tag_on_receive_content_mime_types" type="id"/>
+    <item name="tag_screen_reader_focusable" type="id"/>
+    <item name="tag_state_description" type="id"/>
+    <item name="tag_transition_group" type="id"/>
+    <item name="tag_unhandled_key_event_manager" type="id"/>
+    <item name="tag_unhandled_key_listeners" type="id"/>
+    <item name="tag_window_insets_animation_callback" type="id"/>
+    <item name="text" type="id"/>
+    <item name="text2" type="id"/>
+    <item name="title" type="id"/>
+    <id name="view_tree_lifecycle_owner"/>
+    <id name="view_tree_on_back_pressed_dispatcher_owner"/>
+    <id name="view_tree_saved_state_registry_owner"/>
+    <id name="view_tree_view_model_store_owner"/>
+    <item name="visible_removing_fragment_view_tag" type="id"/>
+    <item name="wrapped_composition_tag" type="id"/>
+    <item name="ws_navigation_drawer_view_pager" type="id"/>
+    <integer name="google_play_services_version">12451000</integer>
+    <integer name="status_bar_notification_info_maxnum">999</integer>
+    <plurals description="Content description of the current number of hours being selected in TimePicker component. [CHAR_LIMIT=NONE]" name="horologist_time_picker_hours_content_description">
+        <item quantity="one">%d Hour</item>
+        <item quantity="other">%d Hours</item>
+    </plurals>
+    <plurals description="Content description of the current number of hours being selected in TimePicker component. [CHAR_LIMIT=NONE]" name="horologist_time_picker_minutes_content_description">
+        <item quantity="one">%d Minute</item>
+        <item quantity="other">%d Minutes</item>
+    </plurals>
+    <plurals description="Content description of the current number of hours being selected in TimePicker component. [CHAR_LIMIT=NONE]" name="horologist_time_picker_seconds_content_description">
+        <item quantity="one">%d Second</item>
+        <item quantity="other">%d Seconds</item>
+    </plurals>
+    <plurals description="Content description of the current number of hours being selected in TimePicker component. [CHAR_LIMIT=NONE]" name="wear_m3c_time_picker_hours_content_description">
+        <item quantity="one">%d Hour</item>
+        <item quantity="other">%d Hours</item>
+    </plurals>
+    <plurals description="Content description of the current number of hours being selected in TimePicker component. [CHAR_LIMIT=NONE]" name="wear_m3c_time_picker_minutes_content_description">
+        <item quantity="one">%d Minute</item>
+        <item quantity="other">%d Minutes</item>
+    </plurals>
+    <plurals description="Content description of the current number of hours being selected in TimePicker component. [CHAR_LIMIT=NONE]" name="wear_m3c_time_picker_seconds_content_description">
+        <item quantity="one">%d Second</item>
+        <item quantity="other">%d Seconds</item>
+    </plurals>
+    <string name="androidx_startup" translatable="false">androidx.startup</string>
+    <string name="app_name">Reddit for Wear</string>
+    <string name="call_notification_answer_action">Answer</string>
+    <string name="call_notification_answer_video_action">Video</string>
+    <string name="call_notification_decline_action">Decline</string>
+    <string name="call_notification_hang_up_action">Hang Up</string>
+    <string name="call_notification_incoming_text">Incoming call</string>
+    <string name="call_notification_ongoing_text">Ongoing call</string>
+    <string name="call_notification_screening_text">Screening an incoming call</string>
+    <string name="client_id_label">Reddit Client ID</string>
+    <string name="close_drawer">"Close navigation menu"</string>
+    <string name="close_sheet">"Close sheet"</string>
+    <string name="comments_empty">No hay comentarios en este post</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Enable</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text"><ns1:g id="app_name">%1$s</ns1:g> won\'t work unless you enable Google Play services.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Enable Google Play services</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">Install</string>
+    <string name="common_google_play_services_install_text"><ns1:g id="app_name">%1$s</ns1:g> won\'t run without Google Play services, which are missing from your device.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Get Google Play services</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play services availability</string>
+    <string name="common_google_play_services_notification_ticker">Google Play services error</string>
+    <string name="common_google_play_services_unknown_issue"><ns1:g id="app_name">%1$s</ns1:g> is having trouble with Google Play services. Please try again.</string>
+    <string name="common_google_play_services_unsupported_text"><ns1:g id="app_name">%1$s</ns1:g> won\'t run without Google Play services, which are not supported by your device.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">Update</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text"><ns1:g id="app_name">%1$s</ns1:g> won\'t run unless you update Google Play services.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Update Google Play services</string>
+    <string name="common_google_play_services_updating_text"><ns1:g id="app_name">%1$s</ns1:g> won\'t run without Google Play services, which are currently updating.</string>
+    <string name="common_google_play_services_wear_update_text">New version of Google Play services needed. It will update itself shortly.</string>
+    <string name="common_open_on_phone">Open on phone</string>
+    <string name="common_signin_button_text">Sign in</string>
+    <string name="common_signin_button_text_long">Sign in with Google</string>
+    <string name="confirmation_overlay_a11y_description_fail">Failure</string>
+    <string name="confirmation_overlay_a11y_description_phone">Opened on your phone</string>
+    <string name="confirmation_overlay_a11y_description_success">Success</string>
+    <string name="default_error_message">"Invalid input"</string>
+    <string name="default_popup_window_title" ns2:ignore="ExtraTranslation">"Pop-Up Window"</string>
+    <string name="dropdown_menu">"Dropdown menu"</string>
+    <string name="feed_empty">No hay publicaciones disponibles</string>
+    <string description="Content description of the confirm button of DatePicker and TimePicker components. It lets the user confirm the date or time selected. [CHAR_LIMIT=NONE]" name="horologist_picker_confirm_button_content_description">Confirm</string>
+    <string description="Lets the user know that this picker is to change the value of the day date unit. Appears on the DatePicker component, on top of the day picker. [CHAR_LIMIT=8]" name="horologist_picker_day">Day</string>
+    <string description="Lets the user know that this picker is to change the value of the month date unit. Appears on the DatePicker component, on top of the month picker. [CHAR_LIMIT=8]" name="horologist_picker_month">Month</string>
+    <string description="Content description of the next button of DatePicker and TimePicker components. It lets the user to move to the next picker. [CHAR_LIMIT=NONE]" name="horologist_picker_next_button_content_description">Next</string>
+    <string description="Lets the user know that this picker is to change the value of the year date unit. Appears on the DatePicker component, on top of the year picker. [CHAR_LIMIT=8]" name="horologist_picker_year">Year</string>
+    <string description="Content description of the placeholder chip. It lets the user know that the content of this chip is being loaded. [CHAR_LIMIT=NONE]" name="horologist_placeholderchip_content_description">Loading</string>
+    <string description="State description of the SplitToggleChip. It lets the user know if the toggle is checked or not. [CHAR_LIMIT=NONE]" name="horologist_split_toggle_chip_off_state_description">Off</string>
+    <string description="State description of the SplitToggleChip. It lets the user know if the toggle is checked or not. [CHAR_LIMIT=NONE]" name="horologist_split_toggle_chip_on_state_description">On</string>
+    <string description="Content description of the Stepper Decrease Button. [CHAR_LIMIT=NONE]" name="horologist_stepper_decrease_content_description">Decrease</string>
+    <string description="Content description of the Stepper Increase Button. [CHAR_LIMIT=NONE]" name="horologist_stepper_increase_content_description">Increase</string>
+    <string description="Lets the user know that the time unit being changed is hour. Appears on the top of the TimePicker component. [CHAR_LIMIT=8]" name="horologist_time_picker_hour">Hour</string>
+    <string description="Lets the user know that this picker is to change the value of the minute time unit. Appears on the TimePickerWith12HourClock component, on top of the minute picker. [CHAR_LIMIT=8]" name="horologist_time_picker_min">Min</string>
+    <string description="Lets the user know that the time unit being changed is minute. Appears on the top of the TimePicker component. [CHAR_LIMIT=8]" name="horologist_time_picker_minute">Minute</string>
+    <string description="Content description of the period picker in TimePickerWith12HourClock. It lets the user select the period for 12H time format. [CHAR_LIMIT=NONE]" name="horologist_time_picker_period">Period</string>
+    <string description="Lets the user know that the time unit being changed is second. Appears on the top of the TimePicker component. [CHAR_LIMIT=8]" name="horologist_time_picker_second">Second</string>
+    <string description="State description of the ToggleButton. It lets the user know if the toggle is checked or not. [CHAR_LIMIT=NONE]" name="horologist_toggle_button_off_state_description">Off</string>
+    <string description="State description of the ToggleButton. It lets the user know if the toggle is checked or not. [CHAR_LIMIT=NONE]" name="horologist_toggle_button_on_state_description">On</string>
+    <string description="State description of the ToggleChip. It lets the user know if the toggle is checked or not. [CHAR_LIMIT=NONE]" name="horologist_toggle_chip_off_state_description">Off</string>
+    <string description="State description of the ToggleChip. It lets the user know if the toggle is checked or not. [CHAR_LIMIT=NONE]" name="horologist_toggle_chip_on_state_description">On</string>
+    <string name="in_progress">In progress</string>
+    <string name="indeterminate">Partially checked</string>
+    <string name="login_button_phone">Abrir en teléfono</string>
+    <string name="login_desc">Usa tu teléfono o ingresa tu Client ID personal para iniciar sesión</string>
+    <string name="login_guest">Continuar como invitado</string>
+    <string name="login_title">Conectar Reddit</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="navigation_menu">"Navigation menu"</string>
+    <string name="not_selected">Not selected</string>
+    <string name="range_end">"Range end"</string>
+    <string name="range_start">"Range start"</string>
+    <string name="selected">Selected</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="snackbar_pane_title">Alert</string>
+    <string name="state_empty">Empty</string>
+    <string name="state_off">Off</string>
+    <string name="state_on">On</string>
+    <string name="status_bar_notification_info_overflow">999+</string>
+    <string name="switch_role">Switch</string>
+    <string name="tab">Tab</string>
+    <string name="template_percent"><ns1:g id="percentage">%1$d</ns1:g> percent.</string>
+    <string name="tile_name">Reddit Quick Glance</string>
+    <string name="tooltip_description">tooltip</string>
+    <string name="tooltip_label">show tooltip</string>
+    <string description="A message which is used to indicate that an action failed in a FailureConfirmation [CHAR_LIMIT=12]" name="wear_m3c_confirmation_failure_message">Failed</string>
+    <string description="A message which is used to indicate that an action succeeded in a SuccessConfirmation [CHAR_LIMIT=12]" name="wear_m3c_confirmation_success_message">Success</string>
+    <string description="Lets the user know that this picker is to change the value of the day date unit. Appears on the DatePicker component, on top of the day picker. [CHAR_LIMIT=8]" name="wear_m3c_date_picker_day">Day</string>
+    <string description="Lets the user know that this picker is to change the value of the month date unit. Appears on the DatePicker component, on top of the month picker. [CHAR_LIMIT=8]" name="wear_m3c_date_picker_month">Month</string>
+    <string description="Lets the user know that this picker is to change the value of the year date unit. Appears on the DatePicker component, on top of the year picker. [CHAR_LIMIT=8]" name="wear_m3c_date_picker_year">Year</string>
+    <string description="A message which is used to indicate than the user should continue their action on their phone, used in OpenOnPhone component [CHAR_LIMIT=12]" name="wear_m3c_open_on_phone">Open on phone</string>
+    <string description="Content description of the confirm button of DatePicker and TimePicker components. It lets the user confirm the date or time selected. [CHAR_LIMIT=NONE]" name="wear_m3c_picker_confirm_button_content_description">Confirm</string>
+    <string description="Content description of the next button of DatePicker and TimePicker components. It lets the user to move to the next picker. [CHAR_LIMIT=NONE]" name="wear_m3c_picker_next_button_content_description">Next</string>
+    <string description="Lets the user know that the time unit being changed is hour. Appears on the top of the TimePicker component. [CHAR_LIMIT=8]" name="wear_m3c_time_picker_hour">Hour</string>
+    <string description="Lets the user know that the time unit being changed is minute. Appears on the top of the TimePicker component. [CHAR_LIMIT=8]" name="wear_m3c_time_picker_minute">Minute</string>
+    <string description="Content description of the period picker in TimePickerWith12HourClock. It lets the user select the period for 12H time format. [CHAR_LIMIT=NONE]" name="wear_m3c_time_picker_period">Period</string>
+    <string description="Lets the user know that the time unit being changed is second. Appears on the top of the TimePicker component. [CHAR_LIMIT=8]" name="wear_m3c_time_picker_second">Second</string>
+    <string name="ws_action_drawer_content_description">Action drawer</string>
+    <string name="ws_navigation_drawer_content_description">Navigation drawer</string>
+    <style name="ConfirmationActivity" parent="android:Theme.Translucent.NoTitleBar.Fullscreen">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:activityOpenEnterAnimation">@null</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+    <style name="DialogWindowTheme">
+        <item name="android:windowClipToOutline">false</item>
+    </style>
+    <style name="FloatingDialogTheme">
+        <item name="android:windowIsFloating">false</item>
+    </style>
+    <style name="FloatingDialogWindowTheme">
+        <item name="android:windowClipToOutline">false</item>
+        <item name="android:dialogTheme">@style/FloatingDialogTheme</item>
+    </style>
+    <style name="MainActivityTheme.Starting" parent="android:Theme.DeviceDefault">
+        <item name="android:windowBackground">@color/background_dark</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification" parent="@android:style/TextAppearance.StatusBar.EventContent"/>
+    <style name="TextAppearance.Compat.Notification.Info">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification.Line2" parent="TextAppearance.Compat.Notification.Info"/>
+    <style name="TextAppearance.Compat.Notification.Time">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+    <style name="TextAppearance.Compat.Notification.Title" parent="@android:style/TextAppearance.StatusBar.EventContent.Title"/>
+    <style name="Widget.Compat.NotificationActionContainer" parent=""/>
+    <style name="Widget.Compat.NotificationActionText" parent=""/>
+    <style name="Widget.Wear.WearableDrawerView" parent="">
+        <item name="android:elevation">@dimen/ws_wearable_drawer_view_elevation</item>
+        <item name="android:background">?android:attr/colorBackgroundFloating</item>
+    </style>
+    <style name="WsHorizontalGuideStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+    <style name="WsPageIndicatorViewStyle">
+        <item name="wsPageIndicatorDotSpacing">7.8dp</item>
+        <item name="wsPageIndicatorDotRadius">2.1dp</item>
+        <item name="wsPageIndicatorDotRadiusSelected">3.1dp</item>
+        <item name="wsPageIndicatorDotColor">?android:attr/colorForeground</item>
+        <item name="wsPageIndicatorDotColorSelected">?android:attr/colorForeground</item>
+        <item name="wsPageIndicatorDotFadeOutDelay">1000</item>
+        <item name="wsPageIndicatorDotFadeOutDuration">250</item>
+        <item name="wsPageIndicatorDotFadeInDuration">100</item>
+        <item name="wsPageIndicatorDotFadeWhenIdle">true</item>
+        <item name="wsPageIndicatorDotShadowColor">#66000000</item>
+        <item name="wsPageIndicatorDotShadowRadius">1dp</item>
+        <item name="wsPageIndicatorDotShadowDx">0.5dp</item>
+        <item name="wsPageIndicatorDotShadowDy">0.5dp</item>
+    </style>
+    <style name="WsSinglePageNavDrawerIconStyle">
+        <item name="android:layout_height">@dimen/ws_nav_drawer_single_page_icon_size</item>
+        <item name="android:layout_width">@dimen/ws_nav_drawer_single_page_icon_size</item>
+        <item name="android:padding">@dimen/ws_nav_drawer_single_page_icon_padding</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="background_radius">@dimen/ws_nav_drawer_single_page_circle_radius</item>
+        <item name="background_color">#33ffffff</item>
+    </style>
+    <style name="WsVerticalGuideStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+    <style name="WsWearableActionDrawerItemText">
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">sans-serif-condensed-light</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">@dimen/ws_action_drawer_item_text_size</item>
+    </style>
+    <style name="WsWearableActionDrawerTitleText" parent="android:TextAppearance.Material.Subhead">
+        <item name="android:alpha">0.7</item>
+    </style>
+    <declare-styleable name="ActivityNavigator">
+        <attr name="android:name"/>
+        <attr format="string" name="action"/>
+        <attr format="string" name="data"/>
+        <attr format="string" name="dataPattern"/>
+        <attr format="string" name="targetPackage"/>
+    </declare-styleable>
+    <declare-styleable name="AnimatedStateListDrawableCompat">
+        
+        <attr name="android:visible"/>
+        
+        <attr name="android:variablePadding"/>
+        
+        <attr name="android:constantSize"/>
+        
+        <attr name="android:dither"/>
+        
+        <attr name="android:enterFadeDuration"/>
+        
+        <attr name="android:exitFadeDuration"/>
+        
+        
+    </declare-styleable>
+    <declare-styleable name="AnimatedStateListDrawableItem">
+        
+        <attr name="android:drawable"/>
+        
+        <attr name="android:id"/>
+    </declare-styleable>
+    <declare-styleable name="AnimatedStateListDrawableTransition">
+        
+        <attr name="android:fromId"/>
+        
+        <attr name="android:toId"/>
+        
+        <attr name="android:drawable"/>
+        
+        <attr name="android:reversible"/>
+    </declare-styleable>
+    <declare-styleable name="ArcLayout">
+        <attr name="anchorAngleDegrees"/>
+        <attr name="anchorPosition"/>
+        <attr name="clockwise"/>
+    </declare-styleable>
+    <declare-styleable name="ArcLayout_Layout">
+        <attr format="boolean" name="layout_rotate"/>
+        <attr format="enum" name="layout_valign">
+            <enum name="outer" value="0"/>
+            <enum name="center" value="1"/>
+            <enum name="inner" value="2"/>
+        </attr>
+        <attr format="float" name="layout_weight"/>
+    </declare-styleable>
+    <declare-styleable name="BoxInsetLayout_Layout">
+        
+        <attr name="boxedEdges">
+            <!-- Default boxing setting. There are no insets forced on the child views. -->
+            <flag name="none" value="0x00"/>
+            <!-- The view will force an inset on the left edge of the children. -->
+            <flag name="left" value="0x01"/>
+            <!-- The view will force an inset on the top edge of the children. -->
+            <flag name="top" value="0x02"/>
+            <!-- The view will force an inset on the right edge of the children. -->
+            <flag name="right" value="0x04"/>
+            <!-- The view will force an inset on the bottom edge of the children. -->
+            <flag name="bottom" value="0x08"/>
+            <!-- The view will force an inset on all of the edges of the children. -->
+            <flag name="all" value="0x0F"/>
+        </attr>
+        
+        <attr name="layout_boxedEdges">
+            <!-- Default boxing setting. There are no insets forced on the child views. -->
+            <flag name="none" value="0x00"/>
+            <!-- The view will force an inset on the left edge of the children. -->
+            <flag name="left" value="0x01"/>
+            <!-- The view will force an inset on the top edge of the children. -->
+            <flag name="top" value="0x02"/>
+            <!-- The view will force an inset on the right edge of the children. -->
+            <flag name="right" value="0x04"/>
+            <!-- The view will force an inset on the bottom edge of the children. -->
+            <flag name="bottom" value="0x08"/>
+            <!-- The view will force an inset on all of the edges of the children. -->
+            <flag name="all" value="0x0F"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="Capability">
+        
+        <attr format="reference" name="queryPatterns"/>
+        
+        <attr format="boolean" name="shortcutMatchRequired"/>
+    </declare-styleable>
+    <declare-styleable name="CircledImageView">
+        <attr name="android:src"/>
+        
+        <attr format="color" name="background_color"/>
+        
+        <attr format="dimension" name="background_radius"/>
+        
+        <attr format="dimension" name="background_radius_pressed"/>
+        
+        <attr format="dimension" name="background_border_width"/>
+        
+        <attr format="color" name="background_border_color"/>
+        
+        <attr format="enum" name="background_border_cap">
+            <enum name="butt" value="0"/>
+            <enum name="round" value="1"/>
+            <enum name="square" value="2"/>
+        </attr>
+        
+        <attr format="dimension" name="img_padding"/>
+        
+        <attr format="dimension" name="background_shadow_width"/>
+        
+        <attr format="dimension" name="img_circle_percentage"/>
+        
+        <attr format="dimension" name="img_horizontal_offset_percentage"/>
+        
+        <attr format="color" name="img_tint"/>
+        
+        <attr format="fraction" name="background_radius_percent"/>
+        
+        <attr format="fraction" name="background_radius_pressed_percent"/>
+        
+        <attr format="enum" name="clip_dimen">
+            <enum name="none" value="0"/>
+            <enum name="height" value="1"/>
+            <enum name="width" value="2"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="CircularProgressLayout">
+        
+        <attr format="color" name="backgroundColor"/>
+        
+        <attr format="dimension" name="strokeWidth"/>
+        
+        <attr format="reference|color" name="colorSchemeColors"/>
+        
+        <attr format="boolean" name="indeterminate"/>
+    </declare-styleable>
+    <declare-styleable name="ColorStateListItem">
+        
+        <attr name="android:color"/>
+        
+        <attr format="float" name="alpha"/>
+        <attr name="android:alpha"/>
+        
+        <attr format="float" name="lStar"/>
+        <attr name="android:lStar"/>
+    </declare-styleable>
+    <declare-styleable name="CurvedTextView">
+        
+        <attr name="android:text"/>
+        <attr name="android:textSize"/>
+        <attr name="android:textColor"/>
+        <attr name="android:typeface"/>
+        <attr name="android:fontFamily"/>
+        <attr name="android:textStyle"/>
+        <attr name="android:textFontWeight"/>
+        <attr name="android:letterSpacing"/>
+        <attr name="android:fontFeatureSettings"/>
+        <attr name="android:fontVariationSettings"/>
+        <attr name="android:textAppearance"/>
+        <attr name="android:ellipsize"/>
+        
+        <attr name="anchorAngleDegrees"/>
+        <attr name="anchorPosition"/>
+        <attr format="float" name="minSweepDegrees"/>
+        <attr format="float" name="maxSweepDegrees"/>
+        <attr name="clockwise"/>
+    </declare-styleable>
+    <declare-styleable name="FontFamily">
+        
+        <attr format="string" name="fontProviderAuthority"/>
+        
+        <attr format="string" name="fontProviderPackage"/>
+        
+        <attr format="string" name="fontProviderQuery"/>
+        
+        <attr format="reference" name="fontProviderCerts"/>
+        
+        <attr name="fontProviderFetchStrategy">
+            <!-- The blocking font fetch works as follows.
+              First, check the local cache, then if the requested font is not cached, request the
+              font from the provider and wait until it is finished.  You can change the length of
+              the timeout by modifying fontProviderFetchTimeout.  If the timeout happens, the
+              default typeface will be used instead. -->
+            <enum name="blocking" value="0"/>
+            <!-- The async font fetch works as follows.
+              First, check the local cache, then if the requeted font is not cached, trigger a
+              request the font and continue with layout inflation. Once the font fetch succeeds, the
+              target text view will be refreshed with the downloaded font data. The
+              fontProviderFetchTimeout will be ignored if async loading is specified. -->
+            <enum name="async" value="1"/>
+        </attr>
+        
+        <attr format="integer" name="fontProviderFetchTimeout">
+            <!-- A special value for the timeout. In this case, the blocking font fetching will not
+              timeout and wait until a reply is received from the font provider. -->
+            <enum name="forever" value="-1"/>
+        </attr>
+        
+        <attr format="string" name="fontProviderSystemFontFamily"/>
+    </declare-styleable>
+    <declare-styleable name="FontFamilyFont">
+        
+        <attr name="fontStyle">
+            <enum name="normal" value="0"/>
+            <enum name="italic" value="1"/>
+        </attr>
+        
+        <attr format="reference" name="font"/>
+        
+        <attr format="integer" name="fontWeight"/>
+        
+        <attr format="string" name="fontVariationSettings"/>
+        
+        <attr format="integer" name="ttcIndex"/>
+        
+        <attr name="android:fontStyle"/>
+        <attr name="android:font"/>
+        <attr name="android:fontWeight"/>
+        <attr name="android:fontVariationSettings"/>
+        <attr name="android:ttcIndex"/>
+    </declare-styleable>
+    <declare-styleable name="Fragment">
+        <attr name="android:name"/>
+        <attr name="android:id"/>
+        <attr name="android:tag"/>
+    </declare-styleable>
+    <declare-styleable name="FragmentContainerView">
+        <attr name="android:name"/>
+        <attr name="android:tag"/>
+    </declare-styleable>
+    <declare-styleable name="GradientColor">
+        
+        <attr name="android:startColor"/>
+        
+        <attr name="android:centerColor"/>
+        
+        <attr name="android:endColor"/>
+        
+        <attr name="android:type"/>
+
+        
+        
+        <attr name="android:gradientRadius"/>
+
+        
+        
+        <attr name="android:centerX"/>
+        
+        <attr name="android:centerY"/>
+
+        
+        
+        <attr name="android:startX"/>
+        
+        <attr name="android:startY"/>
+        
+        <attr name="android:endX"/>
+        
+        <attr name="android:endY"/>
+
+        
+        <attr name="android:tileMode"/>
+    </declare-styleable>
+    <declare-styleable name="GradientColorItem">
+        
+        <attr name="android:offset"/>
+        
+        <attr name="android:color"/>
+    </declare-styleable>
+    <declare-styleable name="LoadingImageView"><attr name="imageAspectRatioAdjust">
+<enum name="none" value="0"/>
+
+<enum name="adjust_width" value="1"/>
+
+<enum name="adjust_height" value="2"/>
+
+</attr>
+
+<attr format="float" name="imageAspectRatio"/>
+
+<attr format="boolean" name="circleCrop"/>
+</declare-styleable>
+    <declare-styleable name="NavAction">
+        <attr name="android:id"/>
+        <attr format="reference" name="destination"/>
+        <attr format="boolean" name="launchSingleTop"/>
+        <attr format="boolean" name="restoreState"/>
+        <attr format="reference" name="popUpTo"/>
+        <attr format="boolean" name="popUpToInclusive"/>
+        <attr format="boolean" name="popUpToSaveState"/>
+        <attr format="reference" name="enterAnim"/>
+        <attr format="reference" name="exitAnim"/>
+        <attr format="reference" name="popEnterAnim"/>
+        <attr format="reference" name="popExitAnim"/>
+    </declare-styleable>
+    <declare-styleable name="NavArgument">
+        <attr name="android:name"/>
+        <attr name="android:defaultValue"/>
+        <attr format="boolean" name="nullable"/>
+        <attr format="string" name="argType"/>
+    </declare-styleable>
+    <declare-styleable name="NavDeepLink">
+        <attr format="string" name="uri"/>
+        <attr format="string" name="action"/>
+        <attr format="string" name="mimeType"/>
+        <attr name="android:autoVerify"/>
+    </declare-styleable>
+    <declare-styleable name="NavGraphNavigator">
+        <attr format="reference" name="startDestination"/>
+    </declare-styleable>
+    <declare-styleable name="NavHost">
+        <attr format="reference" name="navGraph"/>
+    </declare-styleable>
+    <declare-styleable name="NavInclude">
+        <attr format="reference" name="graph"/>
+    </declare-styleable>
+    <declare-styleable name="Navigator">
+        <attr name="android:id"/>
+        <attr format="string" name="route"/>
+        <attr name="android:label"/>
+    </declare-styleable>
+    <declare-styleable name="PageIndicatorView">
+        
+        <attr format="dimension" name="wsPageIndicatorDotSpacing"/>
+        
+        <attr format="dimension" name="wsPageIndicatorDotRadius"/>
+        
+        <attr format="dimension" name="wsPageIndicatorDotRadiusSelected"/>
+        
+        <attr format="color" name="wsPageIndicatorDotColor"/>
+        
+        <attr format="color" name="wsPageIndicatorDotColorSelected"/>
+        
+        <attr format="boolean" name="wsPageIndicatorDotFadeWhenIdle"/>
+        
+        <attr format="integer" name="wsPageIndicatorDotFadeOutDelay"/>
+        
+        <attr format="integer" name="wsPageIndicatorDotFadeOutDuration"/>
+        
+        <attr format="integer" name="wsPageIndicatorDotFadeInDuration"/>
+        
+        <attr format="color" name="wsPageIndicatorDotShadowColor"/>
+        
+        <attr format="dimension" name="wsPageIndicatorDotShadowRadius"/>
+        
+        <attr format="dimension" name="wsPageIndicatorDotShadowDx"/>
+        
+        <attr format="dimension" name="wsPageIndicatorDotShadowDy"/>
+    </declare-styleable>
+    <declare-styleable name="RecyclerView">
+        
+        <attr format="string" name="layoutManager"/>
+
+        
+        
+        
+        <eat-comment/>
+
+        <attr name="android:orientation"/>
+        <attr name="android:descendantFocusability"/>
+        <attr name="android:clipToPadding"/>
+        <attr format="integer" name="spanCount"/>
+        <attr format="boolean" name="reverseLayout"/>
+        <attr format="boolean" name="stackFromEnd"/>
+        <attr format="boolean" name="fastScrollEnabled"/>
+        <attr format="reference" name="fastScrollVerticalThumbDrawable"/>
+        <attr format="reference" name="fastScrollVerticalTrackDrawable"/>
+        <attr format="reference" name="fastScrollHorizontalThumbDrawable"/>
+        <attr format="reference" name="fastScrollHorizontalTrackDrawable"/>
+    </declare-styleable>
+    <declare-styleable name="RoundedDrawable">
+        <attr name="android:src"/>
+        
+        <attr format="dimension" name="radius"/>
+        
+        <attr name="backgroundColor"/>
+        
+        <attr format="boolean" name="clipEnabled"/>
+    </declare-styleable>
+    <declare-styleable name="SignInButton"><attr format="reference" name="buttonSize">
+<enum name="standard" value="0"/>
+
+<enum name="wide" value="1"/>
+
+<enum name="icon_only" value="2"/>
+
+</attr>
+<attr format="reference" name="colorScheme">
+<enum name="dark" value="0"/>
+
+<enum name="light" value="1"/>
+
+<enum name="auto" value="2"/>
+
+</attr>
+
+<attr format="reference|string" name="scopeUris"/>
+</declare-styleable>
+    <declare-styleable name="StateListDrawable">
+        
+        <attr name="android:visible"/>
+        
+        <attr name="android:variablePadding"/>
+        
+        <attr name="android:constantSize"/>
+        
+        <attr name="android:dither"/>
+        
+        <attr name="android:enterFadeDuration"/>
+        
+        <attr name="android:exitFadeDuration"/>
+        
+        
+    </declare-styleable>
+    <declare-styleable name="StateListDrawableItem">
+        
+        <attr name="android:drawable"/>
+    </declare-styleable>
+    <declare-styleable name="TextAppearance">
+        
+        <attr name="android:textColor"/>
+        
+        <attr name="android:textSize"/>
+        
+        <attr name="android:textStyle"/>
+        
+        <attr name="android:textFontWeight"/>
+        
+        <attr name="android:typeface"/>
+        
+        <attr name="android:fontFamily"/>
+        
+        <attr name="android:letterSpacing"/>
+        
+        <attr name="android:fontVariationSettings"/>
+        
+        <attr name="android:fontFeatureSettings"/>
+    </declare-styleable>
+    <declare-styleable name="TextViewAppearance">
+        
+        <attr name="android:textAppearance"/>
+    </declare-styleable>
+    <declare-styleable name="WearableActionDrawerView">
+        
+        <attr format="string" name="drawerTitle"/>
+        
+        <attr format="reference" name="actionMenu"/>
+        
+        <attr format="boolean" name="showOverflowInPeek"/>
+    </declare-styleable>
+    <declare-styleable name="WearableDrawerView">
+        
+        <attr format="reference" name="peekView"/>
+        
+        <attr format="reference" name="drawerContent"/>
+        
+        <attr format="boolean" name="enableAutoPeek"/>
+        <attr name="android:background"/>
+        <attr name="android:elevation"/>
+    </declare-styleable>
+    <declare-styleable name="WearableNavigationDrawerView">
+        
+        <attr format="enum" name="navigationStyle">
+            <!-- Single page navigation drawer style. This is the default drawer style. It is ideal
+                 for 1-5 items, but works with up to 7 items. If more than 7 items exist, then the
+                 drawer will be displayed as empty. -->
+            <enum name="singlePage" value="0"/>
+            <!-- Multi-page navigation drawer style. Each item is on its own page. Useful when more
+                 than 7 items exist. -->
+            <enum name="multiPage" value="1"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="WearableRecyclerView">
+        
+        <attr format="fraction" name="bezelWidth"/>
+        
+        <attr format="boolean" name="circularScrollingGestureEnabled"/>
+        
+        <attr format="float" name="scrollDegreesPerScreen"/>
+    </declare-styleable>
+</resources>

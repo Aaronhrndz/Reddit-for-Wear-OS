@@ -1,0 +1,45 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.reddit.wearos.wear-mergeDebugResources-77:/values-no/values-no.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\344048d4096c71dacb1ac63c9768c221\\transformed\\horologist-composables-0.6.17\\res\\values-no\\values-no.xml",
+                    "from": {
+                        "startLines": "2,6,10,14,15,16,17,18,19,20,21,22,23,24",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,221,394,567,656,710,768,852,906,992,1053,1113,1178,1244",
+                        "endLines": "5,9,13,14,15,16,17,18,19,20,21,22,23,24",
+                        "endColumns": "12,12,12,88,53,57,83,53,85,60,59,64,65,64",
+                        "endOffsets": "216,389,562,651,705,763,847,901,987,1048,1108,1173,1239,1304"
+                    },
+                    "to": {
+                        "startLines": "2,6,10,14,15,16,17,18,19,24,25,26,27,28",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,221,394,567,656,710,768,852,906,1318,1379,1439,1504,1570",
+                        "endLines": "5,9,13,14,15,16,17,18,19,24,25,26,27,28",
+                        "endColumns": "12,12,12,88,53,57,83,53,85,60,59,64,65,64",
+                        "endOffsets": "216,389,562,651,705,763,847,901,987,1374,1434,1499,1565,1630"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\db1e50b7cc1e17514a6629f8de5b4cb8\\transformed\\horologist-compose-material-0.6.17\\res\\values-no\\values-no.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,137,218,302,381,459,536,612",
+                        "endColumns": "81,80,83,78,77,76,75,74",
+                        "endOffsets": "132,213,297,376,454,531,607,682"
+                    },
+                    "to": {
+                        "startLines": "20,21,22,23,29,30,31,32",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "992,1074,1155,1239,1635,1713,1790,1866",
+                        "endColumns": "81,80,83,78,77,76,75,74",
+                        "endOffsets": "1069,1150,1234,1313,1708,1785,1861,1936"
+                    }
+                }
+            ]
+        }
+    ]
+}

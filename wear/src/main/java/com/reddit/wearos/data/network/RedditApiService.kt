@@ -1,0 +1,268 @@
+package com.reddit.wearos.data.network
+
+import android.util.Log
+import com.reddit.wearos.auth.RedditAuthManager
+import com.reddit.wearos.auth.TokenStorage
+import com.reddit.wearos.data.model.ListingChild
+import com.reddit.wearos.data.model.ListingData
+import com.reddit.wearos.data.model.RedditComment
+import com.reddit.wearos.data.model.RedditListing
+import com.reddit.wearos.data.model.RedditPost
+import com.reddit.wearos.data.model.RedditSubreddit
+import com.reddit.wearos.data.model.RedditUser
+import io.ktor.client.HttpClient
+import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.Parameters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.decodeFromJsonElement
+
+class RedditApiService(
+    private val httpClient: HttpClient,
+    private val tokenStorage: TokenStorage,
+    private val authManager: RedditAuthManager
+) {
+
+    companion object {
+        const val TAG = "RedditApiService"
+        const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
+    }
+
+    private suspend fun getAuthHeader(): Pair<String, String>? {
+        val token = authManager.refreshTokenIfNeeded() ?: tokenStorage.getAccessToken() ?: return null
+        return if (token.startsWith("Bearer ") || (token.length > 50 && !token.contains("=") && !token.contains(";"))) {
+            val clean = if (token.startsWith("Bearer ")) token else "Bearer $token"
+            Pair("Authorization", clean)
+        } else {
+            val cookieVal = if (!token.contains("=")) "reddit_session=$token" else token
+            Pair("Cookie", cookieVal)
+        }
+    }
+
+    private suspend fun isBearerAuth(): Boolean {
+        val token = tokenStorage.getAccessToken() ?: return false
+        return token.startsWith("Bearer ") || (token.length > 50 && !token.contains("=") && !token.contains(";"))
+    }
+
+    suspend fun getFeed(
+        subreddit: String? = null,
+        sort: String = "hot",
+        after: String? = null,
+        limit: Int = 25
+    ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val sub = subreddit?.trim()
+        val isHome = sub.isNullOrEmpty() || sub.equals("home", ignoreCase = true) || sub.equals("principal", ignoreCase = true) || sub.equals("frontpage", ignoreCase = true)
+
+        val urlsToTry = mutableListOf<String>()
+        if (isBearer) {
+            if (isHome) {
+                urlsToTry.add("https://oauth.reddit.com/best")
+                urlsToTry.add("https://oauth.reddit.com/hot")
+            } else {
+                urlsToTry.add("https://oauth.reddit.com/r/$sub/$sort")
+            }
+        }
+        if (isHome) {
+            urlsToTry.add("https://old.reddit.com/.json")
+            urlsToTry.add("https://www.reddit.com/.json")
+            urlsToTry.add("https://old.reddit.com/r/popular/hot.json")
+        } else {
+            urlsToTry.add("https://old.reddit.com/r/$sub/$sort.json")
+            urlsToTry.add("https://www.reddit.com/r/$sub/$sort.json")
+        }
+
+        for (url in urlsToTry) {
+            try {
+                Log.d(TAG, "Intentando feed: url=$url, authHeader=${authHeader?.first} -> ${authHeader?.second?.take(15)}...")
+                val response = httpClient.get(url) {
+                    if (url.contains("oauth.reddit.com") && isBearer) {
+                        authHeader?.let { (k, v) -> header(k, v) }
+                    } else if (authHeader?.first == "Cookie") {
+                        header("Cookie", authHeader.second)
+                    }
+                    header("User-Agent", USER_AGENT)
+                    parameter("limit", limit)
+                    after?.let { parameter("after", it) }
+                    parameter("raw_json", 1)
+                }
+
+                val status = response.status.value
+                val responseText = response.bodyAsText()
+                Log.d(TAG, "Respuesta de $url: status=$status, len=${responseText.length}, preview=${responseText.take(120).replace("\n", " ")}")
+
+                if (status == 200 && !responseText.trim().startsWith("<") && responseText.isNotBlank()) {
+                    val listing = NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(responseText)
+                    if (listing.data.children.isNotEmpty()) {
+                        Log.d(TAG, "✅ Feed cargado con éxito: ${listing.data.children.size} posts de $url")
+                        return@withContext listing
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Fallo al consultar $url: ${e.message}")
+            }
+        }
+
+        Log.w(TAG, "Ninguna URL devolvió posts válidos. Devolviendo lista vacía.")
+        RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
+    }
+
+    suspend fun getComments(
+        subreddit: String,
+        postId: String,
+        sort: String = "confidence",
+        limit: Int = 30
+    ): Pair<RedditPost?, List<RedditComment>> = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val sub = if (subreddit.isEmpty() || subreddit == "home") "popular" else subreddit
+
+        val urlsToTry = if (isBearer) {
+            listOf(
+                "https://oauth.reddit.com/r/$sub/comments/$postId",
+                "https://old.reddit.com/r/$sub/comments/$postId.json"
+            )
+        } else {
+            listOf(
+                "https://old.reddit.com/r/$sub/comments/$postId.json",
+                "https://www.reddit.com/r/$sub/comments/$postId.json"
+            )
+        }
+
+        for (url in urlsToTry) {
+            try {
+                val responseText = httpClient.get(url) {
+                    if (url.contains("oauth.reddit.com") && isBearer) {
+                        authHeader?.let { (k, v) -> header(k, v) }
+                    } else if (authHeader?.first == "Cookie") {
+                        header("Cookie", authHeader.second)
+                    }
+                    header("User-Agent", USER_AGENT)
+                    parameter("sort", sort)
+                    parameter("limit", limit)
+                    parameter("raw_json", 1)
+                }.bodyAsText()
+
+                if (!responseText.trim().startsWith("<") && responseText.isNotBlank()) {
+                    val responseJson: JsonArray = NetworkClient.json.decodeFromString(responseText)
+                    var post: RedditPost? = null
+                    val comments = mutableListOf<RedditComment>()
+
+                    if (responseJson.isNotEmpty()) {
+                        val postListing: RedditListing<RedditPost> = NetworkClient.json.decodeFromJsonElement(responseJson[0])
+                        post = postListing.data.children.firstOrNull()?.data
+                    }
+
+                    if (responseJson.size > 1) {
+                        val commentListing: RedditListing<RedditComment> = NetworkClient.json.decodeFromJsonElement(responseJson[1])
+                        for (child in commentListing.data.children) {
+                            if (child.kind == "t1") {
+                                comments.add(child.data)
+                            }
+                        }
+                    }
+
+                    if (post != null || comments.isNotEmpty()) {
+                        return@withContext Pair(post, comments)
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        Pair(null, emptyList())
+    }
+
+    suspend fun vote(postFullName: String, dir: Int): Boolean = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) "https://oauth.reddit.com/api/vote" else "https://old.reddit.com/api/vote"
+        try {
+            httpClient.submitForm(
+                url = url,
+                formParameters = Parameters.build {
+                    append("id", postFullName)
+                    append("dir", dir.toString())
+                }
+            ) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+            }
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun savePost(postFullName: String, save: Boolean): Boolean = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val endpoint = if (isBearer) {
+            if (save) "https://oauth.reddit.com/api/save" else "https://oauth.reddit.com/api/unsave"
+        } else {
+            if (save) "https://old.reddit.com/api/save" else "https://old.reddit.com/api/unsave"
+        }
+        try {
+            httpClient.submitForm(
+                url = endpoint,
+                formParameters = Parameters.build {
+                    append("id", postFullName)
+                }
+            ) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+            }
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun getUserSubreddits(): List<RedditSubreddit> = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) "https://oauth.reddit.com/subreddits/mine/subscriber" else "https://old.reddit.com/subreddits/mine/subscriber.json"
+        try {
+            val responseText = httpClient.get(url) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+                parameter("limit", 50)
+                parameter("raw_json", 1)
+            }.bodyAsText()
+
+            if (responseText.trim().startsWith("<")) {
+                return@withContext emptyList()
+            }
+
+            val response: RedditListing<RedditSubreddit> = NetworkClient.json.decodeFromString(responseText)
+            response.data.children.map { it.data }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun getMe(): RedditUser? = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) "https://oauth.reddit.com/api/v1/me" else "https://old.reddit.com/api/v1/me.json"
+        try {
+            val responseText = httpClient.get(url) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+                parameter("raw_json", 1)
+            }.bodyAsText()
+
+            if (responseText.trim().startsWith("<")) {
+                return@withContext null
+            }
+            NetworkClient.json.decodeFromString<RedditUser>(responseText)
+        } catch (e: Exception) {
+            null
+        }
+    }
+}

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="zero">%d ساعة</item>
+    <item quantity="one">ساعة واحدة (%d)</item>
+    <item quantity="two">ساعتان (%d)</item>
+    <item quantity="few">%d ساعات</item>
+    <item quantity="many">%d ساعة</item>
+    <item quantity="other">%d ساعة</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="zero">%d دقيقة</item>
+    <item quantity="one">دقيقة واحدة (%d)</item>
+    <item quantity="two">دقيقتان (%d)</item>
+    <item quantity="few">%d دقائق</item>
+    <item quantity="many">%d دقيقة</item>
+    <item quantity="other">%d دقيقة</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="zero">%d ثانية</item>
+    <item quantity="one">ثانية واحدة (%d)</item>
+    <item quantity="two">ثانيتان (%d)</item>
+    <item quantity="few">%d ثوانٍ</item>
+    <item quantity="many">%d ثانية</item>
+    <item quantity="other">%d ثانية</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="zero">‏‫%d ساعة</item>
+      <item quantity="two">ساعتان</item>
+      <item quantity="few">‏‫%d ساعات</item>
+      <item quantity="many">‏‫%d ساعة</item>
+      <item quantity="other">‏‫%d ساعة</item>
+      <item quantity="one">ساعة واحدة</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="zero">‏‫%d دقيقة</item>
+      <item quantity="two">دقيقتان</item>
+      <item quantity="few">‏‫%d دقائق</item>
+      <item quantity="many">‏‫%d دقيقة</item>
+      <item quantity="other">‏‫%d دقيقة</item>
+      <item quantity="one">دقيقة واحدة</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="zero">‏‫%d ثانية</item>
+      <item quantity="two">ثانيتان</item>
+      <item quantity="few">‏‫%d ثوانٍ</item>
+      <item quantity="many">‏‫%d ثانية</item>
+      <item quantity="other">‏‫%d ثانية</item>
+      <item quantity="one">ثانية واحدة</item>
+    </plurals>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"ردّ"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"فيديو"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"رفض"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"قطع الاتصال"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"مكالمة واردة"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"مكالمة جارية"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"يتم فحص المكالمة الواردة"</string>
+    <string msgid="406453423630273620" name="close_drawer">"إغلاق قائمة التنقل"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"إغلاق الورقة"</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">تفعيل</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">‏لن يعمل %1$s ما لم يتم تفعيل خدمات Google Play.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">‏تفعيل خدمات Google Play</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">تثبيت</string>
+    <string name="common_google_play_services_install_text">‏لن يتم تشغيل %1$s بدون خدمات Google Play، والتي لا تتوفر على جهازك.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">‏الحصول على خدمات Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">‏مدى توفّر خدمات Google Play</string>
+    <string name="common_google_play_services_notification_ticker">‏خطأ في خدمات Google Play</string>
+    <string name="common_google_play_services_unknown_issue">‏لدى %1$s مشكلة في خدمات Google Play. يُرجى إعادة المحاولة.</string>
+    <string name="common_google_play_services_unsupported_text">‏لن يتم تشغيل %1$s بدون خدمات Google Play التي لا يوفرها جهازك.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">تحديث</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">‏لن يتم تشغيل %1$s ما لم يتم تحديث خدمات Google Play.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">‏تحديث خدمات Google Play</string>
+    <string name="common_google_play_services_updating_text">‏لن يتم تشغيل %1$s بدون خدمات Google Play، والتي يتم تحديثها حاليًا.</string>
+    <string name="common_google_play_services_wear_update_text">‏يجب توفر إصدار جديد من خدمات Google Play. سيتم تحديثها تلقائيًا قريبًا.</string>
+    <string name="common_open_on_phone">فتح على الهاتف</string>
+    <string name="common_signin_button_text">تسجل الدخول</string>
+    <string name="common_signin_button_text_long">‏تسجيل الدخول عبر Google</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"تعذَّر إتمام العملية."</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"تم الفتح على هاتفك."</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"تم تنفيذ الإجراء بنجاح."</string>
+    <string msgid="8038256446254964252" name="default_error_message">"إدخال غير صالح"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"نافذة منبثقة"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"قائمة منسدلة"</string>
+    <string name="horologist_picker_confirm_button_content_description">تأكيد</string>
+    <string name="horologist_picker_day">اليوم</string>
+    <string name="horologist_picker_month">الشهر</string>
+    <string name="horologist_picker_next_button_content_description">التالي</string>
+    <string name="horologist_picker_year">السنة</string>
+    <string name="horologist_placeholderchip_content_description">جارٍ التحميل</string>
+    <string name="horologist_split_toggle_chip_off_state_description">الخيار غير مفعَّل</string>
+    <string name="horologist_split_toggle_chip_on_state_description">الخيار مفعَّل</string>
+    <string name="horologist_stepper_decrease_content_description">خفض مستوى الصوت</string>
+    <string name="horologist_stepper_increase_content_description">رفع مستوى الصوت</string>
+    <string name="horologist_time_picker_hour">الساعة</string>
+    <string name="horologist_time_picker_min">الدقيقة</string>
+    <string name="horologist_time_picker_minute">الدقيقة</string>
+    <string name="horologist_time_picker_period">المدة</string>
+    <string name="horologist_time_picker_second">الثانية</string>
+    <string name="horologist_toggle_button_off_state_description">الخيار غير مفعَّل</string>
+    <string name="horologist_toggle_button_on_state_description">الخيار مفعَّل</string>
+    <string name="horologist_toggle_chip_off_state_description">الخيار غير مفعَّل</string>
+    <string name="horologist_toggle_chip_on_state_description">الخيار مفعَّل</string>
+    <string msgid="6827826412747255547" name="in_progress">"قيد التقدم"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"تم وضع علامة في المربّع بشكل جزئي"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"قائمة تنقل"</string>
+    <string msgid="6610465462668679431" name="not_selected">"غير محدّد"</string>
+    <string msgid="5941395253238309765" name="range_end">"نهاية النطاق"</string>
+    <string msgid="7097486360902471446" name="range_start">"بداية النطاق"</string>
+    <string msgid="6043586758067023" name="selected">"محدّد"</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"تنبيه"</string>
+    <string msgid="4139871816613051306" name="state_empty">"حقل فارغ"</string>
+    <string msgid="5834637030682409883" name="state_off">"غير مفعَّل"</string>
+    <string msgid="1490883874751719580" name="state_on">"مفعَّل"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="2561197295334830845" name="switch_role">"تبديل"</string>
+    <string msgid="1672349317127674378" name="tab">"علامة تبويب"</string>
+    <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g> في المئة."</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"تلميح"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"إظهار التلميح"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"تأكيد"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"ساعة"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"دقيقة"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"فترة"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"ثانية"</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"دُرج الإجراءات"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"لائحة التنقل"</string>
+</resources>

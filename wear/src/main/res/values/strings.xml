@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Reddit for Wear</string>
+    <string name="tile_name">Reddit Quick Glance</string>
+    <string name="login_title">Conectar Reddit</string>
+    <string name="login_desc">Usa tu teléfono o ingresa tu Client ID personal para iniciar sesión</string>
+    <string name="login_button_phone">Abrir en teléfono</string>
+    <string name="login_guest">Continuar como invitado</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="client_id_label">Reddit Client ID</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="feed_empty">No hay publicaciones disponibles</string>
+    <string name="comments_empty">No hay comentarios en este post</string>
+</resources>

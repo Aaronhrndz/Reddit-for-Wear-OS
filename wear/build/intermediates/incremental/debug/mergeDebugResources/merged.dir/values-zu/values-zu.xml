@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="one">Amahora angu-%d</item>
+    <item quantity="other">Amahora angu-%d</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="one">Imizuzu engu-%d</item>
+    <item quantity="other">Imizuzu engu-%d</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="one">Imizuzwana engu-%d</item>
+    <item quantity="other">Imizuzwana engu-%d</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="one">Amahora angu-%d</item>
+      <item quantity="other">Amahora angu-%d</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="one">Imizuzu engu-%d</item>
+      <item quantity="other">Imizuzu engu-%d</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="one">Imizuzwana engu-%d</item>
+      <item quantity="other">Imizuzwana engu-%d</item>
+    </plurals>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Phendula"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Ividiyo"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Yenqaba"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Vala Ucingo"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Ikholi engenayo"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Ikholi eqhubekayo"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Ukuveza ikholi engenayo"</string>
+    <string msgid="406453423630273620" name="close_drawer">"Vala imenyu yokuzulazula"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"Vala ishidi"</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Nika amandla</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">I-%1$s ngeke isebenze ngaphandle kokuthi unike amandla amasevisi we-Google Play.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Nika amandla amasevisi we-Google Play</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">Faka</string>
+    <string name="common_google_play_services_install_text">I-%1$s ngeke ize iqalise ngaphandle kwamasevisi we-Google Play, angekho kusukela kudivayisi yakho.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Thola amasevisi we-Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Ukungatholakali kwamasevisi e-Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Iphutha lamasevisi we-Google Play</string>
+    <string name="common_google_play_services_unknown_issue">%1$s inenkinga ngamasevisi e-Google Play. Sicela uzame futhi.</string>
+    <string name="common_google_play_services_unsupported_text">%1$s ngeke isebenze ngaphandle kwamasevisi e-Google Play, angasekelwa idivayisi yakho.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">Isibuyekezo</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">I-%1$s ngeke ize iqalise ngaphandle kokuthi ubuyekeze i-Google Play.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Buyekeza amasevisi we-Google Play</string>
+    <string name="common_google_play_services_updating_text">I-%1$s ngeke ize iqalise ngaphandle kwamasevisi we-Google Play, okwamanje abuyekezwayo.</string>
+    <string name="common_google_play_services_wear_update_text">Kudingeka inguqulo entsha yamasevisi we-Google Play. Izozibuyekeza ngokwayo maduze.</string>
+    <string name="common_open_on_phone">Vula kufoni</string>
+    <string name="common_signin_button_text">Ngena ngemvume</string>
+    <string name="common_signin_button_text_long">Ngena ngemvume nge-Google</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"Ukwehluleka"</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"Ivuliwe kufoni yakho"</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"Impumelelo"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"Okufakwayo okungalungile"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"Iwindi Lesikhashana"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"Imenyu eya phansi"</string>
+    <string name="horologist_picker_confirm_button_content_description">Qinisekisa</string>
+    <string name="horologist_picker_day">Usuku</string>
+    <string name="horologist_picker_month">Inyanga</string>
+    <string name="horologist_picker_next_button_content_description">Okulandelayo</string>
+    <string name="horologist_picker_year">Unyaka</string>
+    <string name="horologist_placeholderchip_content_description">Iyalayisha</string>
+    <string name="horologist_split_toggle_chip_off_state_description">Ivaliwe</string>
+    <string name="horologist_split_toggle_chip_on_state_description">Ivuliwe</string>
+    <string name="horologist_stepper_decrease_content_description">Yehlisa</string>
+    <string name="horologist_stepper_increase_content_description">Khulisa</string>
+    <string name="horologist_time_picker_hour">Ihora</string>
+    <string name="horologist_time_picker_min">Umzuzo</string>
+    <string name="horologist_time_picker_minute">Umzuzu</string>
+    <string name="horologist_time_picker_period">Isikhathi</string>
+    <string name="horologist_time_picker_second">Isekhondi</string>
+    <string name="horologist_toggle_button_off_state_description">Ivaliwe</string>
+    <string name="horologist_toggle_button_on_state_description">Ivuliwe</string>
+    <string name="horologist_toggle_chip_off_state_description">Ivaliwe</string>
+    <string name="horologist_toggle_chip_on_state_description">Ivuliwe</string>
+    <string msgid="6827826412747255547" name="in_progress">"Kuyaqhubeka"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"Kuhlolwe kancane"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"Imenyu yokuzulazula"</string>
+    <string msgid="6610465462668679431" name="not_selected">"Ayikhethiwe"</string>
+    <string msgid="5941395253238309765" name="range_end">"Umkhawulo wobubanzi"</string>
+    <string msgid="7097486360902471446" name="range_start">"Ukuqala kobubanzi"</string>
+    <string msgid="6043586758067023" name="selected">"Okukhethiwe"</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"Isexwayiso"</string>
+    <string msgid="4139871816613051306" name="state_empty">"Akunalutho"</string>
+    <string msgid="5834637030682409883" name="state_off">"Ivaliwe"</string>
+    <string msgid="1490883874751719580" name="state_on">"Ivuliwe"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="2561197295334830845" name="switch_role">"Shintsha"</string>
+    <string msgid="1672349317127674378" name="tab">"Ithebhu"</string>
+    <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g> amaphesenti."</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"ithulithiphu"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"bonisa ithulithiphu"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"Qinisekisa"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"Ihora"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"Umzuzu"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"Isikhathi"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"Umzuzwana"</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"Ikhabethe lesenzo"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"Ikhabethe lokuzulazula"</string>
+</resources>

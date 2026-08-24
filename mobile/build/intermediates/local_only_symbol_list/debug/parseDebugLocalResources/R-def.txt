@@ -1,0 +1,10 @@
+R_DEF: Internal format may change without notice
+local
+drawable ic_reddit_logo
+string app_name
+string btn_login
+string btn_sync
+string client_id_hint
+string status_connected
+string status_disconnected
+string title_setup
