@@ -8,6 +8,19 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable
+data class OAuthTokenResponse(
+    @SerialName("access_token")
+    val accessToken: String = "",
+    @SerialName("token_type")
+    val tokenType: String = "",
+    @SerialName("expires_in")
+    val expiresIn: Long = 3600L,
+    val scope: String = "",
+    @SerialName("refresh_token")
+    val refreshToken: String? = null
+)
+
+@Serializable
 data class RedditListing<T>(
     val kind: String = "Listing",
     val data: ListingData<T>

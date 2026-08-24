@@ -23,7 +23,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -88,6 +90,13 @@ class CompanionMainActivity : ComponentActivity() {
                             connectedWatches = connectedWatchesCount,
                             isSyncing = isSyncing,
                             onStartLogin = { isWebLoginOpen = true },
+                            onCopyToClipboard = {
+                                if (tokenOrCookieInput.isNotBlank()) {
+                                    copyToClipboard(tokenOrCookieInput)
+                                } else {
+                                    Toast.makeText(this@CompanionMainActivity, "No hay token para copiar", Toast.LENGTH_SHORT).show()
+                                }
+                            },
                             onSyncManualToken = {
                                 if (tokenOrCookieInput.isNotBlank()) {
                                     copyToClipboard(tokenOrCookieInput.trim())
@@ -221,17 +230,6 @@ fun RedditWebLoginView(
                 }
             )
 
-            // Preview del token extraído
-            val currentToken = extractSessionToken()
-            if (currentToken.isNotEmpty()) {
-                Text(
-                    text = "Token detectado: ${currentToken.take(35)}...",
-                    fontSize = 11.sp,
-                    color = Color(0xFF4CAF50),
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
-                )
-            }
-
             // Botón manual de confirmación
             Button(
                 onClick = {
@@ -261,6 +259,7 @@ fun CompanionScreen(
     connectedWatches: Int,
     isSyncing: Boolean,
     onStartLogin: () -> Unit,
+    onCopyToClipboard: () -> Unit,
     onSyncManualToken: () -> Unit,
     onRefreshWatches: () -> Unit
 ) {
@@ -371,23 +370,35 @@ fun CompanionScreen(
             )
         }
 
-        // Opción Token Manual / Visualización
+        // Tarjeta Token con visualización completa y botón copiar
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
-                Text("Token / Cookie Capturado", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
-                Text(
-                    text = if (tokenInput.isNotEmpty()) "✅ Token disponible en el portapapeles y campo inferior:" else "Inicia sesión arriba o pega un token:",
-                    fontSize = 11.sp,
-                    color = Color(0xFFAAAAAA)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Token / Sesión Capturada", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
+                    if (tokenInput.isNotEmpty()) {
+                        Button(
+                            onClick = onCopyToClipboard,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Text("📋 Copiar Todo", fontSize = 11.sp, color = Color.White)
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = tokenInput,
                     onValueChange = onTokenInputChange,
-                    placeholder = { Text("Pega tu Bearer token o sesión...", fontSize = 11.sp, color = Color.Gray) },
+                    minLines = 3,
+                    maxLines = 6,
+                    placeholder = { Text("Pega tu Bearer token o sesión aquí...", fontSize = 11.sp, color = Color.Gray) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color.White,
@@ -400,9 +411,9 @@ fun CompanionScreen(
                 Button(
                     onClick = onSyncManualToken,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500))
                 ) {
-                    Text("📥 Reenviar Este Token al Reloj", fontSize = 12.sp, color = Color.White)
+                    Text("📥 Sincronizar Este Token con el Reloj", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }

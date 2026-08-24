@@ -189,9 +189,9 @@ fun PostDetailScreen(
                                 onClick = { viewModel.toggleSave() },
                                 label = {
                                     Text(
-                                        text = if (state.isSaved) "★ Guardado" else "☆ Guardar",
+                                        text = if (post.saved) "★ Guardado" else "☆ Guardar",
                                         fontSize = 11.sp,
-                                        color = if (state.isSaved) RedditOrange else TextPrimary
+                                        color = if (post.saved) RedditOrange else TextPrimary
                                     )
                                 },
                                 colors = ChipDefaults.secondaryChipColors()
@@ -219,12 +219,7 @@ fun PostDetailScreen(
                     item {
                         CompactChip(
                             onClick = {
-                                val fullUrl = if (post.permalink.isNotEmpty()) {
-                                    "https://reddit.com${post.permalink}"
-                                } else {
-                                    post.url
-                                }
-                                RemotePhoneHelper.openUrlOnPhone(context, fullUrl)
+                                RemotePhoneHelper.openPostOnPhone(context, post)
                             },
                             label = {
                                 Text(
