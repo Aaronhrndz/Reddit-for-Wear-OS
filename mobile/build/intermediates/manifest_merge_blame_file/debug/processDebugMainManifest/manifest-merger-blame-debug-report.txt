@@ -34,12 +34,12 @@
 22-->[androidx.core:core:1.13.0] C:\Users\aaron\.gradle\caches\transforms-4\4e3bdd4d2f51cf77c1bbaef543da9f6c\transformed\core-1.13.0\AndroidManifest.xml:28:18-86
 23        android:debuggable="true"
 24        android:extractNativeLibs="false"
-25        android:icon="@drawable/ic_reddit_logo"
-25-->C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:9:9-48
+25        android:icon="@mipmap/ic_launcher"
+25-->C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:9:9-43
 26        android:label="@string/app_name"
 26-->C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:10:9-41
-27        android:roundIcon="@drawable/ic_reddit_logo"
-27-->C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:11:9-53
+27        android:roundIcon="@mipmap/ic_launcher_round"
+27-->C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:11:9-54
 28        android:supportsRtl="true"
 28-->C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:12:9-35
 29        android:theme="@android:style/Theme.Material.Light.NoActionBar"

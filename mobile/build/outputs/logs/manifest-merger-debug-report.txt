@@ -104,9 +104,9 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\aa
 	android:label
 		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:10:9-41
 	android:roundIcon
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:11:9-53
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:11:9-54
 	android:icon
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:9:9-48
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:9:9-43
 	android:allowBackup
 		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:8:9-35
 	android:theme

@@ -260,6 +260,8 @@ drawable ic_call_answer_video
 drawable ic_call_answer_video_low
 drawable ic_call_decline
 drawable ic_call_decline_low
+drawable ic_launcher_background
+drawable ic_launcher_foreground
 drawable ic_reddit_logo
 drawable notification_action_background
 drawable notification_bg
@@ -472,6 +474,8 @@ layout ws_single_page_nav_drawer_7_item
 layout ws_single_page_nav_drawer_peek_view
 layout ws_single_page_nav_drawer_text
 layout ws_wearable_drawer_view
+mipmap ic_launcher
+mipmap ic_launcher_round
 plurals horologist_time_picker_hours_content_description
 plurals horologist_time_picker_minutes_content_description
 plurals horologist_time_picker_seconds_content_description

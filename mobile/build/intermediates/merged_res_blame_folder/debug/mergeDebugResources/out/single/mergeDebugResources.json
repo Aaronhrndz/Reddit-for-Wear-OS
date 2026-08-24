@@ -1,10 +1,22 @@
 [
     {
+        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
         "merged": "C:\\Users\\aaron\\.gradle\\daemon\\8.7\\com.reddit.wearos.companion.mobile-debug-45:\\drawable_ic_reddit_logo.xml.flat",
         "source": "C:\\Users\\aaron\\.gradle\\daemon\\8.7\\com.reddit.wearos.companion.mobile-main-47:\\drawable\\ic_reddit_logo.xml"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/drawable_ic_reddit_logo.xml.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/drawable/ic_reddit_logo.xml"
+        "merged": "com.reddit.wearos.companion.mobile-debug-45:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-47:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.reddit.wearos.companion.mobile-debug-45:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-47:/drawable/ic_launcher_foreground.xml"
     }
 ]
