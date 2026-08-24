@@ -1,83 +1,87 @@
-# ⌚ Reddit Wear OS (Galaxy Watch Ultra / 7 / 6 / 5 / 4)
+# ⌚ Reddit for Wear OS & Mobile Companion
 
-Cliente nativo y moderno de Reddit para smartwatches con **Wear OS 4 / 5**, diseñado específicamente para pantallas redondas (AMOLED) y control mediante **bisel rotatorio** (físico y táctil) con Jetpack Compose y Horologist.
+Cliente moderno, fluido y nativo de Reddit para smartwatches con **Wear OS 4 / 5** (optimizado para **Galaxy Watch Ultra 2 / 7 / 6 / 5 / 4**) y app complementaria para smartphones Android.
 
----
-
-## ✨ Características
-
-* **Navegación Circular & Scroll por Bisel**:
-  * Control total con la corona / bisel táctil rotatorio del Galaxy Watch (`rotaryWithScroll`) y respuesta háptica.
-  * Curvatura y adaptación de márgenes para pantallas redondas.
-* **Autenticación Oficial & BYOK (Bring Your Own Key)**:
-  * 100% gratuito sin límites comerciales utilizando tu propio Client ID personal.
-  * Login delegable a teléfono móvil emparejado mediante `RemoteAuthClient`.
-  * Modo Invitado (solo lectura) disponible sin cuenta.
-* **Experiencia de Lectura Completa**:
-  * **Feeds**: Home, Popular, Todos y Subreddits personalizados.
-  * **Visualizador de Posts**: Renderizado de texto formateado, previsualización de imágenes y recuento de votos.
-  * **Árbol de Comentarios**: Comentarios anidados con código de color de profundidad optimizados para muñeca.
-  * **Acciones Rápidas**: Upvote / Downvote con guardado de estado en vivo.
-* **Wear OS Tile**:
-  * Tile glanceable en el carrusel del reloj con acceso rápido a tus comunidades favoritas.
+Diseñado desde cero con **Jetpack Compose for Wear OS**, soporte para **bisel rotatorio/corona**, reproductor de vídeo nativo, modo de lectura continuo en **Always On Display monocromo** y sincronización en 1 toque.
 
 ---
 
-## 🔑 Configuración de tu API Key de Reddit (2 minutos, Gratis)
+## ✨ Características Principales
 
-1. Entra en tu navegador en [reddit.com/prefs/apps](https://www.reddit.com/prefs/apps).
-2. Haz clic en **"create another app..."** (o *are you a developer? create an app...*).
-3. Rellena los campos:
-   * **name**: `RedditWear` (o el nombre que quieras).
-   * **type**: Selecciona **installed app**.
-   * **description**: App para Wear OS.
-   * **about url**: Puedes dejarlo vacío o tu perfil.
-   * **redirect uri**: Introduce exactamente: `redditwear://auth`
-4. Haz clic en **create app**.
-5. Copia el string de caracteres que aparece debajo del nombre de tu app (debajo de *installed app*). Ese es tu **`Client ID`**.
+### ⌚ En el Reloj (Wear OS)
+* **📱 Lectura Continua en Always On Display (AOD)**:
+  * Al bajar la muñeca, **se mantiene en pantalla exactamente el post, noticia o feed que estabas leyendo** (sin pantallazos intermediarios ni blur de Samsung).
+  * **Modo Monocromo GPU Puro**: Toda la interfaz pasa instantáneamente a escala de grises de alto contraste sobre fondo negro puro (`#000000`) para ahorrar batería en paneles LTPO/Super AMOLED a 1 Hz.
+* **▶️ Reproductor de Vídeos Integrado (`WearVideoPlayer`)**:
+  * Reproducción fluida de vídeos de Reddit (`v.redd.it`, MP4, GIFV) directamente en la muñeca.
+  * Soporte para tap-to-pause, bucle infinito y botón de activación/silenciado de audio (Mute/Unmute).
+* **🔄 Botón de Refresco Rápido**:
+  * Acceso directo con icono `🔄` en la cabecera para actualizar el feed sin recargar la app ni perder la posición.
+* **👑 Feed Personal 100% Funcional**:
+  * Carga todas tus suscripciones, subreddits favoritos y ordenación por Popular / All / Home.
+* **🎨 Tarjetas Elevadas de Alto Contraste**:
+  * Diseño AMOLED (`#232326`) con borde sutil (`#38383E`) y pastillas independientes para votación y recuento de comentarios.
+* **🔖 Marcapáginas Vectorial**:
+  * Icono de marcapáginas real (`RedditBookmarkIcon`) para guardar posts en tu cuenta de Reddit con feedback visual inmediato.
+* **🌀 Control Total por Bisel Rotatorio & Corona**:
+  * Scroll háptico con aceleración suave mediante Horologist Rotary.
+* **💬 Árbol de Comentarios con Profundidad de Color**:
+  * Comentarios anidados formateados para lectura ultra-rápida en pantallas circulares.
+
+### 📱 En el Teléfono (Mobile Companion)
+* **🚀 Sincronización Automática con el Reloj**:
+  * Inicio de sesión web seguro en 1 toque que transfiere la sesión automáticamente a tu reloj vía Bluetooth (`Wearable Data Layer API`).
+* **📋 Copiar y Pegar de Tokens**:
+  * Botón directo **`📋 Copiar Todo`** y campo multilínea expandido para inspeccionar o pegar sesiones y Bearer tokens manualmente.
+* **🎨 Nuevo Icono Oficial**:
+  * Icono minimalista con la emblemática **`R` en blanco puro sobre fondo naranja Reddit (`#FF4500`)** de alta definición vectorial.
 
 ---
 
-## 📲 Instalación en Galaxy Watch (Vía Wireless ADB)
+## 📲 Instalación Rápida (Vía Wireless ADB)
 
-### Paso 1: Activar Depuración en el Reloj
-1. En tu Galaxy Watch, ve a **Ajustes** -> **Información del reloj** -> **Software** -> Pulsa 7 veces sobre **Versión de software** hasta activar *Opciones de desarrollador*.
-2. Vuelve a **Ajustes** -> **Opciones de desarrollador**.
-3. Activa **Depuración ADB** y **Depuración inalámbrica (Wireless Debugging)**.
-4. Conecta el reloj a la misma red WiFi que tu PC y anota la **IP** y el **Puerto** que muestra la pantalla.
+### 1. Activar Depuración Inalámbrica en tus dispositivos
+1. En tu **Galaxy Watch** y en tu **teléfono**, entra en **Ajustes** -> **Opciones de desarrollador**.
+2. Activa **Depuración ADB** y **Depuración inalámbrica**.
+3. Anota la IP y el puerto de 5 dígitos de cada dispositivo.
 
-### Paso 2: Instalar la App desde tu PC
-Ejecuta en PowerShell:
+### 2. Instalar en Teléfono y Reloj
 
 ```powershell
-.\install-watch.ps1 -WatchIp <IP_DE_TU_RELOJ> -Port <PUERTO>
-```
+# En el Teléfono Android
+.\adb-cmd.ps1 connect 192.168.1.222:<PUERTO_MOVIL>
+.\adb-cmd.ps1 -s 192.168.1.222:<PUERTO_MOVIL> install -r mobile\build\outputs\apk\debug\mobile-debug.apk
 
-El script se encarga automáticamente de:
-1. Conectar ADB inalámbrico con el Galaxy Watch.
-2. Compilar e instalar la APK directamente.
-3. Lanzar la aplicación en tu pantalla.
+# En el Galaxy Watch Ultra
+.\adb-cmd.ps1 connect 192.168.1.176:<PUERTO_RELOJ>
+.\adb-cmd.ps1 -s 192.168.1.176:<PUERTO_RELOJ> install -r wear\build\outputs\apk\debug\wear-debug.apk
+```
 
 ---
 
-## 🛠️ Compilación Local (Sin Android Studio)
+## 🛠️ Compilación Local
 
-No necesitas instalar Android Studio. El proyecto incluye scripts CLI automatizados:
+El proyecto incluye un entorno de compilación totalmente portátil y automatizado en PowerShell:
 
 ```powershell
-# Prepara herramientas portables y compila APK
-.\build-apk.ps1
+# Compila los módulos Mobile y Wear OS generando los APKs
+.\build.ps1
 ```
-
-O si prefieres compilar en la nube, el repositorio incluye **GitHub Actions** (`.github/workflows/build.yml`) que compila la APK en cada commit y la deja lista para descargar.
 
 ---
 
 ## 🏗️ Arquitectura Técnica
 
 * **Lenguaje**: Kotlin 2.0
-* **UI Toolkit**: Jetpack Compose for Wear OS + Wear Material 3 + Horologist 0.6.x
-* **Networking**: Ktor HTTP Client + Kotlinx Serialization
-* **Auth**: OAuth2 PKCE + AndroidX Wear Remote Interactions
-* **Caché y Almacenamiento**: EncryptedSharedPreferences (AES256)
-* **Carga de Imágenes**: Coil Compose
+* **UI Toolkit**: Jetpack Compose for Wear OS + Wear Material 3 + Horologist 0.6.x + Compose Material 3 (Mobile)
+* **Networking**: Ktor HTTP Client (CIO engine) + OkHttp + Kotlinx Serialization
+* **Video & Media**: Android Native `VideoView` / `MediaPlayer` SurfaceView + Coil Compose
+* **Display Engine**: BlendMode GPU Grayscale Shader + AmbientModeSupport
+* **Almacenamiento Seguro**: EncryptedSharedPreferences (AES-256-GCM)
+* **Inter-device Sync**: Google Play Services Wearable API (`MessageClient` + `DataClient`)
+
+---
+
+## 📄 Licencia
+
+Desarrollado bajo licencia libre para uso personal y comunitario.
