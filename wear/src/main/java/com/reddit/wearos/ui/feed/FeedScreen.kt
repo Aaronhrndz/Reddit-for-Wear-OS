@@ -92,12 +92,12 @@ fun FeedScreen(
                     contentPadding = PaddingValues(top = 28.dp, bottom = 40.dp, start = 6.dp, end = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Header con selector de feed y botón de ajustes ⚙
+                    // Header con selector de feed, botón de refrescar 🔄 y ajustes ⚙
                     item {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                                .padding(horizontal = 4.dp, vertical = 2.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -105,7 +105,7 @@ fun FeedScreen(
                                 onClick = onOpenSubreddits,
                                 label = {
                                     val title = when (state.subreddit.lowercase()) {
-                                        "home", "principal" -> "🏠 Feed Personal"
+                                        "home", "principal" -> "🏠 Personal"
                                         "popular" -> "🔥 r/popular"
                                         "all" -> "🌐 r/all"
                                         else -> "r/${state.subreddit}"
@@ -121,7 +121,15 @@ fun FeedScreen(
                                 colors = ChipDefaults.primaryChipColors(),
                                 modifier = Modifier.weight(1f, fill = false)
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(3.dp))
+                            // Botón directo para refrescar el feed
+                            CompactChip(
+                                onClick = { viewModel.loadFeed(refresh = true) },
+                                label = { Text("🔄", fontSize = 11.sp) },
+                                colors = ChipDefaults.secondaryChipColors()
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            // Botón ajustes
                             CompactChip(
                                 onClick = onOpenSettings,
                                 label = { Text("⚙", fontSize = 11.sp) },
@@ -148,6 +156,16 @@ fun FeedScreen(
                                 val newDir = if (post.likes == false) 0 else -1
                                 viewModel.vote(post, newDir)
                             }
+                        )
+                    }
+
+                    // Botón inferior para cargar más o refrescar
+                    item {
+                        CompactChip(
+                            onClick = { viewModel.loadFeed(refresh = true) },
+                            label = { Text("🔄 Refrescar Feed", fontSize = 11.sp) },
+                            colors = ChipDefaults.secondaryChipColors(),
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
 

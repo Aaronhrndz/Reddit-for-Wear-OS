@@ -3,18 +3,37 @@ package com.reddit.wearos
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
-import com.reddit.wearos.ui.aod.MinimalistAodScreen
+import androidx.wear.compose.material.Colors
 import com.reddit.wearos.ui.navigation.AppNavigation
 import com.reddit.wearos.ui.theme.RedditWearTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+val LocalIsAmbient = compositionLocalOf { false }
+
+private val AmbientMonochromePalette = Colors(
+    primary = Color.White,
+    primaryVariant = Color(0xFFAAAAAA),
+    secondary = Color(0xFFCCCCCC),
+    background = Color.Black,
+    surface = Color(0xFF1E1E1E),
+    onPrimary = Color.Black,
+    onSecondary = Color.Black,
+    onBackground = Color(0xFFE0E0E0),
+    onSurface = Color(0xFFE0E0E0),
+    onSurfaceVariant = Color(0xFFAAAAAA),
+    onError = Color.White
+)
 
 class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
@@ -22,13 +41,11 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
     private lateinit var ambientController: AmbientModeSupport.AmbientController
 
     private var isAmbient by mutableStateOf(false)
-    private var isBurnInProtection by mutableStateOf(false)
 
     private val ambientCallback = object : AmbientModeSupport.AmbientCallback() {
         override fun onEnterAmbient(ambientDetails: Bundle?) {
             super.onEnterAmbient(ambientDetails)
             isAmbient = true
-            isBurnInProtection = ambientDetails?.getBoolean(AmbientModeSupport.EXTRA_BURN_IN_PROTECTION, false) ?: false
         }
 
         override fun onExitAmbient() {
@@ -38,7 +55,6 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
 
         override fun onUpdateAmbient() {
             super.onUpdateAmbient()
-            // Se ejecuta cada minuto en AOD
         }
     }
 
@@ -55,20 +71,22 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         handleAuthIntent(intent)
 
         setContent {
-            RedditWearTheme {
-                if (isAmbient) {
-                    val currentSub by app.repository.currentSubreddit.collectAsState()
-                    MinimalistAodScreen(
-                        currentSubreddit = currentSub,
-                        username = app.tokenStorage.getUsername(),
-                        isBurnInProtection = isBurnInProtection
-                    )
-                } else {
-                    AppNavigation(
-                        authManager = app.authManager,
-                        tokenStorage = app.tokenStorage,
-                        repository = app.repository
-                    )
+            RedditWearTheme(
+                colors = if (isAmbient) AmbientMonochromePalette else null
+            ) {
+                CompositionLocalProvider(LocalIsAmbient provides isAmbient) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
+                            .alpha(if (isAmbient) 0.85f else 1f)
+                    ) {
+                        AppNavigation(
+                            authManager = app.authManager,
+                            tokenStorage = app.tokenStorage,
+                            repository = app.repository
+                        )
+                    }
                 }
             }
         }
