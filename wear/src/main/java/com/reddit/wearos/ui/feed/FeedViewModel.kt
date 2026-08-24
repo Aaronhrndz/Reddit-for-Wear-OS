@@ -15,6 +15,7 @@ sealed class FeedUiState {
         val posts: List<RedditPost>,
         val subreddit: String,
         val isLoadingMore: Boolean = false,
+        val isRefreshing: Boolean = false,
         val hasMore: Boolean = true
     ) : FeedUiState()
     data class Error(val message: String) : FeedUiState()
@@ -39,12 +40,20 @@ class FeedViewModel(
         isFetching = true
 
         viewModelScope.launch {
+            val currentState = _uiState.value
+            val targetSubreddit = subreddit ?: repository.currentSubreddit.value
+
             if (refresh) {
-                _uiState.value = FeedUiState.Loading
                 afterCursor = null
+                if (currentState is FeedUiState.Success) {
+                    _uiState.value = currentState.copy(isRefreshing = true)
+                } else {
+                    _uiState.value = FeedUiState.Loading
+                }
+            } else if (currentState is FeedUiState.Success) {
+                _uiState.value = currentState.copy(isLoadingMore = true)
             }
 
-            val targetSubreddit = subreddit ?: repository.currentSubreddit.value
             try {
                 val (newPosts, nextAfter) = repository.getFeed(
                     subreddit = targetSubreddit,
@@ -52,22 +61,25 @@ class FeedViewModel(
                 )
                 afterCursor = nextAfter
 
-                val currentState = _uiState.value
-                val combinedPosts = if (refresh || currentState !is FeedUiState.Success) {
+                val updatedPosts = if (refresh || currentState !is FeedUiState.Success) {
                     newPosts
                 } else {
                     currentState.posts + newPosts
                 }
 
                 _uiState.value = FeedUiState.Success(
-                    posts = combinedPosts,
+                    posts = updatedPosts,
                     subreddit = targetSubreddit,
                     isLoadingMore = false,
+                    isRefreshing = false,
                     hasMore = nextAfter != null
                 )
             } catch (e: Exception) {
                 if (_uiState.value !is FeedUiState.Success) {
                     _uiState.value = FeedUiState.Error(e.localizedMessage ?: "Error al cargar feed")
+                } else if (_uiState.value is FeedUiState.Success) {
+                    val s = _uiState.value as FeedUiState.Success
+                    _uiState.value = s.copy(isLoadingMore = false, isRefreshing = false)
                 }
             } finally {
                 isFetching = false

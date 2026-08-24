@@ -9,10 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.fragment.app.FragmentActivity
 import androidx.wear.ambient.AmbientModeSupport
-import androidx.wear.compose.material.Colors
 import com.reddit.wearos.ui.navigation.AppNavigation
 import com.reddit.wearos.ui.theme.RedditWearTheme
 import kotlinx.coroutines.CoroutineScope
@@ -20,20 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 val LocalIsAmbient = compositionLocalOf { false }
-
-private val AmbientMonochromePalette = Colors(
-    primary = Color.White,
-    primaryVariant = Color(0xFFAAAAAA),
-    secondary = Color(0xFFCCCCCC),
-    background = Color.Black,
-    surface = Color(0xFF1E1E1E),
-    onPrimary = Color.Black,
-    onSecondary = Color.Black,
-    onBackground = Color(0xFFE0E0E0),
-    onSurface = Color(0xFFE0E0E0),
-    onSurfaceVariant = Color(0xFFAAAAAA),
-    onError = Color.White
-)
 
 class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider {
 
@@ -71,15 +58,23 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         handleAuthIntent(intent)
 
         setContent {
-            RedditWearTheme(
-                colors = if (isAmbient) AmbientMonochromePalette else null
-            ) {
+            RedditWearTheme {
                 CompositionLocalProvider(LocalIsAmbient provides isAmbient) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Black)
-                            .alpha(if (isAmbient) 0.85f else 1f)
+                            .drawWithContent {
+                                drawContent()
+                                // Al entrar en Always On Display, transforma 100% de la UI a Blanco y Negro puro
+                                if (isAmbient) {
+                                    drawRect(
+                                        color = Color.Black,
+                                        blendMode = BlendMode.Color
+                                    )
+                                }
+                            }
+                            .alpha(if (isAmbient) 0.82f else 1f)
                     ) {
                         AppNavigation(
                             authManager = app.authManager,
