@@ -7,8 +7,6 @@ color reddit_orange
 color reddit_upvote
 color surface_dark
 color surface_variant
-drawable ic_launcher_background
-drawable ic_launcher_foreground
 drawable ic_reddit_logo
 drawable tile_preview
 mipmap ic_launcher
