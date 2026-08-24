@@ -22,6 +22,7 @@ import androidx.wear.compose.material.*
 import coil.compose.AsyncImage
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
+import com.reddit.wearos.ui.components.RedditBookmarkIcon
 import com.reddit.wearos.ui.components.RedditDownvoteIcon
 import com.reddit.wearos.ui.components.RedditUpvoteIcon
 import com.reddit.wearos.ui.components.WearVideoPlayer
@@ -126,7 +127,7 @@ fun PostDetailScreen(
                         }
                     }
 
-                    // Barra de Votación Reddit (▲ Score ▼ + Guardar)
+                    // Barra de Votación Reddit (▲ Score ▼ + Guardar Marcapáginas)
                     item {
                         Row(
                             modifier = Modifier
@@ -184,15 +185,22 @@ fun PostDetailScreen(
                                 }
                             }
 
-                            // Botón Guardar / Bookmark
+                            // Botón Guardar / Bookmark Real
                             CompactChip(
                                 onClick = { viewModel.toggleSave() },
                                 label = {
-                                    Text(
-                                        text = if (post.saved) "★ Guardado" else "☆ Guardar",
-                                        fontSize = 11.sp,
-                                        color = if (post.saved) RedditOrange else TextPrimary
-                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        RedditBookmarkIcon(
+                                            isSaved = post.saved,
+                                            size = 13.dp
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = if (post.saved) "Guardado" else "Guardar",
+                                            fontSize = 11.sp,
+                                            color = if (post.saved) RedditOrange else TextPrimary
+                                        )
+                                    }
                                 },
                                 colors = ChipDefaults.secondaryChipColors()
                             )

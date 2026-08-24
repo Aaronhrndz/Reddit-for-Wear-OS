@@ -82,3 +82,36 @@ fun RedditDownvoteIcon(
         }
     }
 }
+
+@Composable
+fun RedditBookmarkIcon(
+    isSaved: Boolean,
+    activeColor: Color = Color(0xFFFF4500),
+    inactiveColor: Color = Color(0xFFCCCCCC),
+    size: Dp = 14.dp,
+    modifier: Modifier = Modifier
+) {
+    Canvas(modifier = modifier.size(size)) {
+        val w = this.size.width
+        val h = this.size.height
+
+        val path = Path().apply {
+            moveTo(w * 0.18f, h * 0.08f)
+            lineTo(w * 0.82f, h * 0.08f)
+            lineTo(w * 0.82f, h * 0.92f)
+            lineTo(w * 0.50f, h * 0.65f)
+            lineTo(w * 0.18f, h * 0.92f)
+            close()
+        }
+
+        if (isSaved) {
+            drawPath(path = path, color = activeColor, style = Fill)
+        } else {
+            drawPath(
+                path = path,
+                color = inactiveColor,
+                style = Stroke(width = 1.6.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
+            )
+        }
+    }
+}
