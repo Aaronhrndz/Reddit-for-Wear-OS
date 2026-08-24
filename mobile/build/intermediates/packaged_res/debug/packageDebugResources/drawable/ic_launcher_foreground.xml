@@ -3,19 +3,8 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Letra 'r' oficial estilo tipografía Reddit Sans Bold en blanco puro -->
-    <!-- Tallo de la 'r' -->
+    <!-- Icono oficial: Letra 'R' Mayúscula Reddit en blanco puro -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M24,36 L36,36 L36,74 L24,74 Z" />
-    
-    <!-- Hombro/Arco de la 'r' con curva moderna suave -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M36,46 C39,39 46,34 54,34 C58,34 62,35.5 65,38 L58,48 C56,46.5 53.5,45.5 50.5,45.5 C44.5,45.5 39.5,49.5 37,55 L37,74 L25,74 L25,36 L36,36 L36,46 Z" />
-    
-    <!-- Barra diagonal 'slash' (/) oficial de r/ -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M66,74 L78,74 L90,34 L78,34 Z" />
+        android:pathData="M30,24 L56,24 C68,24 76,31.5 76,42.5 C76,51.8 69.5,58 60,59.5 L77.5,84 L63,84 L48.5,61.5 L42.5,61.5 L42.5,84 L30,84 L30,24 Z M42.5,35 L42.5,51 L55,51 C61.5,51 64.5,47.8 64.5,43 C64.5,38.2 61.5,35 55,35 L42.5,35 Z" />
 </vector>
