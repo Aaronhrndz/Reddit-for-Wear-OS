@@ -228,6 +228,39 @@ class RedditApiService(
         }
     }
 
+    suspend fun getSavedPosts(
+        username: String,
+        after: String? = null,
+        limit: Int = 25
+    ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) {
+            "https://oauth.reddit.com/user/$username/saved"
+        } else {
+            "https://old.reddit.com/user/$username/saved.json"
+        }
+        try {
+            val response = httpClient.get(url) {
+                if (url.contains("oauth.reddit.com") && isBearer) {
+                    authHeader?.let { (k, v) -> header(k, v) }
+                }
+                header("User-Agent", USER_AGENT)
+                parameter("limit", limit)
+                after?.let { parameter("after", it) }
+                parameter("raw_json", 1)
+            }
+            val status = response.status.value
+            val responseText = response.bodyAsText()
+            if (status == 200 && !responseText.trim().startsWith("<") && responseText.isNotBlank()) {
+                return@withContext NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(responseText)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error cargando guardados: ${e.message}")
+        }
+        RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
+    }
+
     suspend fun getUserSubreddits(): List<RedditSubreddit> = withContext(Dispatchers.IO) {
         val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()

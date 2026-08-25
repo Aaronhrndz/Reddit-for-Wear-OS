@@ -68,6 +68,15 @@ class RedditRepository(
         return apiService.addComment(thingId, text)
     }
 
+    suspend fun getSavedPosts(
+        username: String,
+        after: String? = null
+    ): Pair<List<RedditPost>, String?> {
+        val listing = apiService.getSavedPosts(username = username, after = after)
+        val posts = listing.data.children.map { it.data }
+        return Pair(posts, listing.data.after)
+    }
+
     suspend fun getInbox(): List<com.reddit.wearos.data.model.RedditMessage> {
         return apiService.getInbox()
     }

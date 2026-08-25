@@ -34,6 +34,7 @@ fun SettingsScreen(
     tokenStorage: TokenStorage,
     repository: RedditRepository,
     onOpenInbox: () -> Unit,
+    onOpenSaved: () -> Unit,
     onLogout: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -137,6 +138,24 @@ fun SettingsScreen(
                         },
                         label = { Text("Mensajes", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
                         secondaryLabel = { Text("Bandeja de entrada", fontSize = 9.sp) },
+                        colors = ChipDefaults.secondaryChipColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                item {
+                    Chip(
+                        onClick = onOpenSaved,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Bookmark,
+                                contentDescription = null,
+                                tint = RedditOrange,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        label = { Text("Guardados", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                        secondaryLabel = { Text("Posts y comentarios", fontSize = 9.sp) },
                         colors = ChipDefaults.secondaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )

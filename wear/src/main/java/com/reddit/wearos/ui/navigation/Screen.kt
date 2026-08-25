@@ -6,6 +6,7 @@ sealed class Screen(val route: String) {
     object Subreddits : Screen("subreddits")
     object Settings : Screen("settings")
     object Inbox : Screen("inbox")
+    object Saved : Screen("saved")
     object PostDetail : Screen("post_detail/{postId}/{subreddit}") {
         fun createRoute(postId: String, subreddit: String) = "post_detail/$postId/$subreddit"
     }

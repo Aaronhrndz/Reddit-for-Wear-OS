@@ -82,10 +82,27 @@ fun AppNavigation(
                 onOpenInbox = {
                     navController.navigate(Screen.Inbox.route)
                 },
+                onOpenSaved = {
+                    navController.navigate(Screen.Saved.route)
+                },
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Feed.route) { inclusive = true }
                     }
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Saved.route) {
+            val username = tokenStorage.getUsername() ?: "Aaronhrnndz"
+            val savedViewModel = remember { com.reddit.wearos.ui.saved.SavedViewModel(repository, username) }
+            com.reddit.wearos.ui.saved.SavedScreen(
+                viewModel = savedViewModel,
+                onPostClick = { post ->
+                    navController.navigate(Screen.PostDetail.createRoute(post.id, post.subreddit))
                 },
                 onBack = {
                     navController.popBackStack()
