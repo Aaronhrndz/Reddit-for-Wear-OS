@@ -27,7 +27,6 @@ fun flattenCommentTree(
     val result = mutableListOf<FlatComment>()
     for (i in comments.indices) {
         val c = comments[i]
-        val isFirst = (i == 0)
         val isLast = (i == comments.size - 1)
         val replies = if (c.replies != null) {
             com.reddit.wearos.data.model.parseCommentsFromListingElement(c.replies)
@@ -37,17 +36,23 @@ fun flattenCommentTree(
         val hasReplies = replies.isNotEmpty()
 
         val segments = mutableListOf<TreeLineSegment>()
-        // 1. Columnas de ancestros que pasan recto
+        // 1. Columnas de ancestros que pasan recto (0 hasta depth-2)
         for (colIdx in 0 until (depth - 1)) {
             val isActive = colIdx < activeAncestors.size && activeAncestors[colIdx]
             segments.add(TreeLineSegment(hasTop = isActive, hasBottom = isActive, hasHoriz = false))
         }
 
-        // 2. Columna propia si depth > 0 (columna = depth - 1)
+        // 2. Columna propia (depth - 1): la rama que conecta con el padre/hermanos
         if (depth > 0) {
-            val top = !isFirst
-            val bottom = !isLast
-            segments.add(TreeLineSegment(hasTop = top, hasBottom = bottom, hasHoriz = true))
+            // top siempre true: viene del padre (primer hijo) o del hermano anterior
+            // bottom true si hay más hermanos después
+            segments.add(TreeLineSegment(hasTop = true, hasBottom = !isLast, hasHoriz = true))
+        }
+
+        // 3. Si este nodo tiene hijos, emite un segmento "feeder" en la columna depth
+        //    que alimentará al primer hijo (solo bottom, sin top ni horiz)
+        if (hasReplies) {
+            segments.add(TreeLineSegment(hasTop = false, hasBottom = true, hasHoriz = false))
         }
 
         result.add(
