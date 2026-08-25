@@ -3,7 +3,6 @@ package com.reddit.wearos.ui.comments
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,18 +13,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import androidx.wear.compose.foundation.lazy.itemsIndexed
+import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
@@ -91,125 +87,35 @@ fun CommentsScreen(
                         Text(text = "Sin comentarios", color = TextSecondary, fontSize = 12.sp)
                     }
                 } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        // 1. LISTA SCROLLABLE DE COMENTARIOS
-                        ScalingLazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .rotaryWithScroll(scrollState),
-                            state = scrollState,
-                            autoCentering = null,
-                            contentPadding = PaddingValues(top = 22.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            itemsIndexed(state.comments) { index, flatComment ->
-                                CommentCard(
-                                    flatComment = flatComment,
-                                    onUpvote = {
-                                        val newDir = if (flatComment.comment.likes == true) 0 else 1
-                                        viewModel.voteComment(flatComment.comment, newDir)
-                                    },
-                                    onDownvote = {
-                                        val newDir = if (flatComment.comment.likes == false) 0 else -1
-                                        viewModel.voteComment(flatComment.comment, newDir)
-                                    },
-                                    onReply = {
-                                        val targetId = if (flatComment.comment.id.startsWith("t1_")) flatComment.comment.id else "t1_${flatComment.comment.id}"
-                                        launchReply(targetId, flatComment.comment.author)
-                                    }
-                                )
-                            }
+                    ScalingLazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .rotaryWithScroll(scrollState),
+                        state = scrollState,
+                        autoCentering = null,
+                        contentPadding = PaddingValues(top = 22.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(state.comments) { flatComment ->
+                            CommentCard(
+                                flatComment = flatComment,
+                                onUpvote = {
+                                    val newDir = if (flatComment.comment.likes == true) 0 else 1
+                                    viewModel.voteComment(flatComment.comment, newDir)
+                                },
+                                onDownvote = {
+                                    val newDir = if (flatComment.comment.likes == false) 0 else -1
+                                    viewModel.voteComment(flatComment.comment, newDir)
+                                },
+                                onReply = {
+                                    val targetId = if (flatComment.comment.id.startsWith("t1_")) flatComment.comment.id else "t1_${flatComment.comment.id}"
+                                    launchReply(targetId, flatComment.comment.author)
+                                }
+                            )
                         }
-
-                        // 2. COMPONENTE HERMANO: CANVAS DE ÁRBOL SINCRONIZADO FUERA DE LA LISTA
-                        CommentsTreeOverlay(
-                            scrollState = scrollState,
-                            comments = state.comments,
-                            modifier = Modifier.fillMaxSize()
-                        )
                     }
                 }
             }
-        }
-    }
-}
-
-/**
- * Componente hermano fuera de la lista: Dibuja las líneas de árbol (Drilldown └──)
- * sincronizadas en tiempo real con las posiciones de los ítems visibles, sin sufrir distorsión por la curvatura/escalado.
- */
-@Composable
-fun CommentsTreeOverlay(
-    scrollState: ScalingLazyListState,
-    comments: List<FlatComment>,
-    commentStartIndex: Int = 0,
-    modifier: Modifier = Modifier
-) {
-    val treeLineColor = Color(0xFF707080)
-    val gutterUnitPx = with(androidx.compose.ui.platform.LocalDensity.current) { 14.dp.toPx() }
-    val baseMarginPx = with(androidx.compose.ui.platform.LocalDensity.current) { 8.dp.toPx() }
-    val strokeWidthPx = with(androidx.compose.ui.platform.LocalDensity.current) { 1.8.dp.toPx() }
-
-    Canvas(modifier = modifier) {
-        val visibleItems = scrollState.layoutInfo.visibleItemsInfo
-        if (visibleItems.isEmpty()) return@Canvas
-
-        // Mapa de índices visibles a coordenadas Y en pantalla
-        val itemPositions = mutableMapOf<Int, Pair<Float, Float>>()
-        for (item in visibleItems) {
-            val topY = item.offset.toFloat()
-            val height = item.size.toFloat()
-            itemPositions[item.index] = Pair(topY, height)
-        }
-
-        for (item in visibleItems) {
-            val commentIdx = item.index - commentStartIndex
-            if (commentIdx < 0 || commentIdx >= comments.size) continue
-
-            val current = comments[commentIdx]
-            val depth = current.depth.coerceAtMost(3)
-            if (depth <= 0) continue
-
-            val (topY, height) = itemPositions[item.index] ?: continue
-            val headerY = topY + 14.dp.toPx()
-            val targetX = baseMarginPx + (depth * gutterUnitPx)
-
-            // Buscar el ancestro padre anterior en la jerarquía
-            var parentIdx = commentIdx - 1
-            while (parentIdx >= 0 && comments[parentIdx].depth >= depth) {
-                parentIdx--
-            }
-
-            val parentItemIndex = parentIdx + commentStartIndex
-            val parentPos = itemPositions[parentItemIndex]
-            val startY = if (parentPos != null) {
-                parentPos.first + 14.dp.toPx()
-            } else {
-                (topY - 20.dp.toPx()).coerceAtLeast(0f)
-            }
-
-            val branchX = baseMarginPx + ((depth - 1) * gutterUnitPx) + (gutterUnitPx / 2f)
-
-            // Trazar línea vertical continua y conector en L (└──)
-            val path = Path().apply {
-                moveTo(branchX, startY)
-                lineTo(branchX, headerY - 3.dp.toPx())
-                quadraticTo(
-                    branchX, headerY,
-                    branchX + 3.dp.toPx(), headerY
-                )
-                lineTo(targetX, headerY)
-            }
-
-            drawPath(
-                path = path,
-                color = treeLineColor,
-                style = Stroke(
-                    width = strokeWidthPx,
-                    cap = StrokeCap.Round,
-                    join = StrokeJoin.Round
-                )
-            )
         }
     }
 }
@@ -224,8 +130,13 @@ fun CommentCard(
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
 
-    // Sangría proporcional al nivel de profundidad para que la tarjeta se alinee con las líneas hermanas
-    val startIndent = (depth * 14).dp
+    // Sangría limpia y escalonada por nivel de jerarquía
+    val startIndent = when (depth) {
+        0 -> 0.dp
+        1 -> 12.dp
+        2 -> 22.dp
+        else -> 30.dp
+    }
 
     Box(
         modifier = Modifier
@@ -233,7 +144,20 @@ fun CommentCard(
             .padding(start = startIndent, end = 2.dp, top = 2.dp, bottom = 2.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(DarkSurface)
-            .padding(horizontal = 7.dp, vertical = 5.dp)
+            .then(
+                if (depth > 0) {
+                    Modifier.drawBehind {
+                        drawLine(
+                            color = Color(0xFF4A4A58),
+                            start = Offset(0f, 6.dp.toPx()),
+                            end = Offset(0f, size.height - 6.dp.toPx()),
+                            strokeWidth = 2.5.dp.toPx(),
+                            cap = StrokeCap.Round
+                        )
+                    }
+                } else Modifier
+            )
+            .padding(horizontal = 8.dp, vertical = 6.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Cabecera con autor en naranja
