@@ -63,10 +63,9 @@ fun PostDetailScreen(
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val replyText = WearInputHelper.extractText(result.data)
-            val currentPost = (uiState as? PostDetailUiState.Success)?.post
             val targetId = replyingToThingId
-            if (!replyText.isNullOrEmpty() && currentPost != null && !targetId.isNullOrEmpty()) {
-                viewModel.submitComment(currentPost.id, currentPost.subreddit, targetId, replyText)
+            if (!replyText.isNullOrEmpty() && !targetId.isNullOrEmpty()) {
+                viewModel.submitComment(targetId, replyText)
             }
         }
         replyingToThingId = null
@@ -334,7 +333,7 @@ fun PostDetailScreen(
                             }
                         }
 
-                        if (state.isLoadingComments) {
+                        if (state.commentsLoading) {
                             item {
                                 Box(
                                     modifier = Modifier
