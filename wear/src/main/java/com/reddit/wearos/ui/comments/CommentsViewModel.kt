@@ -132,7 +132,7 @@ class CommentsViewModel(
             )
 
             if (hasReplies) {
-                val nextPassThrough = if (depth == 0) {
+                val nextPassThrough = if (depth <= 1) {
                     emptyList()
                 } else {
                     passThrough + (!isLast)

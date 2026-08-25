@@ -438,8 +438,9 @@ fun InlineCommentCard(
                 val colStepPx = 14.dp.toPx()
                 val cornerY = 16.dp.toPx()
 
-                // 1. Columnas de ancestros pass-through (d de 0 hasta depth - 2)
-                for (d in 0 until depth - 1) {
+                // 1. Columnas de ancestros pass-through (d de 0 hasta parentCol - 1)
+                val parentCol = if (depth <= 1) 0 else depth - 2
+                for (d in 0 until parentCol) {
                     if (d < passThroughColumns.size && passThroughColumns[d]) {
                         val x = colStepPx * d + (colStepPx / 2f)
                         drawLine(
@@ -452,35 +453,58 @@ fun InlineCommentCard(
                     }
                 }
 
-                // 2. Columna de la rama propia (columna depth - 1)
-                val currentCol = depth - 1
-                val currentX = colStepPx * currentCol + (colStepPx / 2f)
+                // 2. Columna del tronco del padre (parentCol) que alimenta a este comentario
+                val parentX = colStepPx * parentCol + (colStepPx / 2f)
 
                 // Tramo vertical desde el tope (y=0) hasta cornerY
                 drawLine(
                     color = treeLineColor,
-                    start = Offset(currentX, 0f),
-                    end = Offset(currentX, cornerY),
+                    start = Offset(parentX, 0f),
+                    end = Offset(parentX, cornerY),
                     strokeWidth = strokeWidthPx,
                     cap = StrokeCap.Square
                 )
 
-                // Tramo horizontal que entra a la tarjeta del comentario
+                // Tramo horizontal desde el tronco del padre hasta la tarjeta del comentario
                 drawLine(
                     color = treeLineColor,
-                    start = Offset(currentX, cornerY),
+                    start = Offset(parentX, cornerY),
                     end = Offset(size.width, cornerY),
                     strokeWidth = strokeWidthPx,
                     cap = StrokeCap.Square
                 )
 
-                // Si NO es el último hijo o si TIENE respuestas debajo, continúa hacia abajo conectando con sus hijos/hermanos (├── T)
-                // Si es el último hijo Y no tiene respuestas, finaliza limpiamente en L (└──)
-                if (!isLastChild || hasReplies) {
+                // Continuidad del tronco del padre hacia abajo:
+                if (depth == 1) {
+                    if (!isLastChild || hasReplies) {
+                        drawLine(
+                            color = treeLineColor,
+                            start = Offset(parentX, cornerY),
+                            end = Offset(parentX, size.height),
+                            strokeWidth = strokeWidthPx,
+                            cap = StrokeCap.Square
+                        )
+                    }
+                } else {
+                    if (!isLastChild) {
+                        drawLine(
+                            color = treeLineColor,
+                            start = Offset(parentX, cornerY),
+                            end = Offset(parentX, size.height),
+                            strokeWidth = strokeWidthPx,
+                            cap = StrokeCap.Square
+                        )
+                    }
+                }
+
+                // 3. Tronco propio para los hijos que estén anidados debajo de este comentario (depth >= 2)
+                if (depth >= 2 && hasReplies && depth < 3) {
+                    val myCol = depth - 1
+                    val myX = colStepPx * myCol + (colStepPx / 2f)
                     drawLine(
                         color = treeLineColor,
-                        start = Offset(currentX, cornerY),
-                        end = Offset(currentX, size.height),
+                        start = Offset(myX, cornerY),
+                        end = Offset(myX, size.height),
                         strokeWidth = strokeWidthPx,
                         cap = StrokeCap.Square
                     )
