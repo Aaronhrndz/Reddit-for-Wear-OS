@@ -54,12 +54,9 @@ fun FeedScreen(
     val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
 
     Scaffold(
-        timeText = { TimeText() },
-        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            when (val state = uiState) {
+        when (val state = uiState) {
                 is FeedUiState.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -275,11 +272,7 @@ fun FeedScreen(
                 }
             }
         }
-
-        // Máscara superior oscurecida bajo el reloj
-        com.reddit.wearos.ui.components.TopClockScrim()
     }
-}
 }
 
 @Composable

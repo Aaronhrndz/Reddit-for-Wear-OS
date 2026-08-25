@@ -86,12 +86,9 @@ fun PostDetailScreen(
     )
 
     Scaffold(
-        timeText = { TimeText() },
-        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            when (val state = uiState) {
+        when (val state = uiState) {
                 is PostDetailUiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(indicatorColor = RedditOrange)
@@ -408,11 +405,7 @@ fun PostDetailScreen(
                 }
             }
         }
-
-        // Máscara superior oscurecida bajo el reloj
-        com.reddit.wearos.ui.components.TopClockScrim()
     }
-}
 }
 
 @Composable
