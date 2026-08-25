@@ -32,9 +32,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.Parameters
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.longOrNull
 
 class CompanionMainActivity : ComponentActivity() {
 
@@ -90,6 +103,7 @@ class CompanionMainActivity : ComponentActivity() {
                             connectedWatches = connectedWatchesCount,
                             isSyncing = isSyncing,
                             onStartLogin = { isWebLoginOpen = true },
+                            onStartOAuthLogin = { startOAuth2Flow() },
                             onCopyToClipboard = {
                                 if (tokenOrCookieInput.isNotBlank()) {
                                     copyToClipboard(tokenOrCookieInput)
@@ -129,6 +143,128 @@ class CompanionMainActivity : ComponentActivity() {
         }
     }
 
+    private var oauthVerifier: String? = null
+    private var oauthState: String? = null
+
+    private fun generateRandomString(length: Int = 32): String {
+        val random = java.security.SecureRandom()
+        val bytes = ByteArray(length)
+        random.nextBytes(bytes)
+        return android.util.Base64.encodeToString(bytes, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
+    }
+
+    private fun generateCodeChallenge(verifier: String): String {
+        val bytes = verifier.toByteArray(Charsets.US_ASCII)
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        md.update(bytes, 0, bytes.size)
+        val digest = md.digest()
+        return android.util.Base64.encodeToString(digest, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
+    }
+
+    private fun startOAuth2Flow() {
+        val verifier = generateRandomString(32)
+        val state = generateRandomString(16)
+        oauthVerifier = verifier
+        oauthState = state
+        val challenge = generateCodeChallenge(verifier)
+        val clientId = "0R-WAMhuoo-MyQ"
+        val redirectUri = "redditwear://auth"
+        val scopes = "identity read mysubreddits vote save history"
+
+        val authUrl = Uri.parse("https://www.reddit.com/api/v1/authorize.compact").buildUpon()
+            .appendQueryParameter("client_id", clientId)
+            .appendQueryParameter("response_type", "code")
+            .appendQueryParameter("state", state)
+            .appendQueryParameter("redirect_uri", redirectUri)
+            .appendQueryParameter("duration", "permanent")
+            .appendQueryParameter("scope", scopes)
+            .appendQueryParameter("code_challenge", challenge)
+            .appendQueryParameter("code_challenge_method", "S256")
+            .build()
+
+        val intent = Intent(Intent.ACTION_VIEW, authUrl)
+        startActivity(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val data = intent.data ?: return
+        if (data.scheme == "redditwear" && data.host == "auth") {
+            val code = data.getQueryParameter("code")
+            if (!code.isNullOrEmpty()) {
+                exchangeOAuthCode(code)
+            }
+        }
+    }
+
+    private fun exchangeOAuthCode(code: String) {
+        isSyncing = true
+        loginStatus = "Intercambiando código OAuth 2.0 PKCE con Reddit..."
+        val verifier = oauthVerifier ?: ""
+        val clientId = "0R-WAMhuoo-MyQ"
+        val redirectUri = "redditwear://auth"
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val client = io.ktor.client.HttpClient(io.ktor.client.engine.okhttp.OkHttp) {
+                    install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+                        json(kotlinx.serialization.json.Json { ignoreUnknownKeys = true })
+                    }
+                }
+
+                val credentials = android.util.Base64.encodeToString("$clientId:".toByteArray(), android.util.Base64.NO_WRAP)
+                val response: String = client.submitForm(
+                    url = "https://www.reddit.com/api/v1/access_token",
+                    formParameters = io.ktor.http.Parameters.build {
+                        append("grant_type", "authorization_code")
+                        append("code", code)
+                        append("redirect_uri", redirectUri)
+                        append("code_verifier", verifier)
+                    }
+                ) {
+                    header("Authorization", "Basic $credentials")
+                    header("User-Agent", "android:com.reddit.wearos:v1.1.0 (by /u/Aaronhrnndz)")
+                }.bodyAsText()
+
+                val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                val jsonElement = json.parseToJsonElement(response).jsonObject
+                val accessToken = jsonElement["access_token"]?.jsonPrimitive?.content ?: ""
+                val refreshToken = jsonElement["refresh_token"]?.jsonPrimitive?.contentOrNull
+                val expiresIn = jsonElement["expires_in"]?.jsonPrimitive?.longOrNull ?: 3600L
+
+                if (accessToken.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        tokenOrCookieInput = accessToken
+                        copyToClipboard(accessToken)
+                    }
+                    val payload = AuthSyncPayload(
+                        clientId = clientId,
+                        accessToken = accessToken,
+                        refreshToken = refreshToken,
+                        expiresInSeconds = expiresIn,
+                        username = redditUsername
+                    )
+                    val syncSuccess = syncManager.sendAuthToWatch(payload)
+                    withContext(Dispatchers.Main) {
+                        isSyncing = false
+                        loginStatus = if (syncSuccess) "✅ ¡OAuth 2.0 vinculado con éxito en el reloj!" else "✅ Token OAuth generado. Conecta el reloj por BT."
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        isSyncing = false
+                        loginStatus = "❌ Error en OAuth: $response"
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    isSyncing = false
+                    loginStatus = "❌ Error al intercambiar token: ${e.localizedMessage}"
+                }
+            }
+        }
+    }
+
     private fun syncSessionToWatch(sessionData: String, username: String) {
         isSyncing = true
         loginStatus = "Sincronizando sesión de u/$username con Galaxy Watch..."
@@ -147,7 +283,7 @@ class CompanionMainActivity : ComponentActivity() {
                 withContext(Dispatchers.Main) {
                     isSyncing = false
                     if (syncSuccess) {
-                        loginStatus = "✅ ¡u/$username sincronizado con éxito en tu Galaxy Watch Ultra!"
+                        loginStatus = "✅ ¡u/$username sincronizado con éxito en tu Galaxy Watch!"
                         Toast.makeText(this@CompanionMainActivity, "u/$username conectado en el reloj", Toast.LENGTH_LONG).show()
                     } else {
                         loginStatus = "✅ Sesión obtenida. Conecta tu reloj por Bluetooth para sincronizar."
@@ -266,6 +402,7 @@ fun CompanionScreen(
     connectedWatches: Int,
     isSyncing: Boolean,
     onStartLogin: () -> Unit,
+    onStartOAuthLogin: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onSyncManualToken: () -> Unit,
     onRefreshWatches: () -> Unit
@@ -307,7 +444,7 @@ fun CompanionScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("Galaxy Watch Ultra", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Galaxy Watch", fontWeight = FontWeight.Bold, color = Color.White)
                     Text(
                         text = if (connectedWatches > 0) "✅ $connectedWatches reloj conectado" else "⚠️ Buscando reloj vía Bluetooth...",
                         fontSize = 12.sp,
@@ -359,19 +496,37 @@ fun CompanionScreen(
             }
         }
 
-        // BOTÓN PRINCIPAL
+        // BOTÓN 1: WEB LOGIN IN-APP (FUNCIONA DIRECTO)
         Button(
             onClick = onStartLogin,
             enabled = !isSyncing,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
+                .height(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "🚀 Iniciar Sesión con tu Cuenta",
-                fontSize = 15.sp,
+                text = "🚀 Login Web In-App (Rápido)",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+
+        // BOTÓN 2: OAUTH 2.0 OFICIAL (PLAY STORE COMPLIANT)
+        Button(
+            onClick = onStartOAuthLogin,
+            enabled = !isSyncing,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                text = "🔑 Login Oficial Reddit OAuth 2.0",
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
