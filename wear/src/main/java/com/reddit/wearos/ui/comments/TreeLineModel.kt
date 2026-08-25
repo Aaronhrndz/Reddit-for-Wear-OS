@@ -2,6 +2,12 @@ package com.reddit.wearos.ui.comments
 
 import com.reddit.wearos.data.model.RedditComment
 
+/**
+ * Segmento de línea de árbol para una columna específica.
+ * hasTop: línea vertical desde y=0 hasta cornerY
+ * hasBottom: línea vertical desde cornerY hasta height
+ * hasHoriz: línea horizontal desde este punto hacia la derecha (entrada a la tarjeta)
+ */
 data class TreeLineSegment(
     val hasTop: Boolean = false,
     val hasBottom: Boolean = false,
@@ -16,8 +22,18 @@ data class FlatComment(
 )
 
 /**
- * Algoritmo canónico de árbol para listas planas.
- * Garantiza 100% de continuidad vertical entre elementos adyacentes (bottom[i][c] == top[i+1][c]).
+ * Modelo canónico de árbol plano estilo `tree` (terminal/explorador de archivos).
+ *
+ * Para un nodo a depth D, se generan exactamente D segmentos (segments.size == depth):
+ *   - Columnas 0..D-2: ancestros (pass-through vertical si activo)
+ *   - Columna D-1: rama propia (├── o └──)
+ *
+ * La conexión padre-hijo se establece así:
+ *   - Hermanos comparten la misma columna D-1
+ *   - El primer hijo tiene top=true: su línea vertical empieza en el borde superior
+ *     de la fila, conectando visualmente con el padre por proximidad de filas adyacentes
+ *   - El último hijo tiene bottom=false: la línea termina en └──
+ *   - Hijos intermedios tienen top=true y bottom=true: la línea pasa de ├── a ├──
  */
 fun flattenCommentTree(
     comments: List<RedditComment>,
@@ -36,24 +52,23 @@ fun flattenCommentTree(
         val hasReplies = replies.isNotEmpty()
 
         val segments = mutableListOf<TreeLineSegment>()
-        // 1. Columnas de ancestros que pasan recto (0 hasta depth-2)
+
+        // 1. Columnas de ancestros (0 hasta depth-2): pasan recto si el ancestro tiene más hermanos
         for (colIdx in 0 until (depth - 1)) {
             val isActive = colIdx < activeAncestors.size && activeAncestors[colIdx]
             segments.add(TreeLineSegment(hasTop = isActive, hasBottom = isActive, hasHoriz = false))
         }
 
-        // 2. Columna propia (depth - 1): la rama que conecta con el padre/hermanos
+        // 2. Columna propia (depth-1): rama de entrada a esta tarjeta
         if (depth > 0) {
-            // top siempre true: viene del padre (primer hijo) o del hermano anterior
-            // bottom true si hay más hermanos después
-            segments.add(TreeLineSegment(hasTop = true, hasBottom = !isLast, hasHoriz = true))
+            segments.add(TreeLineSegment(
+                hasTop = true,       // siempre: viene del padre (primer hijo) o del hermano anterior
+                hasBottom = !isLast, // continúa hacia el siguiente hermano
+                hasHoriz = true      // horizontal hacia la tarjeta
+            ))
         }
 
-        // 3. Si este nodo tiene hijos, emite un segmento "feeder" en la columna depth
-        //    que alimentará al primer hijo (solo bottom, sin top ni horiz)
-        if (hasReplies) {
-            segments.add(TreeLineSegment(hasTop = false, hasBottom = true, hasHoriz = false))
-        }
+        // segments.size == depth SIEMPRE (sin feeder)
 
         result.add(
             FlatComment(
