@@ -118,7 +118,7 @@ fun PostDetailScreen(
                             minTransitionArea = 0f,
                             maxTransitionArea = 0f
                         ),
-                        contentPadding = PaddingValues(top = 34.dp, bottom = 44.dp, start = 6.dp, end = 6.dp),
+                        contentPadding = PaddingValues(top = 20.dp, bottom = 42.dp, start = 6.dp, end = 6.dp),
                         verticalArrangement = Arrangement.spacedBy(0.dp)
                     ) {
                     // CABECERA + TÍTULO INTEGRADO (Optimizado para pantalla circular)

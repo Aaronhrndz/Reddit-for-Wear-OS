@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TopClockScrim(
     modifier: Modifier = Modifier,
-    height: Dp = 44.dp
+    height: Dp = 22.dp
 ) {
     Box(
         modifier = modifier
@@ -28,8 +28,7 @@ fun TopClockScrim(
                 Brush.verticalGradient(
                     colors = listOf(
                         Color.Black,
-                        Color.Black.copy(alpha = 0.95f),
-                        Color.Black.copy(alpha = 0.6f),
+                        Color.Black.copy(alpha = 0.8f),
                         Color.Transparent
                     )
                 )

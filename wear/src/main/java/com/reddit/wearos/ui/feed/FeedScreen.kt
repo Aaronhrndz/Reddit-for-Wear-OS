@@ -98,7 +98,7 @@ fun FeedScreen(
                             .fillMaxSize()
                             .rotaryWithScroll(scrollState),
                         state = scrollState,
-                        contentPadding = PaddingValues(top = 34.dp, bottom = 44.dp, start = 8.dp, end = 8.dp),
+                        contentPadding = PaddingValues(top = 18.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                     // PANEL SUPERIOR DE CONTROL (Visible al deslizar hacia arriba)
