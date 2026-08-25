@@ -90,7 +90,7 @@ fun FeedScreen(
                         .fillMaxSize()
                         .rotaryWithScroll(scrollState),
                     state = scrollState,
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 40.dp, start = 4.dp, end = 4.dp),
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     // PANEL SUPERIOR DE CONTROL (Visible al deslizar hacia arriba)
@@ -281,7 +281,7 @@ fun PostCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 7.dp),
+        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 7.dp),
         backgroundPainter = CardDefaults.cardBackgroundPainter(
             startBackgroundColor = DarkSurface,
             endBackgroundColor = DarkSurface
