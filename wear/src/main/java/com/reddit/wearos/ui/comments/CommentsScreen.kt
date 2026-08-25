@@ -9,7 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Reply
+import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
+import com.reddit.wearos.ui.components.ClickableRedditText
 import com.reddit.wearos.ui.components.RedditDownvoteIcon
 import com.reddit.wearos.ui.components.RedditUpvoteIcon
 import com.reddit.wearos.ui.feed.formatScore
@@ -236,33 +237,33 @@ fun CommentCard(
 
                 Spacer(modifier = Modifier.height(2.dp))
 
-                // Texto del comentario
-                Text(
+                // Texto del comentario con enlaces interactivos a Samsung Internet
+                ClickableRedditText(
                     text = comment.body,
                     fontSize = 11.sp,
                     color = TextPrimary,
                     lineHeight = 14.sp
                 )
 
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                // Barra inferior: Responder + Votación
+                // Barra inferior: Responder en Pildorita + Votación en Pildorita
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Botón Responder
+                    // Botón Responder en Pildorita
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(14.dp))
                             .background(Color(0xFF1E1E1E))
                             .clickable { onReply() }
-                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                            .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Reply,
+                            imageVector = Icons.AutoMirrored.Filled.Reply,
                             contentDescription = "Responder",
                             tint = RedditOrange,
                             modifier = Modifier.size(11.dp)
@@ -270,19 +271,19 @@ fun CommentCard(
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = "Responder",
-                            fontSize = 8.sp,
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Medium,
-                            color = TextSecondary
+                            color = Color.White
                         )
                     }
 
-                    // Votación
+                    // Votación en Pildorita
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(14.dp))
                             .background(Color(0xFF1E1E1E))
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                            .padding(horizontal = 5.dp, vertical = 3.dp)
                     ) {
                         Box(
                             modifier = Modifier
@@ -310,7 +311,7 @@ fun CommentCard(
                         Box(
                             modifier = Modifier
                                 .clickable { onDownvote() }
-                            .padding(1.dp)
+                                .padding(1.dp)
                         ) {
                             RedditDownvoteIcon(
                                 isVoted = comment.likes == false,

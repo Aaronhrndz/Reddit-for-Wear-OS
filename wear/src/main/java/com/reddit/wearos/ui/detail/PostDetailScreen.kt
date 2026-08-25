@@ -9,9 +9,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.runtime.*
@@ -36,6 +36,7 @@ import coil.compose.AsyncImage
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
 import com.reddit.wearos.ui.comments.FlatComment
+import com.reddit.wearos.ui.components.ClickableRedditText
 import com.reddit.wearos.ui.components.RedditDownvoteIcon
 import com.reddit.wearos.ui.components.RedditUpvoteIcon
 import com.reddit.wearos.ui.components.WearVideoPlayer
@@ -178,10 +179,10 @@ fun PostDetailScreen(
                         }
                     }
 
-                    // Texto del Post (selftext)
+                    // Texto del Post con Links Navegables
                     if (post.selfText.isNotEmpty()) {
                         item {
-                            Text(
+                            ClickableRedditText(
                                 text = post.selfText,
                                 fontSize = 11.sp,
                                 color = TextPrimary,
@@ -280,7 +281,7 @@ fun PostDetailScreen(
                             },
                             icon = {
                                 Icon(
-                                    imageVector = Icons.Default.Reply,
+                                    imageVector = Icons.AutoMirrored.Filled.Reply,
                                     contentDescription = null,
                                     tint = Color.White,
                                     modifier = Modifier.size(16.dp)
@@ -510,33 +511,33 @@ fun InlineCommentCard(
 
                 Spacer(modifier = Modifier.height(2.dp))
 
-                // Texto del comentario
-                Text(
+                // Texto del comentario con links clicables hacia Samsung Internet
+                ClickableRedditText(
                     text = comment.body,
                     fontSize = 11.sp,
                     color = TextPrimary,
                     lineHeight = 14.sp
                 )
 
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                // Barra inferior con botón Responder y Barra de votación
+                // Barra inferior con botón Responder en Pildorita y Barra de votación en Pildorita
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Botón Responder
+                    // Botón Responder en Pildorita
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(14.dp))
                             .background(Color(0xFF1E1E1E))
                             .clickable { onReply() }
-                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                            .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Reply,
+                            imageVector = Icons.AutoMirrored.Filled.Reply,
                             contentDescription = "Responder",
                             tint = RedditOrange,
                             modifier = Modifier.size(11.dp)
@@ -544,19 +545,19 @@ fun InlineCommentCard(
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = "Responder",
-                            fontSize = 8.sp,
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Medium,
-                            color = TextSecondary
+                            color = Color.White
                         )
                     }
 
-                    // Votación
+                    // Votación en Pildorita
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(14.dp))
                             .background(Color(0xFF1E1E1E))
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                            .padding(horizontal = 5.dp, vertical = 3.dp)
                     ) {
                         Box(
                             modifier = Modifier
