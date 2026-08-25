@@ -343,119 +343,110 @@ fun InlineCommentCard(
     onDownvote: () -> Unit
 ) {
     val comment = flatComment.comment
+    val indent = (flatComment.depth.coerceAtMost(3) * 5).dp
 
-    val depthBorderColors = listOf(
-        RedditOrange,
-        RedditBlue,
-        Color(0xFF4CAF50),
-        Color(0xFFFFEB3B),
-        Color(0xFFAB47BC)
-    )
-
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .padding(horizontal = 4.dp, vertical = 2.dp)
+            .padding(start = indent, end = 2.dp, top = 2.dp, bottom = 2.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(DarkSurface)
+            .padding(horizontal = 7.dp, vertical = 5.dp)
     ) {
-        // Líneas verticales indicadoras de herencia (1 por cada nivel de profundidad)
-        if (flatComment.depth > 0) {
-            for (d in 1..flatComment.depth.coerceAtMost(3)) {
-                val barColor = depthBorderColors[(d - 1) % depthBorderColors.size]
-                Box(
-                    modifier = Modifier
-                        .width(2.5.dp)
-                        .fillMaxHeight()
-                        .background(barColor, RoundedCornerShape(1.dp))
-                )
-                Spacer(modifier = Modifier.width(3.5.dp))
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .clip(RoundedCornerShape(8.dp))
-                .background(DarkSurface)
-                .padding(horizontal = 7.dp, vertical = 5.dp)
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // Header u/author SIEMPRE en color naranja
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (flatComment.depth > 0) {
-                        Text(
-                            text = "↳ ",
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextSecondary
-                        )
-                    }
-                    Text(
-                        text = "u/${comment.author}",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = RedditOrange
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(2.dp))
-
-                // Texto del comentario
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Cabecera: u/author a la izquierda, indicador de Hilo/Tree a la derecha
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = comment.body,
-                    fontSize = 11.sp,
-                    color = TextPrimary,
-                    lineHeight = 14.sp
+                    text = "u/${comment.author}",
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RedditOrange
                 )
 
-                Spacer(modifier = Modifier.height(3.dp))
-
-                // Barra de votación de comentarios compacta
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                if (flatComment.depth > 0) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF1E1E1E))
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(0xFF222222))
+                            .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .clickable { onUpvote() }
-                                .padding(1.dp)
-                        ) {
-                            RedditUpvoteIcon(
-                                isVoted = comment.likes == true,
-                                size = 11.dp
-                            )
-                        }
-
                         Text(
-                            text = formatScore(comment.score),
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = when (comment.likes) {
-                                true -> RedditUpvote
-                                false -> RedditDownvote
-                                else -> TextPrimary
+                            text = when (flatComment.depth) {
+                                1 -> "└─ hilo 1"
+                                2 -> "└── hilo 2"
+                                3 -> "└─── hilo 3"
+                                else -> "└─ L${flatComment.depth}"
                             },
-                            modifier = Modifier.padding(horizontal = 3.dp)
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = RedditBlue
                         )
+                    }
+                }
+            }
 
-                        Box(
-                            modifier = Modifier
-                                .clickable { onDownvote() }
-                                .padding(1.dp)
-                        ) {
-                            RedditDownvoteIcon(
-                                isVoted = comment.likes == false,
-                                size = 11.dp
-                            )
-                        }
+            Spacer(modifier = Modifier.height(2.dp))
+
+            // Texto del comentario
+            Text(
+                text = comment.body,
+                fontSize = 11.sp,
+                color = TextPrimary,
+                lineHeight = 14.sp
+            )
+
+            Spacer(modifier = Modifier.height(3.dp))
+
+            // Barra de votación de comentarios compacta
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF1E1E1E))
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clickable { onUpvote() }
+                            .padding(1.dp)
+                    ) {
+                        RedditUpvoteIcon(
+                            isVoted = comment.likes == true,
+                            size = 11.dp
+                        )
+                    }
+
+                    Text(
+                        text = formatScore(comment.score),
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = when (comment.likes) {
+                            true -> RedditUpvote
+                            false -> RedditDownvote
+                            else -> TextPrimary
+                        },
+                        modifier = Modifier.padding(horizontal = 3.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .clickable { onDownvote() }
+                            .padding(1.dp)
+                    ) {
+                        RedditDownvoteIcon(
+                            isVoted = comment.likes == false,
+                            size = 11.dp
+                        )
                     }
                 }
             }
