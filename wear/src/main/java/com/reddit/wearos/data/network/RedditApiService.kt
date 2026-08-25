@@ -49,7 +49,7 @@ class RedditApiService(
         return token.startsWith("Bearer ")
     }
 
-    private var cachedSubscribedSubs: List<String>? = null
+    var lastDiagnostic: String = "Iniciando consulta..."
 
     suspend fun getFeed(
         subreddit: String? = null,
@@ -107,6 +107,7 @@ class RedditApiService(
 
                 var status = response.status.value
                 var responseText = response.bodyAsText()
+                lastDiagnostic = "HTTP $status (${url.substringAfter("://").take(30)}): ${responseText.take(60).replace("\n", " ")}"
                 Log.d(TAG, "Respuesta de $url: status=$status, len=${responseText.length}, preview=${responseText.take(120).replace("\n", " ")}")
 
                 // Si recibimos 401 en oauth.reddit.com, intentamos refrescar el token de forma forzada
@@ -126,7 +127,7 @@ class RedditApiService(
                         }
                         status = response.status.value
                         responseText = response.bodyAsText()
-                        Log.d(TAG, "Reintento tras refresh en $url: status=$status, len=${responseText.length}")
+                        lastDiagnostic = "Reintento $status: ${responseText.take(60).replace("\n", " ")}"
                     }
                 }
 
@@ -134,10 +135,12 @@ class RedditApiService(
                     val listing = NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(responseText)
                     if (listing.data.children.isNotEmpty()) {
                         Log.d(TAG, "✅ Feed cargado con éxito: ${listing.data.children.size} posts de $url")
+                        lastDiagnostic = "OK (${listing.data.children.size} posts)"
                         return@withContext listing
                     }
                 }
             } catch (e: Exception) {
+                lastDiagnostic = "Excepción en ${url.substringAfter("://").take(25)}: ${e.message}"
                 Log.e(TAG, "Fallo al consultar $url: ${e.message}")
             }
         }

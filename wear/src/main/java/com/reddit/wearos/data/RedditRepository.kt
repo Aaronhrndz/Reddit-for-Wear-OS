@@ -28,6 +28,8 @@ class RedditRepository(
         _currentSort.value = sort
     }
 
+    fun getLastDiagnostic(): String = apiService.lastDiagnostic
+
     suspend fun getFeed(
         subreddit: String = _currentSubreddit.value,
         sort: String = _currentSort.value,

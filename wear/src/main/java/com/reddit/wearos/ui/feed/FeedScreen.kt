@@ -264,17 +264,34 @@ fun FeedScreen(
 
                     if (state.posts.isEmpty()) {
                         item {
-                            Box(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 20.dp),
-                                contentAlignment = Alignment.Center
+                                    .padding(horizontal = 12.dp, vertical = 14.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
                                     text = "Sin publicaciones",
-                                    fontSize = 11.sp,
-                                    color = TextSecondary,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White,
                                     textAlign = TextAlign.Center
+                                )
+                                if (!state.diagnostic.isNullOrEmpty()) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = state.diagnostic,
+                                        fontSize = 8.sp,
+                                        color = Color(0xFFFF8888),
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
+                                CompactChip(
+                                    onClick = { viewModel.loadFeed(refresh = true) },
+                                    label = { Text("Reintentar", fontSize = 10.sp) },
+                                    colors = ChipDefaults.primaryChipColors(backgroundColor = RedditOrange)
                                 )
                             }
                         }

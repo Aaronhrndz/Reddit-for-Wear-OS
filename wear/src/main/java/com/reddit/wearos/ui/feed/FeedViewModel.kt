@@ -18,7 +18,8 @@ sealed class FeedUiState {
         val sort: String = "new",
         val isLoadingMore: Boolean = false,
         val isRefreshing: Boolean = false,
-        val hasMore: Boolean = true
+        val hasMore: Boolean = true,
+        val diagnostic: String? = null
     ) : FeedUiState()
     data class Error(val message: String) : FeedUiState()
 }
@@ -91,14 +92,15 @@ class FeedViewModel(
                     sort = sort,
                     isLoadingMore = false,
                     isRefreshing = false,
-                    hasMore = nextAfter != null
+                    hasMore = nextAfter != null,
+                    diagnostic = repository.getLastDiagnostic()
                 )
             } catch (e: Exception) {
                 if (_uiState.value !is FeedUiState.Success) {
-                    _uiState.value = FeedUiState.Error(e.localizedMessage ?: "Error al cargar feed")
+                    _uiState.value = FeedUiState.Error(e.localizedMessage ?: "Error al cargar feed: ${repository.getLastDiagnostic()}")
                 } else if (_uiState.value is FeedUiState.Success) {
                     val s = _uiState.value as FeedUiState.Success
-                    _uiState.value = s.copy(isLoadingMore = false, isRefreshing = false)
+                    _uiState.value = s.copy(isLoadingMore = false, isRefreshing = false, diagnostic = repository.getLastDiagnostic())
                 }
             } finally {
                 isFetching = false
