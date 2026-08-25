@@ -16,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -92,7 +95,8 @@ fun CommentsScreen(
                             .fillMaxSize()
                             .rotaryWithScroll(scrollState),
                         state = scrollState,
-                        contentPadding = PaddingValues(top = 28.dp, bottom = 40.dp, start = 6.dp, end = 6.dp),
+                        autoCentering = null,
+                        contentPadding = PaddingValues(top = 22.dp, bottom = 42.dp, start = 6.dp, end = 6.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         items(state.comments) { flatComment ->
@@ -127,39 +131,65 @@ fun CommentCard(
     onReply: () -> Unit
 ) {
     val comment = flatComment.comment
-    val depth = flatComment.depth.coerceAtMost(4)
-
-    val depthColors = listOf(
-        RedditOrange,
-        RedditBlue,
-        Color(0xFF4CAF50),
-        Color(0xFFFFEB3B),
-        Color(0xFFAB47BC)
-    )
+    val depth = flatComment.depth.coerceAtMost(3)
+    val treeLineColor = Color(0xFF484852)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .padding(horizontal = 4.dp, vertical = 2.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 2.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        // Tabulación con líneas verticales continuas de árbol por nivel (Reddit Android Style)
+        // Líneas de árbol estilo Explorador de Archivos (Treeview Drilldown └──)
         if (depth > 0) {
-            for (d in 1..depth) {
-                val color = depthColors[(d - 1) % depthColors.size]
-                Box(
-                    modifier = Modifier
-                        .width(2.5.dp)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(1.dp))
-                        .background(color)
+            val gutterWidth = (depth * 9).dp
+            Canvas(
+                modifier = Modifier
+                    .width(gutterWidth)
+                    .height(48.dp)
+                    .padding(end = 3.dp)
+            ) {
+                val strokeWidthPx = 1.5.dp.toPx()
+                val colStepPx = this.size.width / depth
+
+                // Columnas de ancestros (│)
+                for (d in 0 until depth - 1) {
+                    val x = colStepPx * d + (colStepPx / 2f)
+                    drawLine(
+                        color = treeLineColor,
+                        start = Offset(x, 0f),
+                        end = Offset(x, this.size.height),
+                        strokeWidth = strokeWidthPx,
+                        cap = StrokeCap.Round
+                    )
+                }
+
+                // Rama actual conectora en L (└──)
+                val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
+                val cornerY = 16.dp.toPx()
+                val path = Path().apply {
+                    moveTo(currentX, 0f)
+                    lineTo(currentX, cornerY - 3.dp.toPx())
+                    quadraticTo(
+                        currentX, cornerY,
+                        currentX + 3.dp.toPx(), cornerY
+                    )
+                    lineTo(this@Canvas.size.width, cornerY)
+                }
+
+                drawPath(
+                    path = path,
+                    color = treeLineColor,
+                    style = Stroke(
+                        width = strokeWidthPx,
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
                 )
-                Spacer(modifier = Modifier.width(6.dp))
             }
         }
 
-        // Caja de contenido del comentario
+        // Tarjeta de contenido del comentario
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -168,7 +198,7 @@ fun CommentCard(
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera: u/author SIEMPRE en naranja
+                // Cabecera: u/author en naranja
                 Text(
                     text = "u/${comment.author}",
                     fontSize = 9.sp,
@@ -188,7 +218,7 @@ fun CommentCard(
 
                 Spacer(modifier = Modifier.height(3.dp))
 
-                // Barra inferior con botón Responder y Barra de votación
+                // Barra inferior: Responder + Votación
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
