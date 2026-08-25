@@ -253,7 +253,7 @@ fun PostDetailScreen(
                     item {
                         CompactChip(
                             onClick = {
-                                RemotePhoneHelper.openPostOnPhone(context, post.permalink)
+                                RemotePhoneHelper.openPostOnPhone(context, post)
                             },
                             icon = {
                                 Icon(
