@@ -50,6 +50,8 @@ class RedditApiService(
         return token.startsWith("Bearer ") || (token.length > 50 && !token.contains("=") && !token.contains(";"))
     }
 
+    private var cachedSubscribedSubs: List<String>? = null
+
     suspend fun getFeed(
         subreddit: String? = null,
         sort: String = "hot",
@@ -65,8 +67,22 @@ class RedditApiService(
         val sortPath = if (sort.isBlank()) "hot" else sort.lowercase()
         if (isBearer) {
             if (isHome) {
-                urlsToTry.add("https://oauth.reddit.com/$sortPath")
-                urlsToTry.add("https://oauth.reddit.com/hot")
+                // Obtener suscripciones del usuario para construir un feed 100% personal sin filtraciones globales
+                if (cachedSubscribedSubs.isNullOrEmpty()) {
+                    try {
+                        val subs = getUserSubreddits()
+                        if (subs.isNotEmpty()) {
+                            cachedSubscribedSubs = subs.map { it.displayName }
+                        }
+                    } catch (_: Exception) {}
+                }
+
+                val subs = cachedSubscribedSubs
+                if (!subs.isNullOrEmpty()) {
+                    val multi = subs.take(50).joinToString("+")
+                    urlsToTry.add("https://oauth.reddit.com/r/$multi/$sortPath")
+                }
+                urlsToTry.add("https://oauth.reddit.com/")
                 urlsToTry.add("https://oauth.reddit.com/best")
             } else {
                 urlsToTry.add("https://oauth.reddit.com/r/$sub/$sortPath")
@@ -75,7 +91,6 @@ class RedditApiService(
         if (isHome) {
             urlsToTry.add("https://old.reddit.com/$sortPath.json")
             urlsToTry.add("https://www.reddit.com/$sortPath.json")
-            urlsToTry.add("https://old.reddit.com/r/popular/$sortPath.json")
         } else {
             urlsToTry.add("https://old.reddit.com/r/$sub/$sortPath.json")
             urlsToTry.add("https://www.reddit.com/r/$sub/$sortPath.json")
