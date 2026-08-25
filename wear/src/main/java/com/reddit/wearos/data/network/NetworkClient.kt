@@ -26,9 +26,9 @@ object NetworkClient {
                 json(json)
             }
             install(HttpTimeout) {
-                requestTimeoutMillis = 5000
-                connectTimeoutMillis = 5000
-                socketTimeoutMillis = 5000
+                requestTimeoutMillis = 12000
+                connectTimeoutMillis = 12000
+                socketTimeoutMillis = 12000
             }
             install(Logging) {
                 level = LogLevel.INFO
@@ -42,9 +42,9 @@ object NetworkClient {
                 json(json)
             }
             install(HttpTimeout) {
-                requestTimeoutMillis = 5000
-                connectTimeoutMillis = 5000
-                socketTimeoutMillis = 5000
+                requestTimeoutMillis = 12000
+                connectTimeoutMillis = 12000
+                socketTimeoutMillis = 12000
             }
         }
     }

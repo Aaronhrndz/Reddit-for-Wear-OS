@@ -75,13 +75,15 @@ class RedditApiService(
             }
         }
         if (isHome) {
-            urlsToTry.add("https://api.reddit.com/$sortPath")
+            if (authHeader != null) {
+                urlsToTry.add("https://api.reddit.com/$sortPath")
+            }
             urlsToTry.add("https://api.reddit.com/r/popular/$sortPath")
-            urlsToTry.add("https://old.reddit.com/$sortPath.json")
+            urlsToTry.add("https://api.reddit.com/r/all/$sortPath")
+            urlsToTry.add("https://api.reddit.com/$sortPath")
         } else {
             urlsToTry.add("https://api.reddit.com/r/$sub/$sortPath")
             urlsToTry.add("https://api.reddit.com/r/$sub")
-            urlsToTry.add("https://old.reddit.com/r/$sub/$sortPath.json")
         }
 
         var currentAuthHeader = authHeader
@@ -135,6 +137,30 @@ class RedditApiService(
                         Log.d(TAG, "✅ Feed cargado con éxito: ${listing.data.children.size} posts de $url")
                         lastDiagnostic = "OK (${listing.data.children.size} posts)"
                         return@withContext listing
+                    }
+                }
+
+                // Si la sesión dio 403 o no trajo posts, intentamos inmediatamente en modo público
+                if ((status == 403 || status == 401) && currentAuthHeader != null) {
+                    Log.d(TAG, "Reintentando $url de forma pública...")
+                    val publicResp = httpClient.get(url) {
+                        header("User-Agent", USER_AGENT)
+                        header("Cache-Control", "no-cache, no-store, must-revalidate")
+                        header("Pragma", "no-cache")
+                        parameter("limit", limit)
+                        after?.let { parameter("after", it) }
+                        parameter("raw_json", 1)
+                    }
+                    if (publicResp.status.value == 200) {
+                        val pubText = publicResp.bodyAsText()
+                        if (!pubText.trim().startsWith("<") && pubText.isNotBlank()) {
+                            val listing = NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(pubText)
+                            if (listing.data.children.isNotEmpty()) {
+                                Log.d(TAG, "✅ Feed público cargado: ${listing.data.children.size} posts de $url")
+                                lastDiagnostic = "OK Público (${listing.data.children.size} posts)"
+                                return@withContext listing
+                            }
+                        }
                     }
                 }
             } catch (e: Exception) {
