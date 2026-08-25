@@ -120,11 +120,14 @@ fun CommentsScreen(
 }
 
 @Composable
-fun TreeGutter(
-    depth: Int,
-    modifier: Modifier = Modifier
+fun CommentCard(
+    flatComment: FlatComment,
+    onUpvote: () -> Unit,
+    onDownvote: () -> Unit,
+    onReply: () -> Unit
 ) {
-    if (depth <= 0) return
+    val comment = flatComment.comment
+    val depth = flatComment.depth.coerceAtMost(4)
 
     val depthColors = listOf(
         RedditOrange,
@@ -134,62 +137,6 @@ fun TreeGutter(
         Color(0xFFAB47BC)
     )
 
-    val maxDepth = depth.coerceAtMost(3)
-    val railSpacing = 7.dp
-    val startPadding = 2.dp
-    val totalWidth = startPadding + (railSpacing * maxDepth) + 3.dp
-
-    Canvas(
-        modifier = modifier
-            .width(totalWidth)
-            .fillMaxHeight()
-    ) {
-        val strokePx = 2.dp.toPx()
-        val branchY = 12.dp.toPx()
-
-        for (d in 1..maxDepth) {
-            val color = depthColors[(d - 1) % depthColors.size]
-            val x = (startPadding + railSpacing * (d - 1) + 2.dp).toPx()
-
-            if (d < maxDepth) {
-                // Línea vertical continua de guía del nivel superior
-                drawLine(
-                    color = color,
-                    start = Offset(x, 0f),
-                    end = Offset(x, size.height),
-                    strokeWidth = strokePx,
-                    cap = StrokeCap.Round
-                )
-            } else {
-                // Rama actual: baja del nivel superior y conecta horizontalmente a la caja del comentario
-                drawLine(
-                    color = color,
-                    start = Offset(x, 0f),
-                    end = Offset(x, branchY),
-                    strokeWidth = strokePx,
-                    cap = StrokeCap.Round
-                )
-                drawLine(
-                    color = color,
-                    start = Offset(x, branchY),
-                    end = Offset(size.width, branchY),
-                    strokeWidth = strokePx,
-                    cap = StrokeCap.Round
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun CommentCard(
-    flatComment: FlatComment,
-    onUpvote: () -> Unit,
-    onDownvote: () -> Unit,
-    onReply: () -> Unit
-) {
-    val comment = flatComment.comment
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -197,9 +144,19 @@ fun CommentCard(
             .padding(horizontal = 4.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // ÁRBOL DE HERENCIA FUERA DE LA CAJA
-        if (flatComment.depth > 0) {
-            TreeGutter(depth = flatComment.depth)
+        // Tabulación con líneas verticales continuas de árbol por nivel (Reddit Android Style)
+        if (depth > 0) {
+            for (d in 1..depth) {
+                val color = depthColors[(d - 1) % depthColors.size]
+                Box(
+                    modifier = Modifier
+                        .width(2.5.dp)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(1.dp))
+                        .background(color)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+            }
         }
 
         // Caja de contenido del comentario
