@@ -90,47 +90,60 @@ fun CommentCard(
     onDownvote: () -> Unit
 ) {
     val comment = flatComment.comment
-    val indent = (flatComment.depth.coerceAtMost(3) * 5).dp
 
     val depthBorderColors = listOf(
         RedditOrange,
         RedditBlue,
         Color(0xFF4CAF50),
         Color(0xFFFFEB3B),
-        Color(0xFF9C27B0)
+        Color(0xFFAB47BC)
     )
-    val indicatorColor = depthBorderColors[flatComment.depth % depthBorderColors.size]
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = indent, top = 2.dp, bottom = 2.dp)
+            .height(IntrinsicSize.Min)
+            .padding(horizontal = 4.dp, vertical = 2.dp)
     ) {
+        // Líneas verticales indicadoras de herencia
         if (flatComment.depth > 0) {
-            Box(
-                modifier = Modifier
-                    .width(2.dp)
-                    .fillMaxHeight()
-                    .background(indicatorColor, RoundedCornerShape(1.dp))
-            )
-            Spacer(modifier = Modifier.width(3.dp))
+            for (d in 1..flatComment.depth.coerceAtMost(3)) {
+                val barColor = depthBorderColors[(d - 1) % depthBorderColors.size]
+                Box(
+                    modifier = Modifier
+                        .width(2.5.dp)
+                        .fillMaxHeight()
+                        .background(barColor, RoundedCornerShape(1.dp))
+                )
+                Spacer(modifier = Modifier.width(3.5.dp))
+            }
         }
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
+                .weight(1f)
                 .clip(RoundedCornerShape(8.dp))
                 .background(DarkSurface)
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Header u/author
-                Text(
-                    text = "u/${comment.author}",
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (flatComment.depth == 0) RedditOrange else TextSecondary
-                )
+                // Header u/author SIEMPRE en color naranja
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (flatComment.depth > 0) {
+                        Text(
+                            text = "↳ ",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TextSecondary
+                        )
+                    }
+                    Text(
+                        text = "u/${comment.author}",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RedditOrange
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 
