@@ -2,10 +2,36 @@ package com.reddit.wearos.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+
+fun parseCommentsFromListingElement(element: JsonElement): List<RedditComment> {
+    val comments = mutableListOf<RedditComment>()
+    try {
+        if (element !is JsonObject) return emptyList()
+        val data = element.jsonObject["data"]?.jsonObject ?: return emptyList()
+        val children = data["children"]?.jsonArray ?: return emptyList()
+        for (child in children) {
+            try {
+                val childObj = child.jsonObject
+                val kind = childObj["kind"]?.jsonPrimitive?.content
+                if (kind == "t1") {
+                    val commentData = childObj["data"]
+                    if (commentData != null) {
+                        val comment = com.reddit.wearos.data.network.NetworkClient.json.decodeFromJsonElement<RedditComment>(commentData)
+                        comments.add(comment)
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+    } catch (_: Exception) {}
+    return comments
+}
 
 @Serializable
 data class OAuthTokenResponse(

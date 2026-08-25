@@ -171,11 +171,9 @@ class PostDetailViewModel(
         for (c in comments) {
             result.add(FlatComment(comment = c.copy(depth = depth), depth = depth))
             if (c.replies != null) {
-                try {
-                    val listing: RedditListing<RedditComment> = NetworkClient.json.decodeFromJsonElement(c.replies)
-                    val subComments = listing.data.children.filter { it.kind == "t1" }.map { it.data }
+                val subComments = com.reddit.wearos.data.model.parseCommentsFromListingElement(c.replies)
+                if (subComments.isNotEmpty()) {
                     result.addAll(flattenComments(subComments, depth + 1))
-                } catch (_: Exception) {
                 }
             }
         }

@@ -170,12 +170,8 @@ class RedditApiService(
                     }
 
                     if (responseJson.size > 1) {
-                        val commentListing: RedditListing<RedditComment> = NetworkClient.json.decodeFromJsonElement(responseJson[1])
-                        for (child in commentListing.data.children) {
-                            if (child.kind == "t1") {
-                                comments.add(child.data)
-                            }
-                        }
+                        val parsed = com.reddit.wearos.data.model.parseCommentsFromListingElement(responseJson[1])
+                        comments.addAll(parsed)
                     }
 
                     if (post != null || comments.isNotEmpty()) {
