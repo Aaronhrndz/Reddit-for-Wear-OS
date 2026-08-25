@@ -1,10 +1,6 @@
 name: Build Reddit for Wear & Companion
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -21,6 +17,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew || true
