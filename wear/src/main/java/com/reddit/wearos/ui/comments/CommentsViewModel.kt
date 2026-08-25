@@ -16,6 +16,8 @@ import kotlinx.serialization.json.decodeFromJsonElement
 data class FlatComment(
     val comment: RedditComment,
     val depth: Int,
+    val isLastChild: Boolean = false,
+    val activeAncestors: List<Boolean> = emptyList(),
     val isCollapsed: Boolean = false
 )
 
@@ -58,6 +60,7 @@ class CommentsViewModel(
                 subreddit = "",
                 subredditPrefixed = "",
                 selfText = comment.body,
+                likes = comment.likes,
                 score = comment.score
             )
             val success = repository.vote(postEquivalent, direction)
@@ -74,8 +77,8 @@ class CommentsViewModel(
                             val scoreDiff = when {
                                 flat.comment.likes == true && direction == 0 -> -1
                                 flat.comment.likes == true && direction == -1 -> -2
-                                flat.comment.likes == false && direction == 1 -> 2
                                 flat.comment.likes == false && direction == 0 -> 1
+                                flat.comment.likes == false && direction == 1 -> 2
                                 flat.comment.likes == null && direction == 1 -> 1
                                 flat.comment.likes == null && direction == -1 -> -1
                                 else -> 0
@@ -85,7 +88,7 @@ class CommentsViewModel(
                             flat
                         }
                     }
-                    _uiState.value = state.copy(comments = updated)
+                    _uiState.value = CommentsUiState.Success(updated)
                 }
             }
         }
@@ -93,7 +96,7 @@ class CommentsViewModel(
 
     fun submitComment(postId: String, subreddit: String, thingId: String, text: String, onComplete: ((Boolean) -> Unit)? = null) {
         viewModelScope.launch {
-            val success = repository.addComment(thingId, text)
+            val success = repository.submitComment(thingId, text)
             if (success) {
                 loadComments(postId, subreddit)
             }
@@ -101,14 +104,29 @@ class CommentsViewModel(
         }
     }
 
-    private fun flattenComments(comments: List<RedditComment>, depth: Int): List<FlatComment> {
+    private fun flattenComments(
+        comments: List<RedditComment>,
+        depth: Int,
+        ancestors: List<Boolean> = emptyList()
+    ): List<FlatComment> {
         val result = mutableListOf<FlatComment>()
-        for (c in comments) {
-            result.add(FlatComment(comment = c.copy(depth = depth), depth = depth))
+        for (i in comments.indices) {
+            val c = comments[i]
+            val isLast = (i == comments.size - 1)
+            val currentAncestors = if (depth > 0) ancestors else emptyList()
+            result.add(
+                FlatComment(
+                    comment = c.copy(depth = depth),
+                    depth = depth,
+                    isLastChild = isLast,
+                    activeAncestors = currentAncestors
+                )
+            )
             if (c.replies != null) {
                 val subComments = com.reddit.wearos.data.model.parseCommentsFromListingElement(c.replies)
                 if (subComments.isNotEmpty()) {
-                    result.addAll(flattenComments(subComments, depth + 1))
+                    val nextAncestors = currentAncestors + (!isLast)
+                    result.addAll(flattenComments(subComments, depth + 1, nextAncestors))
                 }
             }
         }

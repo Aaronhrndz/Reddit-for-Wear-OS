@@ -166,14 +166,29 @@ class PostDetailViewModel(
         }
     }
 
-    private fun flattenComments(comments: List<RedditComment>, depth: Int): List<FlatComment> {
+    private fun flattenComments(
+        comments: List<RedditComment>,
+        depth: Int,
+        ancestors: List<Boolean> = emptyList()
+    ): List<FlatComment> {
         val result = mutableListOf<FlatComment>()
-        for (c in comments) {
-            result.add(FlatComment(comment = c.copy(depth = depth), depth = depth))
+        for (i in comments.indices) {
+            val c = comments[i]
+            val isLast = (i == comments.size - 1)
+            val currentAncestors = if (depth > 0) ancestors else emptyList()
+            result.add(
+                FlatComment(
+                    comment = c.copy(depth = depth),
+                    depth = depth,
+                    isLastChild = isLast,
+                    activeAncestors = currentAncestors
+                )
+            )
             if (c.replies != null) {
                 val subComments = com.reddit.wearos.data.model.parseCommentsFromListingElement(c.replies)
                 if (subComments.isNotEmpty()) {
-                    result.addAll(flattenComments(subComments, depth + 1))
+                    val nextAncestors = currentAncestors + (!isLast)
+                    result.addAll(flattenComments(subComments, depth + 1, nextAncestors))
                 }
             }
         }

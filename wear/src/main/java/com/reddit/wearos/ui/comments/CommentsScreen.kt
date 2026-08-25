@@ -67,7 +67,13 @@ fun CommentsScreen(
     fun launchReply(thingId: String, author: String) {
         replyingToThingId = thingId
         replyingToAuthor = author
-        inputLauncher.launch(WearInputHelper.createInputIntent("Responder a u/$author..."))
+        try {
+            inputLauncher.launch(WearInputHelper.createInputIntent("Responder a u/$author..."))
+        } catch (_: Exception) {
+            try {
+                inputLauncher.launch(WearInputHelper.createSpeechFallbackIntent("Responder a u/$author..."))
+            } catch (_: Exception) {}
+        }
     }
 
     Scaffold(
@@ -139,6 +145,8 @@ fun CommentCard(
 ) {
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
+    val isLastChild = flatComment.isLastChild
+    val activeAncestors = flatComment.activeAncestors
     val treeLineColor = Color(0xFF6E6E80)
 
     Row(
@@ -148,7 +156,7 @@ fun CommentCard(
             .padding(horizontal = 2.dp, vertical = 2.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── Continuas y Alineadas)
+        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── / ├── Continuas)
         if (depth > 0) {
             val gutterWidth = (depth * 14).dp
             Canvas(
@@ -160,21 +168,25 @@ fun CommentCard(
                 val strokeWidthPx = 1.8.dp.toPx()
                 val colStepPx = this.size.width / depth
 
-                // 1. Columnas de ancestros (│) continuas de tope a tope
+                // 1. Columnas de ancestros (│) continuas si activeAncestors[d] es true
                 for (d in 0 until depth - 1) {
-                    val x = colStepPx * d + (colStepPx / 2f)
-                    drawLine(
-                        color = treeLineColor,
-                        start = Offset(x, 0f),
-                        end = Offset(x, size.height),
-                        strokeWidth = strokeWidthPx,
-                        cap = StrokeCap.Square
-                    )
+                    if (d < activeAncestors.size && activeAncestors[d]) {
+                        val x = colStepPx * d + (colStepPx / 2f)
+                        drawLine(
+                            color = treeLineColor,
+                            start = Offset(x, 0f),
+                            end = Offset(x, size.height),
+                            strokeWidth = strokeWidthPx,
+                            cap = StrokeCap.Square
+                        )
+                    }
                 }
 
-                // 2. Rama conectora en L (└──) que entra a la cabecera de la tarjeta
+                // 2. Rama conectora del nivel actual
                 val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
                 val cornerY = 14.dp.toPx()
+
+                // Rama en L hacia la tarjeta
                 val path = Path().apply {
                     moveTo(currentX, 0f)
                     lineTo(currentX, cornerY - 2.dp.toPx())
@@ -194,6 +206,17 @@ fun CommentCard(
                         join = StrokeJoin.Round
                     )
                 )
+
+                // Si NO es el último hijo, la línea vertical continúa hacia abajo (├──)
+                if (!isLastChild) {
+                    drawLine(
+                        color = treeLineColor,
+                        start = Offset(currentX, cornerY),
+                        end = Offset(currentX, size.height),
+                        strokeWidth = strokeWidthPx,
+                        cap = StrokeCap.Square
+                    )
+                }
             }
         }
 
@@ -206,7 +229,7 @@ fun CommentCard(
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera: u/author en naranja
+                // Cabecera: u/author en naranja sin icono
                 Text(
                     text = "u/${comment.author}",
                     fontSize = 9.sp,

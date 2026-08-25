@@ -1,4 +1,4 @@
-﻿package com.reddit.wearos.util
+package com.reddit.wearos.util
 
 import android.app.RemoteInput
 import android.content.Intent
@@ -20,14 +20,25 @@ object WearInputHelper {
         }
     }
 
+    fun createSpeechFallbackIntent(prompt: String): Intent {
+        return Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_PROMPT, prompt)
+        }
+    }
+
     fun extractText(data: Intent?): String? {
         if (data == null) return null
-        val bundle: Bundle? = RemoteInput.getResultsFromIntent(data)
-        val fromRemoteInput = bundle?.getCharSequence(EXTRA_KEY)?.toString()?.trim()
-        if (!fromRemoteInput.isNullOrBlank()) return fromRemoteInput
+        try {
+            val bundle: Bundle? = RemoteInput.getResultsFromIntent(data)
+            val fromRemoteInput = bundle?.getCharSequence(EXTRA_KEY)?.toString()?.trim()
+            if (!fromRemoteInput.isNullOrBlank()) return fromRemoteInput
+        } catch (_: Exception) {}
 
-        val fromSpeech = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.trim()
-        if (!fromSpeech.isNullOrBlank()) return fromSpeech
+        try {
+            val fromSpeech = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()?.trim()
+            if (!fromSpeech.isNullOrBlank()) return fromSpeech
+        } catch (_: Exception) {}
 
         return null
     }
