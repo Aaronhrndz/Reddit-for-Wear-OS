@@ -474,12 +474,25 @@ fun InlineCommentCard(
                     cap = StrokeCap.Square
                 )
 
-                // Si NO es el último hijo o si tiene respuestas debajo, continúa hacia abajo (├── T)
-                if (!isLastChild || hasReplies) {
+                // Si NO es el último hijo de su nivel, continúa hacia abajo conectando con el siguiente hermano (├── T)
+                // Si es el último hijo, finaliza limpiamente en L (└──) sin extenderse hacia el vacío
+                if (!isLastChild) {
                     drawLine(
                         color = treeLineColor,
                         start = Offset(currentX, cornerY),
                         end = Offset(currentX, size.height),
+                        strokeWidth = strokeWidthPx,
+                        cap = StrokeCap.Square
+                    )
+                }
+
+                // 3. Si este comentario tiene respuestas debajo, alimenta a sus hijos en la columna depth (siguiente a la derecha)
+                if (hasReplies && depth < 3) {
+                    val childX = colStepPx * depth + (colStepPx / 2f)
+                    drawLine(
+                        color = treeLineColor,
+                        start = Offset(childX, cornerY),
+                        end = Offset(childX, size.height),
                         strokeWidth = strokeWidthPx,
                         cap = StrokeCap.Square
                     )
