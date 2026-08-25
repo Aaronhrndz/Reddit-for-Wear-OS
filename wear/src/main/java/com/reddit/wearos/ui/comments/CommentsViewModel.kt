@@ -91,6 +91,16 @@ class CommentsViewModel(
         }
     }
 
+    fun submitComment(postId: String, subreddit: String, thingId: String, text: String, onComplete: ((Boolean) -> Unit)? = null) {
+        viewModelScope.launch {
+            val success = repository.addComment(thingId, text)
+            if (success) {
+                loadComments(postId, subreddit)
+            }
+            onComplete?.invoke(success)
+        }
+    }
+
     private fun flattenComments(comments: List<RedditComment>, depth: Int): List<FlatComment> {
         val result = mutableListOf<FlatComment>()
         for (c in comments) {

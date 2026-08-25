@@ -141,3 +141,21 @@ data class RedditUser(
     @SerialName("created_utc")
     val createdUtc: Double = 0.0
 )
+
+@Serializable
+data class RedditMessage(
+    val id: String = "",
+    val name: String = "",
+    val author: String = "[desconocido]",
+    val body: String = "",
+    val subject: String = "",
+    val subreddit: String? = null,
+    @SerialName("created_utc")
+    val createdUtc: Double = 0.0,
+    val new: Boolean = false,
+    @SerialName("was_comment")
+    val wasComment: Boolean = false,
+    @SerialName("parent_id")
+    val parentId: String? = null,
+    val context: String = ""
+)

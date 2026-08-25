@@ -146,6 +146,26 @@ class PostDetailViewModel(
         }
     }
 
+    fun submitComment(thingId: String, text: String, onComplete: ((Boolean) -> Unit)? = null) {
+        val state = _uiState.value
+        if (state is PostDetailUiState.Success) {
+            viewModelScope.launch {
+                val success = repository.addComment(thingId, text)
+                if (success) {
+                    try {
+                        val (_, comments) = repository.getComments(state.post.subreddit, state.post.id)
+                        val flattened = flattenComments(comments, depth = 0)
+                        val current = _uiState.value
+                        if (current is PostDetailUiState.Success) {
+                            _uiState.value = current.copy(comments = flattened)
+                        }
+                    } catch (_: Exception) {}
+                }
+                onComplete?.invoke(success)
+            }
+        }
+    }
+
     private fun flattenComments(comments: List<RedditComment>, depth: Int): List<FlatComment> {
         val result = mutableListOf<FlatComment>()
         for (c in comments) {

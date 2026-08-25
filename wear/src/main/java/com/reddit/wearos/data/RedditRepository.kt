@@ -63,4 +63,12 @@ class RedditRepository(
     suspend fun getMe(): RedditUser? {
         return apiService.getMe()
     }
+
+    suspend fun addComment(thingId: String, text: String): Boolean {
+        return apiService.addComment(thingId, text)
+    }
+
+    suspend fun getInbox(): List<com.reddit.wearos.data.model.RedditMessage> {
+        return apiService.getInbox()
+    }
 }

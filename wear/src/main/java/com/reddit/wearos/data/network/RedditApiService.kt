@@ -7,6 +7,7 @@ import com.reddit.wearos.data.model.ListingChild
 import com.reddit.wearos.data.model.ListingData
 import com.reddit.wearos.data.model.RedditComment
 import com.reddit.wearos.data.model.RedditListing
+import com.reddit.wearos.data.model.RedditMessage
 import com.reddit.wearos.data.model.RedditPost
 import com.reddit.wearos.data.model.RedditSubreddit
 import com.reddit.wearos.data.model.RedditUser
@@ -271,6 +272,56 @@ class RedditApiService(
             NetworkClient.json.decodeFromString<RedditUser>(responseText)
         } catch (e: Exception) {
             null
+        }
+    }
+
+    suspend fun addComment(thingId: String, text: String): Boolean = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) "https://oauth.reddit.com/api/comment" else "https://old.reddit.com/api/comment"
+        val formattedThingId = if (thingId.startsWith("t1_") || thingId.startsWith("t3_")) thingId else if (thingId.length <= 8) "t3_$thingId" else thingId
+        try {
+            val response = httpClient.submitForm(
+                url = url,
+                formParameters = Parameters.build {
+                    append("api_type", "json")
+                    append("thing_id", formattedThingId)
+                    append("text", text)
+                }
+            ) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+            }
+            val resText = response.bodyAsText()
+            Log.d(TAG, "addComment result for $formattedThingId: status=${response.status.value}, len=${resText.length}")
+            !resText.contains("NO_USER") && !resText.contains("USER_REQUIRED") && response.status.value in 200..299
+        } catch (e: Exception) {
+            Log.e(TAG, "Error posting comment: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun getInbox(limit: Int = 25): List<RedditMessage> = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) "https://oauth.reddit.com/message/inbox" else "https://old.reddit.com/message/inbox.json"
+        try {
+            val responseText = httpClient.get(url) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+                parameter("limit", limit)
+                parameter("raw_json", 1)
+            }.bodyAsText()
+
+            if (responseText.trim().startsWith("<")) {
+                return@withContext emptyList()
+            }
+
+            val response: RedditListing<RedditMessage> = NetworkClient.json.decodeFromString(responseText)
+            response.data.children.map { it.data }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error loading inbox: ${e.message}")
+            emptyList()
         }
     }
 }

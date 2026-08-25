@@ -1,5 +1,8 @@
 package com.reddit.wearos.ui.detail
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,11 +10,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Reply
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +38,7 @@ import com.reddit.wearos.ui.components.WearVideoPlayer
 import com.reddit.wearos.ui.feed.formatScore
 import com.reddit.wearos.ui.theme.*
 import com.reddit.wearos.util.RemotePhoneHelper
+import com.reddit.wearos.util.WearInputHelper
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
@@ -50,6 +53,30 @@ fun PostDetailScreen(
         initialCenterItemScrollOffset = 0
     )
     val context = LocalContext.current
+
+    var replyingToThingId by remember { mutableStateOf<String?>(null) }
+    var replyingToAuthor by remember { mutableStateOf<String?>(null) }
+
+    val inputLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val replyText = WearInputHelper.extractText(result.data)
+            val targetId = replyingToThingId
+            if (!replyText.isNullOrEmpty() && !targetId.isNullOrEmpty()) {
+                viewModel.submitComment(targetId, replyText)
+            }
+        }
+        replyingToThingId = null
+        replyingToAuthor = null
+    }
+
+    fun launchReply(thingId: String, author: String?) {
+        replyingToThingId = thingId
+        replyingToAuthor = author
+        val label = if (author != null) "Responder a u/$author..." else "Comentar en el post..."
+        inputLauncher.launch(WearInputHelper.createInputIntent(label))
+    }
 
     Scaffold(
         timeText = { TimeText() },
@@ -235,30 +262,61 @@ fun PostDetailScreen(
                         }
                     }
 
-                    // Abrir en el teléfono Companion
+                    // Botones de acción secundarios: Comentar y Abrir en el móvil
                     item {
-                        CompactChip(
-                            onClick = {
-                                RemotePhoneHelper.openPostOnPhone(context, post)
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Default.Share,
-                                    contentDescription = null,
-                                    tint = TextSecondary,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = "Abrir en el móvil",
-                                    fontSize = 10.sp,
-                                    color = TextSecondary
-                                )
-                            },
-                            colors = ChipDefaults.secondaryChipColors(),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            CompactChip(
+                                onClick = {
+                                    val postFullName = if (post.name.isNotEmpty()) post.name else "t3_${post.id}"
+                                    launchReply(postFullName, null)
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Reply,
+                                        contentDescription = "Comentar",
+                                        tint = RedditOrange,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = "Comentar",
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                },
+                                colors = ChipDefaults.secondaryChipColors(),
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            CompactChip(
+                                onClick = {
+                                    RemotePhoneHelper.openPostOnPhone(context, post)
+                                },
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Share,
+                                        contentDescription = null,
+                                        tint = TextSecondary,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = "Móvil",
+                                        fontSize = 10.sp,
+                                        color = TextSecondary
+                                    )
+                                },
+                                colors = ChipDefaults.secondaryChipColors(),
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
 
                     // SECCIÓN DE COMENTARIOS DIRECTOS
@@ -326,6 +384,10 @@ fun PostDetailScreen(
                                 onDownvote = {
                                     val newDir = if (flatComment.comment.likes == false) 0 else -1
                                     viewModel.voteComment(flatComment.comment, newDir)
+                                },
+                                onReply = {
+                                    val targetId = if (flatComment.comment.id.startsWith("t1_")) flatComment.comment.id else "t1_${flatComment.comment.id}"
+                                    launchReply(targetId, flatComment.comment.author)
                                 }
                             )
                         }
@@ -340,7 +402,8 @@ fun PostDetailScreen(
 fun InlineCommentCard(
     flatComment: FlatComment,
     onUpvote: () -> Unit,
-    onDownvote: () -> Unit
+    onDownvote: () -> Unit,
+    onReply: () -> Unit
 ) {
     val comment = flatComment.comment
     val indent = (flatComment.depth.coerceAtMost(3) * 5).dp
@@ -402,12 +465,37 @@ fun InlineCommentCard(
 
             Spacer(modifier = Modifier.height(3.dp))
 
-            // Barra de votación de comentarios compacta
+            // Barra inferior con botón Responder y Barra de votación
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Botón Responder
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF1E1E1E))
+                        .clickable { onReply() }
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Reply,
+                        contentDescription = "Responder",
+                        tint = RedditOrange,
+                        modifier = Modifier.size(11.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = "Responder",
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = TextSecondary
+                    )
+                }
+
+                // Votación
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier

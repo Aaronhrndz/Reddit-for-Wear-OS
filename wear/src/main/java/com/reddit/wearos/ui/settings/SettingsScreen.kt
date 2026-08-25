@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,6 +33,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(
     tokenStorage: TokenStorage,
     repository: RedditRepository,
+    onOpenInbox: () -> Unit,
     onLogout: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -117,6 +119,27 @@ fun SettingsScreen(
                             )
                         }
                     }
+                }
+            }
+
+            // Bandeja de Mensajes
+            if (isLoggedIn) {
+                item {
+                    Chip(
+                        onClick = onOpenInbox,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Mail,
+                                contentDescription = null,
+                                tint = RedditOrange,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        label = { Text("Mensajes", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                        secondaryLabel = { Text("Bandeja de entrada", fontSize = 9.sp) },
+                        colors = ChipDefaults.secondaryChipColors(),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
 

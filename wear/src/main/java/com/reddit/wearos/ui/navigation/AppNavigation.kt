@@ -15,6 +15,8 @@ import com.reddit.wearos.ui.detail.PostDetailScreen
 import com.reddit.wearos.ui.detail.PostDetailViewModel
 import com.reddit.wearos.ui.feed.FeedScreen
 import com.reddit.wearos.ui.feed.FeedViewModel
+import com.reddit.wearos.ui.inbox.InboxScreen
+import com.reddit.wearos.ui.inbox.InboxViewModel
 import com.reddit.wearos.ui.settings.SettingsScreen
 import com.reddit.wearos.ui.subreddits.SubredditListScreen
 
@@ -77,11 +79,24 @@ fun AppNavigation(
             SettingsScreen(
                 tokenStorage = tokenStorage,
                 repository = repository,
+                onOpenInbox = {
+                    navController.navigate(Screen.Inbox.route)
+                },
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Feed.route) { inclusive = true }
                     }
                 },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Inbox.route) {
+            val inboxViewModel = remember { InboxViewModel(repository) }
+            InboxScreen(
+                viewModel = inboxViewModel,
                 onBack = {
                     navController.popBackStack()
                 }
@@ -113,6 +128,8 @@ fun AppNavigation(
 
             CommentsScreen(
                 viewModel = commentsViewModel,
+                postId = postId,
+                subreddit = subreddit,
                 onBack = {
                     navController.popBackStack()
                 }
