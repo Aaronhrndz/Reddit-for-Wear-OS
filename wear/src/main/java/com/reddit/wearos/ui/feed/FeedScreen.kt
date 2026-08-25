@@ -54,52 +54,53 @@ fun FeedScreen(
     val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
 
     Scaffold(
-        timeText = { com.reddit.wearos.ui.components.RedditTimeText() },
+        timeText = { TimeText() },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
-        when (val state = uiState) {
-            is FeedUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(indicatorColor = RedditOrange)
-                }
-            }
-            is FeedUiState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = state.message,
-                            color = Color.Red,
-                            fontSize = 12.sp,
-                            maxLines = 3,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Chip(
-                            onClick = { viewModel.loadFeed(refresh = true) },
-                            label = { Text("Reintentar") },
-                            colors = ChipDefaults.primaryChipColors(backgroundColor = RedditOrange)
-                        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (val state = uiState) {
+                is FeedUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(indicatorColor = RedditOrange)
                     }
                 }
-            }
-            is FeedUiState.Success -> {
-                ScalingLazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .rotaryWithScroll(scrollState),
-                    state = scrollState,
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
+                is FeedUiState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = state.message,
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                maxLines = 3,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Chip(
+                                onClick = { viewModel.loadFeed(refresh = true) },
+                                label = { Text("Reintentar") },
+                                colors = ChipDefaults.primaryChipColors(backgroundColor = RedditOrange)
+                            )
+                        }
+                    }
+                }
+                is FeedUiState.Success -> {
+                    ScalingLazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .rotaryWithScroll(scrollState),
+                        state = scrollState,
+                        contentPadding = PaddingValues(top = 34.dp, bottom = 44.dp, start = 8.dp, end = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
                     // PANEL SUPERIOR DE CONTROL (Visible al deslizar hacia arriba)
                     item {
                         Row(
@@ -274,7 +275,11 @@ fun FeedScreen(
                 }
             }
         }
+
+        // Máscara superior oscurecida bajo el reloj
+        com.reddit.wearos.ui.components.TopClockScrim()
     }
+}
 }
 
 @Composable

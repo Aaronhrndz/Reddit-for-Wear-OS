@@ -86,40 +86,41 @@ fun PostDetailScreen(
     )
 
     Scaffold(
-        timeText = { com.reddit.wearos.ui.components.RedditTimeText() },
+        timeText = { TimeText() },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
-        when (val state = uiState) {
-            is PostDetailUiState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(indicatorColor = RedditOrange)
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (val state = uiState) {
+                is PostDetailUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(indicatorColor = RedditOrange)
+                    }
                 }
-            }
-            is PostDetailUiState.Error -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = state.message, color = Color.Red, fontSize = 12.sp)
+                is PostDetailUiState.Error -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = state.message, color = Color.Red, fontSize = 12.sp)
+                    }
                 }
-            }
-            is PostDetailUiState.Success -> {
-                val post = state.post
-                val videoUrl = post.getVideoUrl()
+                is PostDetailUiState.Success -> {
+                    val post = state.post
+                    val videoUrl = post.getVideoUrl()
 
-                ScalingLazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .rotaryWithScroll(scrollState),
-                    state = scrollState,
-                    autoCentering = null,
-                    scalingParams = ScalingLazyColumnDefaults.scalingParams(
-                        edgeScale = 1f,
-                        edgeAlpha = 1f,
-                        minTransitionArea = 0f,
-                        maxTransitionArea = 0f
-                    ),
-                    contentPadding = PaddingValues(top = 28.dp, bottom = 44.dp, start = 6.dp, end = 6.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp)
-                ) {
+                    ScalingLazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .rotaryWithScroll(scrollState),
+                        state = scrollState,
+                        autoCentering = null,
+                        scalingParams = ScalingLazyColumnDefaults.scalingParams(
+                            edgeScale = 1f,
+                            edgeAlpha = 1f,
+                            minTransitionArea = 0f,
+                            maxTransitionArea = 0f
+                        ),
+                        contentPadding = PaddingValues(top = 34.dp, bottom = 44.dp, start = 6.dp, end = 6.dp),
+                        verticalArrangement = Arrangement.spacedBy(0.dp)
+                    ) {
                     // CABECERA + TÍTULO INTEGRADO (Optimizado para pantalla circular)
                     item {
                         Column(
@@ -407,7 +408,11 @@ fun PostDetailScreen(
                 }
             }
         }
+
+        // Máscara superior oscurecida bajo el reloj
+        com.reddit.wearos.ui.components.TopClockScrim()
     }
+}
 }
 
 @Composable

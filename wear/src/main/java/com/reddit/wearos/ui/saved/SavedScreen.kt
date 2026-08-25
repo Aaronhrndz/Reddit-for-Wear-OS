@@ -36,7 +36,7 @@ fun SavedScreen(
     val scrollState = rememberScalingLazyListState()
 
     Scaffold(
-        timeText = { TimeText() },
+        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
         when (val state = uiState) {

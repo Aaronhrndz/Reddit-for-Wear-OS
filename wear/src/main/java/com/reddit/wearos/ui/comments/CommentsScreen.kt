@@ -71,7 +71,7 @@ fun CommentsScreen(
     )
 
     Scaffold(
-        timeText = { com.reddit.wearos.ui.components.RedditTimeText() },
+        timeText = { TimeText() },
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {

@@ -62,6 +62,7 @@ fun SettingsScreen(
 
     Scaffold(
         timeText = { TimeText() },
+        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
         ScalingLazyColumn(
