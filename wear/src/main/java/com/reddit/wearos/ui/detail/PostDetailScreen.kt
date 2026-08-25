@@ -75,7 +75,7 @@ fun PostDetailScreen(
                         .rotaryWithScroll(scrollState),
                     state = scrollState,
                     autoCentering = null,
-                    contentPadding = PaddingValues(top = 18.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
+                    contentPadding = PaddingValues(top = 24.dp, bottom = 42.dp, start = 10.dp, end = 10.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     // CABECERA + TÍTULO INTEGRADO (Optimizado para pantalla circular)
@@ -83,7 +83,7 @@ fun PostDetailScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 4.dp, vertical = 2.dp),
+                                .padding(horizontal = 14.dp, vertical = 2.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
@@ -101,7 +101,8 @@ fun PostDetailScreen(
                                 fontWeight = FontWeight.SemiBold,
                                 color = TextPrimary,
                                 textAlign = TextAlign.Center,
-                                lineHeight = 15.sp
+                                lineHeight = 15.sp,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -140,7 +141,7 @@ fun PostDetailScreen(
                                 fontSize = 11.sp,
                                 color = TextPrimary,
                                 lineHeight = 15.sp,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)
                             )
                         }
                     }
