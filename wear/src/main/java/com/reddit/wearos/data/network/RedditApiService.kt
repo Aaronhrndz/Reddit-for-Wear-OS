@@ -36,9 +36,8 @@ class RedditApiService(
 
     private suspend fun getAuthHeader(): Pair<String, String>? {
         val token = authManager.refreshTokenIfNeeded() ?: tokenStorage.getAccessToken() ?: return null
-        return if (token.startsWith("Bearer ") || (token.length > 50 && !token.contains("=") && !token.contains(";"))) {
-            val clean = if (token.startsWith("Bearer ")) token else "Bearer $token"
-            Pair("Authorization", clean)
+        return if (token.startsWith("Bearer ")) {
+            Pair("Authorization", token)
         } else {
             val cookieVal = if (!token.contains("=")) "reddit_session=$token" else token
             Pair("Cookie", cookieVal)
@@ -47,7 +46,7 @@ class RedditApiService(
 
     private suspend fun isBearerAuth(): Boolean {
         val token = tokenStorage.getAccessToken() ?: return false
-        return token.startsWith("Bearer ") || (token.length > 50 && !token.contains("=") && !token.contains(";"))
+        return token.startsWith("Bearer ")
     }
 
     private var cachedSubscribedSubs: List<String>? = null
