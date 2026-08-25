@@ -31,7 +31,7 @@ class RedditApiService(
 
     companion object {
         const val TAG = "RedditApiService"
-        const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
+        const val USER_AGENT = "android:com.reddit.wearos:v1.1.0 (by /u/Aaronhrndz)"
     }
 
     private suspend fun getAuthHeader(): Pair<String, String>? {
@@ -67,7 +67,6 @@ class RedditApiService(
         val sortPath = if (sort.isBlank()) "new" else sort.lowercase()
         if (isBearer) {
             if (isHome) {
-                // En la API OAuth de Reddit, el feed personal se consulta directamente en /hot, /new, /rising, /top
                 urlsToTry.add("https://oauth.reddit.com/$sortPath")
                 if (sortPath == "hot") {
                     urlsToTry.add("https://oauth.reddit.com/best")
@@ -96,7 +95,7 @@ class RedditApiService(
                 var response = httpClient.get(url) {
                     if (url.contains("oauth.reddit.com") && isBearer) {
                         currentAuthHeader?.let { (k, v) -> header(k, v) }
-                    } else if (currentAuthHeader?.first == "Cookie" && !url.contains("oauth.reddit.com")) {
+                    } else if (currentAuthHeader?.first == "Cookie") {
                         header("Cookie", currentAuthHeader.second)
                     }
                     header("User-Agent", USER_AGENT)
@@ -105,7 +104,6 @@ class RedditApiService(
                     parameter("limit", limit)
                     after?.let { parameter("after", it) }
                     parameter("raw_json", 1)
-                    parameter("_t", System.currentTimeMillis())
                 }
 
                 var status = response.status.value
@@ -126,7 +124,6 @@ class RedditApiService(
                             parameter("limit", limit)
                             after?.let { parameter("after", it) }
                             parameter("raw_json", 1)
-                            parameter("_t", System.currentTimeMillis())
                         }
                         status = response.status.value
                         responseText = response.bodyAsText()
