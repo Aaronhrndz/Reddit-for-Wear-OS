@@ -2,6 +2,7 @@ package com.reddit.wearos.ui.subreddits
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -14,6 +15,7 @@ import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
 import com.reddit.wearos.data.RedditRepository
 import com.reddit.wearos.ui.theme.RedditOrange
+import com.reddit.wearos.ui.theme.TextSecondary
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalHorologistApi::class)
@@ -26,6 +28,10 @@ fun SubredditListScreen(
     val scope = rememberCoroutineScope()
     var userSubreddits by remember { mutableStateOf<List<String>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+
+    val defaultSuggested = listOf(
+        "technology", "espanol", "AskReddit", "gaming", "science", "worldnews", "todayilearned", "aww"
+    )
 
     LaunchedEffect(Unit) {
         scope.launch {
@@ -51,7 +57,7 @@ fun SubredditListScreen(
                 .rotaryWithScroll(scrollState),
             state = scrollState,
             contentPadding = PaddingValues(top = 28.dp, bottom = 40.dp, start = 8.dp, end = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             item {
                 Text(
@@ -63,27 +69,28 @@ fun SubredditListScreen(
                 )
             }
 
-            // Feed Personal (Home)
+            // Feeds Principales
             item {
                 Chip(
                     onClick = {
                         repository.setSubreddit("home")
                         onSubredditSelected("home")
                     },
-                    label = { Text("🏠 Feed Personal", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                    label = { Text("🏠 Feed Personal", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    secondaryLabel = { Text("Tus suscripciones", fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.primaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            // Popular y All
             item {
                 Chip(
                     onClick = {
                         repository.setSubreddit("popular")
                         onSubredditSelected("popular")
                     },
-                    label = { Text("🔥 r/popular", fontSize = 12.sp) },
+                    label = { Text("🔥 r/popular", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                    secondaryLabel = { Text("Tendencias globales", fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.secondaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -95,19 +102,22 @@ fun SubredditListScreen(
                         repository.setSubreddit("all")
                         onSubredditSelected("all")
                     },
-                    label = { Text("🌐 r/all", fontSize = 12.sp) },
+                    label = { Text("🌐 r/all", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                    secondaryLabel = { Text("Todo Reddit", fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.secondaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
+            // Sección: Mis Subreddits Suscritos
             if (userSubreddits.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Mis Subreddits",
+                        text = "⭐ Mis Suscripciones (${userSubreddits.size})",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(top = 6.dp, bottom = 2.dp)
+                        fontWeight = FontWeight.Bold,
+                        color = RedditOrange,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
                     )
                 }
 
@@ -117,11 +127,48 @@ fun SubredditListScreen(
                             repository.setSubreddit(sub)
                             onSubredditSelected(sub)
                         },
-                        label = { Text("r/$sub", fontSize = 12.sp) },
+                        label = { Text("r/$sub", fontSize = 12.sp, fontWeight = FontWeight.Medium) },
                         colors = ChipDefaults.secondaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+            } else if (isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            indicatorColor = RedditOrange
+                        )
+                    }
+                }
+            }
+
+            // Sección: Comunidades Sugeridas
+            item {
+                Text(
+                    text = "💡 Comunidades Destacadas",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextSecondary,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
+                )
+            }
+
+            items(defaultSuggested.filter { it !in userSubreddits }) { sub ->
+                Chip(
+                    onClick = {
+                        repository.setSubreddit(sub)
+                        onSubredditSelected(sub)
+                    },
+                    label = { Text("r/$sub", fontSize = 12.sp) },
+                    colors = ChipDefaults.secondaryChipColors(),
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

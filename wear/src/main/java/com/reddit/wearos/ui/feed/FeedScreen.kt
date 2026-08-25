@@ -1,8 +1,5 @@
 package com.reddit.wearos.ui.feed
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,7 +32,6 @@ import com.reddit.wearos.data.model.RedditPost
 import com.reddit.wearos.ui.components.RedditDownvoteIcon
 import com.reddit.wearos.ui.components.RedditUpvoteIcon
 import com.reddit.wearos.ui.theme.*
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
@@ -45,8 +42,8 @@ fun FeedScreen(
     onOpenSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState()
-    val coroutineScope = rememberCoroutineScope()
+    // Inicializa el scroll en el primer post (ítem 1) para que el feed ocupe 100% de la pantalla
+    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
 
     var pullDistance by remember { mutableStateOf(0f) }
     val isAtTop = remember {
@@ -78,7 +75,8 @@ fun FeedScreen(
                             text = state.message,
                             color = Color.Red,
                             fontSize = 12.sp,
-                            maxLines = 3
+                            maxLines = 3,
+                            textAlign = TextAlign.Center
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Chip(
@@ -115,85 +113,88 @@ fun FeedScreen(
                             .fillMaxSize()
                             .rotaryWithScroll(scrollState),
                         state = scrollState,
-                        contentPadding = PaddingValues(top = 28.dp, bottom = 44.dp, start = 8.dp, end = 8.dp),
+                        contentPadding = PaddingValues(top = 18.dp, bottom = 44.dp, start = 8.dp, end = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Indicador visual de Pull to Refresh cuando está refrescando o tirando hacia abajo
-                        if (state.isRefreshing || pullDistance > 0f) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp),
-                                    contentAlignment = Alignment.Center
+                        // PANTALLA / PANEL SUPERIOR DE CONTROL (Visible solo al deslizar hacia arriba)
+                        item {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                if (state.isRefreshing || pullDistance > 0f) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (state.isRefreshing) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                indicatorColor = RedditOrange
+                                            )
+                                        } else {
+                                            Text(
+                                                text = if (pullDistance > 75f) "⬆️ Suelta para refrescar" else "⬇️ Desliza para refrescar",
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = if (pullDistance > 75f) RedditOrange else TextSecondary
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    if (state.isRefreshing) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(24.dp),
-                                            indicatorColor = RedditOrange
-                                        )
-                                    } else {
-                                        Text(
-                                            text = if (pullDistance > 75f) "⬆️ Suelta para refrescar" else "⬇️ Desliza para refrescar",
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = if (pullDistance > 75f) RedditOrange else TextSecondary
-                                        )
+                                    // Selector de Feeds y Comunidades
+                                    Chip(
+                                        onClick = onOpenSubreddits,
+                                        label = {
+                                            val title = when (state.subreddit.lowercase()) {
+                                                "home", "principal" -> "🏠 Personal"
+                                                "popular" -> "🔥 r/popular"
+                                                "all" -> "🌐 r/all"
+                                                else -> "r/${state.subreddit}"
+                                            }
+                                            Text(
+                                                text = title,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp
+                                            )
+                                        },
+                                        colors = ChipDefaults.primaryChipColors(backgroundColor = DarkSurface),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(42.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    // Botón grande de Ajustes
+                                    Box(
+                                        modifier = Modifier
+                                            .size(42.dp)
+                                            .clip(CircleShape)
+                                            .background(DarkSurface)
+                                            .clickable { onOpenSettings() },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text("⚙️", fontSize = 16.sp)
                                     }
                                 }
                             }
                         }
 
-                        // Header limpio y ergonómico: Selector a la izquierda + Botón Ajustes GRANDE y cómodo a la derecha
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // Selector de Subreddit
-                                Chip(
-                                    onClick = onOpenSubreddits,
-                                    label = {
-                                        val title = when (state.subreddit.lowercase()) {
-                                            "home", "principal" -> "🏠 Personal"
-                                            "popular" -> "🔥 r/popular"
-                                            "all" -> "🌐 r/all"
-                                            else -> "r/${state.subreddit}"
-                                        }
-                                        Text(
-                                            text = title,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp
-                                        )
-                                    },
-                                    colors = ChipDefaults.primaryChipColors(backgroundColor = DarkSurface),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(42.dp)
-                                )
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                // Botón de Ajustes GRANDE y ergonómico (42dp de diámetro)
-                                Box(
-                                    modifier = Modifier
-                                        .size(42.dp)
-                                        .clip(CircleShape)
-                                        .background(DarkSurface)
-                                        .clickable { onOpenSettings() },
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text("⚙️", fontSize = 16.sp)
-                                }
-                            }
-                        }
-
-                        // Lista de posts
+                        // LISTA DE PUBLICACIONES (Ocupa 100% de la pantalla inmediatamente)
                         itemsIndexed(state.posts) { index, post ->
                             if (index >= state.posts.size - 3 && state.hasMore && !state.isLoadingMore) {
                                 LaunchedEffect(Unit) {
@@ -214,7 +215,7 @@ fun FeedScreen(
                             )
                         }
 
-                        // Footer con botón de ajustes y cargar más
+                        // Pie de lista con acceso a Ajustes
                         item {
                             Chip(
                                 onClick = onOpenSettings,
