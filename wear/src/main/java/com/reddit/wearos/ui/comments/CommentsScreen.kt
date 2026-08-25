@@ -1,10 +1,8 @@
 package com.reddit.wearos.ui.comments
 
-import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,9 +28,9 @@ import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
 import com.reddit.wearos.ui.components.ClickableRedditText
 import com.reddit.wearos.ui.components.RedditDownvoteIcon
 import com.reddit.wearos.ui.components.RedditUpvoteIcon
+import com.reddit.wearos.ui.components.ReplyDialog
 import com.reddit.wearos.ui.feed.formatScore
 import com.reddit.wearos.ui.theme.*
-import com.reddit.wearos.util.WearInputHelper
 
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
@@ -47,32 +45,30 @@ fun CommentsScreen(
 
     var replyingToThingId by remember { mutableStateOf<String?>(null) }
     var replyingToAuthor by remember { mutableStateOf<String?>(null) }
-
-    val inputLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val replyText = WearInputHelper.extractText(result.data)
-            val targetId = replyingToThingId
-            if (!replyText.isNullOrEmpty() && !targetId.isNullOrEmpty()) {
-                viewModel.submitComment(postId, subreddit, targetId, replyText)
-            }
-        }
-        replyingToThingId = null
-        replyingToAuthor = null
-    }
+    var showReplyDialog by remember { mutableStateOf(false) }
 
     fun launchReply(thingId: String, author: String) {
         replyingToThingId = thingId
         replyingToAuthor = author
-        try {
-            inputLauncher.launch(WearInputHelper.createInputIntent("Responder a u/$author..."))
-        } catch (_: Exception) {
-            try {
-                inputLauncher.launch(WearInputHelper.createSpeechFallbackIntent("Responder a u/$author..."))
-            } catch (_: Exception) {}
-        }
+        showReplyDialog = true
     }
+
+    // Modal de Entrada de Texto con Teclado
+    ReplyDialog(
+        show = showReplyDialog,
+        author = replyingToAuthor ?: "usuario",
+        onDismiss = {
+            showReplyDialog = false
+            replyingToThingId = null
+            replyingToAuthor = null
+        },
+        onSend = { text ->
+            val targetId = replyingToThingId
+            if (!targetId.isNullOrEmpty()) {
+                viewModel.submitComment(postId, subreddit, targetId, text)
+            }
+        }
+    )
 
     Scaffold(
         timeText = { TimeText() },
@@ -144,7 +140,6 @@ fun CommentCard(
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
     val isLastChild = flatComment.isLastChild
-    val hasReplies = flatComment.hasReplies
     val passThroughColumns = flatComment.passThroughColumns
     val treeLineColor = Color(0xFF6E6E80)
 
@@ -204,8 +199,9 @@ fun CommentCard(
                     cap = StrokeCap.Square
                 )
 
-                // Si NO es el último hijo o si tiene respuestas debajo, continúa hacia abajo (├── T)
-                if (!isLastChild || hasReplies) {
+                // Únicamente si NO es el último hijo de su nivel, la rama continúa hacia abajo (├── T)
+                // Si es el último hijo, finaliza limpiamente en L (└──)
+                if (!isLastChild) {
                     drawLine(
                         color = treeLineColor,
                         start = Offset(currentX, cornerY),
@@ -247,18 +243,19 @@ fun CommentCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Barra inferior: Responder en Pildorita + Votación en Pildorita
+                // Barra inferior: Responder en Pildorita destacada + Votación en Pildorita
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Botón Responder en Pildorita
+                    // Botón Responder en Pildorita con alto contraste y borde sutil
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF1E1E1E))
+                            .background(Color(0xFF282834))
+                            .border(1.dp, Color(0xFF404052), RoundedCornerShape(14.dp))
                             .clickable { onReply() }
                             .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
@@ -268,11 +265,11 @@ fun CommentCard(
                             tint = RedditOrange,
                             modifier = Modifier.size(11.dp)
                         )
-                        Spacer(modifier = Modifier.width(3.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "Responder",
                             fontSize = 9.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.SemiBold,
                             color = Color.White
                         )
                     }
@@ -282,7 +279,8 @@ fun CommentCard(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF1E1E1E))
+                            .background(Color(0xFF282834))
+                            .border(1.dp, Color(0xFF404052), RoundedCornerShape(14.dp))
                             .padding(horizontal = 5.dp, vertical = 3.dp)
                     ) {
                         Box(
