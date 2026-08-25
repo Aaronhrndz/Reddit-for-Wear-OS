@@ -38,6 +38,8 @@ class RedditApiService(
         val token = authManager.refreshTokenIfNeeded() ?: tokenStorage.getAccessToken() ?: return null
         return if (token.startsWith("Bearer ")) {
             Pair("Authorization", token)
+        } else if (token.startsWith("eyJ") && !token.contains("=") && !token.contains(";")) {
+            Pair("Authorization", "Bearer $token")
         } else {
             val cookieVal = if (!token.contains("=")) "reddit_session=$token" else token
             Pair("Cookie", cookieVal)
@@ -46,7 +48,7 @@ class RedditApiService(
 
     private suspend fun isBearerAuth(): Boolean {
         val token = tokenStorage.getAccessToken() ?: return false
-        return token.startsWith("Bearer ")
+        return token.startsWith("Bearer ") || (token.startsWith("eyJ") && !token.contains("=") && !token.contains(";"))
     }
 
     var lastDiagnostic: String = "Iniciando consulta..."
