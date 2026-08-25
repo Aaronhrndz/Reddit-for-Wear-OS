@@ -54,7 +54,8 @@ fun FeedScreen(
     val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
 
     Scaffold(
-        timeText = { TimeText() },
+        timeText = { com.reddit.wearos.ui.components.RedditTimeText() },
+        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
         when (val state = uiState) {

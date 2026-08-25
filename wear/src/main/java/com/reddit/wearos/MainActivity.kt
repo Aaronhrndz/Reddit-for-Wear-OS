@@ -53,9 +53,6 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Evita que la pantalla se apague o se duerma mientras la app esta activa
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
         app = application as RedditWearApp
         ambientController = AmbientModeSupport.attach(this)
 

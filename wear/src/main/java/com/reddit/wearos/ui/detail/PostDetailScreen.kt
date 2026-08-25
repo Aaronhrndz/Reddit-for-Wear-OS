@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,7 +86,8 @@ fun PostDetailScreen(
     )
 
     Scaffold(
-        timeText = { TimeText() },
+        timeText = { com.reddit.wearos.ui.components.RedditTimeText() },
+        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
         when (val state = uiState) {
@@ -115,7 +117,7 @@ fun PostDetailScreen(
                         minTransitionArea = 0f,
                         maxTransitionArea = 0f
                     ),
-                    contentPadding = PaddingValues(top = 24.dp, bottom = 42.dp, start = 6.dp, end = 6.dp),
+                    contentPadding = PaddingValues(top = 28.dp, bottom = 44.dp, start = 6.dp, end = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(0.dp)
                 ) {
                     // CABECERA + TÍTULO INTEGRADO (Optimizado para pantalla circular)
@@ -309,7 +311,7 @@ fun PostDetailScreen(
                             },
                             icon = {
                                 Icon(
-                                    imageVector = Icons.Default.Share,
+                                    imageVector = Icons.Default.Smartphone,
                                     contentDescription = null,
                                     tint = TextSecondary,
                                     modifier = Modifier.size(13.dp)
