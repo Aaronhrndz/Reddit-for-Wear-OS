@@ -26,6 +26,9 @@ class TokenStorage(context: Context) {
         context.getSharedPreferences("reddit_fallback_prefs", Context.MODE_PRIVATE)
     }
 
+    private val _isLoggedIn = MutableStateFlow(!getAccessToken().isNullOrEmpty())
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
     init {
         if (getAccessToken().isNullOrEmpty()) {
             saveTokens(
@@ -37,9 +40,6 @@ class TokenStorage(context: Context) {
             setClientId("0R-WAMhuoo-MyQ")
         }
     }
-
-    private val _isLoggedIn = MutableStateFlow(!getAccessToken().isNullOrEmpty())
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
     fun getClientId(): String {
         return prefs.getString(KEY_CLIENT_ID, "") ?: ""

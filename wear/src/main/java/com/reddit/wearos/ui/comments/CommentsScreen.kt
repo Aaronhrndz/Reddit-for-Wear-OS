@@ -140,7 +140,6 @@ fun CommentCard(
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
     val isLastChild = flatComment.isLastChild
-    val hasReplies = flatComment.hasReplies
     val passThroughColumns = flatComment.passThroughColumns
     val treeLineColor = Color(0xFF6E6E80)
 
@@ -178,7 +177,7 @@ fun CommentCard(
                     }
                 }
 
-                // 2. Columna del nivel actual (columna depth - 1)
+                // 2. Columna de la rama propia (columna depth - 1)
                 val currentCol = depth - 1
                 val currentX = colStepPx * currentCol + (colStepPx / 2f)
 
@@ -201,24 +200,12 @@ fun CommentCard(
                 )
 
                 // Si NO es el último hijo de su nivel, continúa hacia abajo conectando con el siguiente hermano (├── T)
-                // Si es el último hijo, finaliza limpiamente en L (└──) sin extenderse hacia el vacío
+                // Si es el último hijo, finaliza limpiamente en L (└──)
                 if (!isLastChild) {
                     drawLine(
                         color = treeLineColor,
                         start = Offset(currentX, cornerY),
                         end = Offset(currentX, size.height),
-                        strokeWidth = strokeWidthPx,
-                        cap = StrokeCap.Square
-                    )
-                }
-
-                // 3. Si este comentario tiene respuestas debajo, alimenta a sus hijos en la columna depth (siguiente a la derecha)
-                if (hasReplies && depth < 3) {
-                    val childX = colStepPx * depth + (colStepPx / 2f)
-                    drawLine(
-                        color = treeLineColor,
-                        start = Offset(childX, cornerY),
-                        end = Offset(childX, size.height),
                         strokeWidth = strokeWidthPx,
                         cap = StrokeCap.Square
                     )
@@ -322,7 +309,7 @@ fun CommentCard(
                         Box(
                             modifier = Modifier
                                 .clickable { onDownvote() }
-                            .padding(1.dp)
+                                .padding(1.dp)
                         ) {
                             RedditDownvoteIcon(
                                 isVoted = comment.likes == false,
