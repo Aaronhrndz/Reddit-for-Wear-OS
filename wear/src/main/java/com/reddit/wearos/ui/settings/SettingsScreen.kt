@@ -205,8 +205,9 @@ fun SettingsScreen(
 
             // Info de versión
             item {
+                val deviceName = "${android.os.Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${android.os.Build.MODEL}"
                 Text(
-                    text = "Reddit for WearOS v1.0.0\nGalaxy Watch Ultra",
+                    text = "Reddit for Wear OS v1.1.0\n$deviceName",
                     fontSize = 9.sp,
                     color = TextSecondary,
                     textAlign = TextAlign.Center,
