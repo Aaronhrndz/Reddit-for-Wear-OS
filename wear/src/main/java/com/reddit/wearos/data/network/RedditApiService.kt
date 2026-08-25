@@ -77,15 +77,15 @@ class RedditApiService(
             }
         }
         if (isHome) {
-            urlsToTry.add("https://old.reddit.com/$sortPath/.json")
+            urlsToTry.add("https://old.reddit.com/$sortPath.json")
             urlsToTry.add("https://old.reddit.com/.json")
-            urlsToTry.add("https://www.reddit.com/$sortPath/.json")
+            urlsToTry.add("https://www.reddit.com/$sortPath.json")
             urlsToTry.add("https://www.reddit.com/.json")
         } else {
-            urlsToTry.add("https://old.reddit.com/r/$sub/$sortPath/.json")
-            urlsToTry.add("https://old.reddit.com/r/$sub/.json")
-            urlsToTry.add("https://www.reddit.com/r/$sub/$sortPath/.json")
-            urlsToTry.add("https://www.reddit.com/r/$sub/.json")
+            urlsToTry.add("https://old.reddit.com/r/$sub/$sortPath.json")
+            urlsToTry.add("https://old.reddit.com/r/$sub.json")
+            urlsToTry.add("https://www.reddit.com/r/$sub/$sortPath.json")
+            urlsToTry.add("https://www.reddit.com/r/$sub.json")
         }
 
         var currentAuthHeader = authHeader
