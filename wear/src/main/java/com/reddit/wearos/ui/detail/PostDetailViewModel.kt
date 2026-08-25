@@ -195,10 +195,10 @@ class PostDetailViewModel(
             )
 
             if (hasReplies) {
-                val nextPassThrough = if (depth > 0) {
-                    passThrough + (!isLast)
+                val nextPassThrough = if (depth == 0) {
+                    emptyList()
                 } else {
-                    listOf(!isLast)
+                    passThrough + (!isLast)
                 }
                 result.addAll(flattenComments(replies, depth + 1, nextPassThrough))
             }
