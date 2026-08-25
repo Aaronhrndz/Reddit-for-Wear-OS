@@ -4,23 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reddit.wearos.data.RedditRepository
 import com.reddit.wearos.data.model.RedditComment
-import com.reddit.wearos.data.model.RedditListing
 import com.reddit.wearos.data.model.RedditPost
-import com.reddit.wearos.data.network.NetworkClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.decodeFromJsonElement
-
-data class FlatComment(
-    val comment: RedditComment,
-    val depth: Int,
-    val hasReplies: Boolean = false,
-    val isLastChild: Boolean = false,
-    val passThroughColumns: List<Boolean> = emptyList(),
-    val isCollapsed: Boolean = false
-)
 
 sealed class CommentsUiState {
     object Loading : CommentsUiState()
@@ -43,10 +31,23 @@ class CommentsViewModel(
             try {
                 val (_, comments) = repository.getComments(subreddit, postId)
                 rawCommentTree = comments
-                val flattened = flattenComments(comments, depth = 0)
+                val flattened = flattenCommentTree(comments)
                 _uiState.value = CommentsUiState.Success(flattened)
             } catch (e: Exception) {
-                _uiState.value = CommentsUiState.Error(e.localizedMessage ?: "Error al cargar comentarios")
+                _uiState.value = CommentsUiState.Error(e.message ?: "Error al cargar comentarios")
+            }
+        }
+    }
+
+    fun submitComment(postId: String, subreddit: String, parentThingId: String, text: String) {
+        viewModelScope.launch {
+            val success = repository.addComment(parentThingId, text)
+            if (success) {
+                try {
+                    val (_, comments) = repository.getComments(subreddit, postId)
+                    rawCommentTree = comments
+                    _uiState.value = CommentsUiState.Success(flattenCommentTree(comments))
+                } catch (_: Exception) {}
             }
         }
     }
@@ -93,53 +94,5 @@ class CommentsViewModel(
                 }
             }
         }
-    }
-
-    fun submitComment(postId: String, subreddit: String, thingId: String, text: String, onComplete: ((Boolean) -> Unit)? = null) {
-        viewModelScope.launch {
-            val success = repository.addComment(thingId, text)
-            if (success) {
-                loadComments(postId, subreddit)
-            }
-            onComplete?.invoke(success)
-        }
-    }
-
-    private fun flattenComments(
-        comments: List<RedditComment>,
-        depth: Int,
-        passThrough: List<Boolean> = emptyList()
-    ): List<FlatComment> {
-        val result = mutableListOf<FlatComment>()
-        for (i in comments.indices) {
-            val c = comments[i]
-            val isLast = (i == comments.size - 1)
-            val replies = if (c.replies != null) {
-                com.reddit.wearos.data.model.parseCommentsFromListingElement(c.replies)
-            } else {
-                emptyList()
-            }
-            val hasReplies = replies.isNotEmpty()
-
-            result.add(
-                FlatComment(
-                    comment = c.copy(depth = depth),
-                    depth = depth,
-                    hasReplies = hasReplies,
-                    isLastChild = isLast,
-                    passThroughColumns = passThrough
-                )
-            )
-
-            if (hasReplies) {
-                val nextPassThrough = if (depth <= 1) {
-                    emptyList()
-                } else {
-                    passThrough + (!isLast)
-                }
-                result.addAll(flattenComments(replies, depth + 1, nextPassThrough))
-            }
-        }
-        return result
     }
 }

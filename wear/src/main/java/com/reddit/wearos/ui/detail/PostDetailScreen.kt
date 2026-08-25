@@ -412,11 +412,6 @@ fun InlineCommentCard(
     onReply: () -> Unit
 ) {
     val comment = flatComment.comment
-    val depth = flatComment.depth.coerceAtMost(3)
-    val isLastChild = flatComment.isLastChild
-    val hasReplies = flatComment.hasReplies
-    val passThroughColumns = flatComment.passThroughColumns
-    val treeLineColor = Color(0xFF6E6E80)
 
     Row(
         modifier = Modifier
@@ -425,92 +420,10 @@ fun InlineCommentCard(
             .padding(horizontal = 2.dp, vertical = 0.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── / ├── 100% Continuas)
-        if (depth > 0) {
-            val gutterWidth = (depth * 14).dp
-            Canvas(
-                modifier = Modifier
-                    .width(gutterWidth)
-                    .fillMaxHeight()
-                    .padding(end = 2.dp)
-            ) {
-                val strokeWidthPx = 1.8.dp.toPx()
-                val colStepPx = 14.dp.toPx()
-                val cornerY = 16.dp.toPx()
-
-                // 1. Columnas de ancestros pass-through (d de 0 hasta parentCol - 1)
-                val parentCol = if (depth <= 1) 0 else depth - 2
-                for (d in 0 until parentCol) {
-                    if (d < passThroughColumns.size && passThroughColumns[d]) {
-                        val x = colStepPx * d + (colStepPx / 2f)
-                        drawLine(
-                            color = treeLineColor,
-                            start = Offset(x, 0f),
-                            end = Offset(x, size.height),
-                            strokeWidth = strokeWidthPx,
-                            cap = StrokeCap.Square
-                        )
-                    }
-                }
-
-                // 2. Columna del tronco del padre (parentCol) que alimenta a este comentario
-                val parentX = colStepPx * parentCol + (colStepPx / 2f)
-
-                // Tramo vertical desde el tope (y=0) hasta cornerY
-                drawLine(
-                    color = treeLineColor,
-                    start = Offset(parentX, 0f),
-                    end = Offset(parentX, cornerY),
-                    strokeWidth = strokeWidthPx,
-                    cap = StrokeCap.Square
-                )
-
-                // Tramo horizontal desde el tronco del padre hasta la tarjeta del comentario
-                drawLine(
-                    color = treeLineColor,
-                    start = Offset(parentX, cornerY),
-                    end = Offset(size.width, cornerY),
-                    strokeWidth = strokeWidthPx,
-                    cap = StrokeCap.Square
-                )
-
-                // Continuidad del tronco del padre hacia abajo:
-                if (depth == 1) {
-                    if (!isLastChild || hasReplies) {
-                        drawLine(
-                            color = treeLineColor,
-                            start = Offset(parentX, cornerY),
-                            end = Offset(parentX, size.height),
-                            strokeWidth = strokeWidthPx,
-                            cap = StrokeCap.Square
-                        )
-                    }
-                } else {
-                    if (!isLastChild) {
-                        drawLine(
-                            color = treeLineColor,
-                            start = Offset(parentX, cornerY),
-                            end = Offset(parentX, size.height),
-                            strokeWidth = strokeWidthPx,
-                            cap = StrokeCap.Square
-                        )
-                    }
-                }
-
-                // 3. Tronco propio para los hijos que estén anidados debajo de este comentario (depth >= 2)
-                if (depth >= 2 && hasReplies && depth < 3) {
-                    val myCol = depth - 1
-                    val myX = colStepPx * myCol + (colStepPx / 2f)
-                    drawLine(
-                        color = treeLineColor,
-                        start = Offset(myX, cornerY),
-                        end = Offset(myX, size.height),
-                        strokeWidth = strokeWidthPx,
-                        cap = StrokeCap.Square
-                    )
-                }
-            }
-        }
+        // Líneas de árbol continuas precalculadas con 0 errores matemáticos
+        com.reddit.wearos.ui.components.TreeLineCanvas(
+            segments = flatComment.segments
+        )
 
         // Tarjeta de contenido del comentario (con margen vertical interno para no cortar las líneas)
         Box(
