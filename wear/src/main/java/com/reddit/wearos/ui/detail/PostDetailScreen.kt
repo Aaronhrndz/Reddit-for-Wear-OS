@@ -413,7 +413,7 @@ fun InlineCommentCard(
 ) {
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
-    val treeLineColor = Color(0xFF484852)
+    val treeLineColor = Color(0xFF707080)
 
     Row(
         modifier = Modifier
@@ -424,14 +424,14 @@ fun InlineCommentCard(
     ) {
         // Líneas de árbol estilo Explorador de Archivos (Treeview Drilldown └──)
         if (depth > 0) {
-            val gutterWidth = (depth * 9).dp
+            val gutterWidth = (depth * 16).dp
             Canvas(
                 modifier = Modifier
                     .width(gutterWidth)
                     .fillMaxHeight()
-                    .padding(end = 3.dp)
+                    .padding(end = 4.dp)
             ) {
-                val strokeWidthPx = 1.5.dp.toPx()
+                val strokeWidthPx = 1.8.dp.toPx()
                 val colStepPx = this.size.width / depth
 
                 // Columnas de ancestros continuas (│)
@@ -448,13 +448,13 @@ fun InlineCommentCard(
 
                 // Rama actual conectora en L (└──)
                 val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
-                val cornerY = 12.dp.toPx()
+                val cornerY = 13.dp.toPx()
                 val path = Path().apply {
                     moveTo(currentX, 0f)
-                    lineTo(currentX, cornerY - 2.dp.toPx())
+                    lineTo(currentX, cornerY - 3.dp.toPx())
                     quadraticTo(
                         currentX, cornerY,
-                        currentX + 2.dp.toPx(), cornerY
+                        currentX + 3.dp.toPx(), cornerY
                     )
                     lineTo(this@Canvas.size.width, cornerY)
                 }
