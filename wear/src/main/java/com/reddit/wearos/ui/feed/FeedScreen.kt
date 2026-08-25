@@ -36,6 +36,9 @@ import com.reddit.wearos.ui.components.RedditDownvoteIcon
 import com.reddit.wearos.ui.components.RedditUpvoteIcon
 import com.reddit.wearos.ui.theme.*
 
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun FeedScreen(
@@ -45,7 +48,9 @@ fun FeedScreen(
     onOpenSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
+    val scrollState = rememberSaveable(saver = ScalingLazyListState.Saver) {
+        ScalingLazyListState(initialCenterItemIndex = 1)
+    }
 
     Scaffold(
         timeText = { TimeText() },

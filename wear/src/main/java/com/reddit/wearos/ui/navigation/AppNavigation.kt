@@ -24,6 +24,7 @@ fun AppNavigation(
     repository: RedditRepository
 ) {
     val navController = rememberSwipeDismissableNavController()
+    val feedViewModel = remember { FeedViewModel(repository) }
     val startDestination = if (tokenStorage.getAccessToken() != null) Screen.Feed.route else Screen.Login.route
 
     SwipeDismissableNavHost(
@@ -48,7 +49,6 @@ fun AppNavigation(
         }
 
         composable(Screen.Feed.route) {
-            val feedViewModel = FeedViewModel(repository)
             FeedScreen(
                 viewModel = feedViewModel,
                 onPostClick = { post ->
