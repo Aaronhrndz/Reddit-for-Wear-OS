@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
@@ -108,8 +109,14 @@ fun PostDetailScreen(
                         .rotaryWithScroll(scrollState),
                     state = scrollState,
                     autoCentering = null,
+                    scalingParams = ScalingLazyColumnDefaults.scalingParams(
+                        edgeScale = 1f,
+                        edgeAlpha = 1f,
+                        minTransitionArea = 0f,
+                        maxTransitionArea = 0f
+                    ),
                     contentPadding = PaddingValues(top = 24.dp, bottom = 42.dp, start = 6.dp, end = 6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     // CABECERA + TÍTULO INTEGRADO (Optimizado para pantalla circular)
                     item {
@@ -400,7 +407,7 @@ fun InlineCommentCard(
 ) {
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
-    val treeLineColor = Color(0xFF656575)
+    val treeLineColor = Color(0xFF6E6E80)
 
     Row(
         modifier = Modifier
@@ -409,7 +416,7 @@ fun InlineCommentCard(
             .padding(horizontal = 2.dp, vertical = 2.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── continuo entre filas)
+        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── Continuas y Alineadas)
         if (depth > 0) {
             val gutterWidth = (depth * 14).dp
             Canvas(
@@ -420,25 +427,24 @@ fun InlineCommentCard(
             ) {
                 val strokeWidthPx = 1.8.dp.toPx()
                 val colStepPx = this.size.width / depth
-                val spacingExtensionPx = 6.dp.toPx()
 
-                // Líneas de ancestros (│) extendidas arriba y abajo para conectar filas
+                // 1. Columnas de ancestros (│) continuas de tope a tope
                 for (d in 0 until depth - 1) {
                     val x = colStepPx * d + (colStepPx / 2f)
                     drawLine(
                         color = treeLineColor,
-                        start = Offset(x, -spacingExtensionPx),
-                        end = Offset(x, size.height + spacingExtensionPx),
+                        start = Offset(x, 0f),
+                        end = Offset(x, size.height),
                         strokeWidth = strokeWidthPx,
                         cap = StrokeCap.Square
                     )
                 }
 
-                // Rama conectora en L (└──)
+                // 2. Rama conectora en L (└──) que entra a la cabecera de la tarjeta
                 val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
-                val cornerY = 12.dp.toPx()
+                val cornerY = 14.dp.toPx()
                 val path = Path().apply {
-                    moveTo(currentX, -spacingExtensionPx)
+                    moveTo(currentX, 0f)
                     lineTo(currentX, cornerY - 2.dp.toPx())
                     quadraticTo(
                         currentX, cornerY,
