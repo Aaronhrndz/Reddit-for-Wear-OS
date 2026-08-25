@@ -42,6 +42,7 @@ import kotlinx.coroutines.delay
 fun WearVideoPlayer(
     videoUrl: String,
     modifier: Modifier = Modifier,
+    audioUrl: String? = null,
     posterUrl: String? = null,
     autoPlay: Boolean = false
 ) {
@@ -60,6 +61,7 @@ fun WearVideoPlayer(
 
     var textureViewRef by remember { mutableStateOf<TextureView?>(null) }
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    var audioPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     var surfaceRef by remember { mutableStateOf<Surface?>(null) }
     var retryTrigger by remember { mutableIntStateOf(0) }
 
@@ -90,7 +92,13 @@ fun WearVideoPlayer(
                 mediaPlayer?.reset()
                 mediaPlayer?.release()
             } catch (_: Exception) {}
+            try {
+                audioPlayer?.stop()
+                audioPlayer?.reset()
+                audioPlayer?.release()
+            } catch (_: Exception) {}
             mediaPlayer = null
+            audioPlayer = null
             surfaceRef?.release()
             surfaceRef = null
             textureViewRef = null
@@ -215,10 +223,35 @@ fun WearVideoPlayer(
                                         isBuffering = false
                                         true
                                     }
-
                                     prepareAsync()
                                 }
                                 mediaPlayer = mp
+
+                                if (!audioUrl.isNullOrEmpty()) {
+                                    try {
+                                        val ap = MediaPlayer().apply {
+                                            setAudioAttributes(
+                                                AudioAttributes.Builder()
+                                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                                    .build()
+                                            )
+                                            isLooping = true
+                                            setDataSource(ctx, Uri.parse(audioUrl), mapOf("User-Agent" to "android:com.reddit.wearos:v1.0.0 (WearOS client)"))
+                                            val vol = if (isMuted) 0f else 1f
+                                            setVolume(vol, vol)
+                                            setOnPreparedListener {
+                                                val vVol = if (isMuted) 0f else 1f
+                                                it.setVolume(vVol, vVol)
+                                                if (isPlaying) {
+                                                    it.start()
+                                                }
+                                            }
+                                            prepareAsync()
+                                        }
+                                        audioPlayer = ap
+                                    } catch (_: Exception) {}
+                                }
                             } catch (e: Exception) {
                                 hasError = true
                                 isBuffering = false
@@ -251,14 +284,16 @@ fun WearVideoPlayer(
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .clickable {
-                        mediaPlayer?.let { mp ->
+                    .pointerInput(isPlaying) {
+                        detectTapGestures {
                             try {
-                                if (mp.isPlaying) {
-                                    mp.pause()
+                                if (isPlaying) {
+                                    mediaPlayer?.pause()
+                                    audioPlayer?.pause()
                                     isPlaying = false
                                 } else {
-                                    mp.start()
+                                    mediaPlayer?.start()
+                                    audioPlayer?.start()
                                     isPlaying = true
                                 }
                             } catch (_: Exception) {}
@@ -285,6 +320,7 @@ fun WearVideoPlayer(
                         .clickable {
                             try {
                                 mediaPlayer?.start()
+                                audioPlayer?.start()
                                 isPlaying = true
                             } catch (_: Exception) {}
                         },
@@ -308,10 +344,19 @@ fun WearVideoPlayer(
                     .background(Color(0x99000000))
                     .clickable {
                         isMuted = !isMuted
+                        val vol = if (isMuted) 0f else 1f
                         mediaPlayer?.let { mp ->
                             try {
-                                val vol = if (isMuted) 0f else 1f
                                 mp.setVolume(vol, vol)
+                            } catch (_: Exception) {}
+                        }
+                        audioPlayer?.let { ap ->
+                            try {
+                                ap.setVolume(vol, vol)
+                                if (!isMuted && isPlaying && !ap.isPlaying) {
+                                    ap.seekTo(currentPositionMs)
+                                    ap.start()
+                                }
                             } catch (_: Exception) {}
                         }
                     }
