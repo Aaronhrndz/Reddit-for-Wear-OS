@@ -62,6 +62,22 @@ fun AppNavigation(
                 },
                 onOpenSettings = {
                     navController.navigate(Screen.Settings.route)
+                },
+                onOpenSearch = {
+                    navController.navigate(Screen.Search.route)
+                }
+            )
+        }
+
+        composable(Screen.Search.route) {
+            com.reddit.wearos.ui.search.SearchScreen(
+                repository = repository,
+                onSubredditClick = { sub ->
+                    repository.setSubreddit(sub)
+                    navController.popBackStack(Screen.Feed.route, inclusive = false)
+                },
+                onPostClick = { post ->
+                    navController.navigate(Screen.PostDetail.createRoute(post.id, post.subreddit))
                 }
             )
         }
@@ -85,6 +101,9 @@ fun AppNavigation(
                 onOpenSaved = {
                     navController.navigate(Screen.Saved.route)
                 },
+                onOpenProfile = {
+                    navController.navigate(Screen.Profile.route)
+                },
                 onLogout = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Feed.route) { inclusive = true }
@@ -92,6 +111,15 @@ fun AppNavigation(
                 },
                 onBack = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Profile.route) {
+            com.reddit.wearos.ui.profile.ProfileScreen(
+                repository = repository,
+                onPostClick = { post ->
+                    navController.navigate(Screen.PostDetail.createRoute(post.id, post.subreddit))
                 }
             )
         }

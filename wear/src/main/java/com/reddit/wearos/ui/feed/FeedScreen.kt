@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
@@ -48,7 +49,8 @@ fun FeedScreen(
     viewModel: FeedViewModel,
     onPostClick: (RedditPost) -> Unit,
     onOpenSubreddits: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
+    onOpenSearch: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
@@ -98,6 +100,36 @@ fun FeedScreen(
                         contentPadding = PaddingValues(top = 18.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
+                    // BARRA DE BÚSQUEDA INTERACTIVA (Visible al hacer scroll hacia arriba)
+                    item {
+                        Chip(
+                            onClick = onOpenSearch,
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = RedditOrange,
+                                    modifier = Modifier.size(15.dp)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = "Buscar en Reddit...",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.White
+                                )
+                            },
+                            secondaryLabel = {
+                                Text("Feeds y posts", fontSize = 8.sp, color = TextSecondary)
+                            },
+                            colors = ChipDefaults.secondaryChipColors(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 2.dp)
+                        )
+                    }
+
                     // PANEL SUPERIOR DE CONTROL (Visible al deslizar hacia arriba)
                     item {
                         Row(

@@ -36,6 +36,7 @@ fun SettingsScreen(
     repository: RedditRepository,
     onOpenInbox: () -> Unit,
     onOpenSaved: () -> Unit,
+    onOpenProfile: () -> Unit = {},
     onLogout: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -81,7 +82,7 @@ fun SettingsScreen(
                 )
             }
 
-            // Estado de la cuenta
+            // Estado de la cuenta (Pulsar para abrir Perfil)
             item {
                 val currentName = username ?: tokenStorage.getUsername()
                 val displayText = if (isLoggedIn) {
@@ -90,7 +91,7 @@ fun SettingsScreen(
                     "Modo Invitado"
                 }
                 Chip(
-                    onClick = {},
+                    onClick = { if (isLoggedIn) onOpenProfile() },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ChipDefaults.primaryChipColors(
                         backgroundColor = if (isLoggedIn) RedditOrange else Color(0xFF24242E),
@@ -114,7 +115,7 @@ fun SettingsScreen(
                     },
                     secondaryLabel = {
                         Text(
-                            text = if (isLoggedIn) "Cuenta vinculada" else "Sin cuenta vinculada",
+                            text = if (isLoggedIn) "Ver perfil e historial ➔" else "Sin cuenta vinculada",
                             fontSize = 9.sp,
                             color = Color.White.copy(alpha = 0.85f)
                         )

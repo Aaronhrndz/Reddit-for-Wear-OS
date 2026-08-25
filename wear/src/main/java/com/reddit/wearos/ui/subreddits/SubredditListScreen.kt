@@ -59,7 +59,6 @@ fun SubredditListScreen(
     }
 
     Scaffold(
-        vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },
         positionIndicator = { PositionIndicator(scalingLazyListState = scrollState) }
     ) {
         ScalingLazyColumn(

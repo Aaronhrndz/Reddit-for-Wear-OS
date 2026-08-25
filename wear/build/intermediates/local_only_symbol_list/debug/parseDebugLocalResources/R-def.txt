@@ -20,6 +20,7 @@ string login_desc
 string login_guest
 string login_title
 string logout
+string news_tile_name
 string settings_title
 string tile_name
 style MainActivityTheme.Starting

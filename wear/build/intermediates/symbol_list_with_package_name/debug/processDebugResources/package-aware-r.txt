@@ -545,6 +545,7 @@ string login_guest
 string login_title
 string logout
 string navigation_menu
+string news_tile_name
 string not_selected
 string range_end
 string range_start

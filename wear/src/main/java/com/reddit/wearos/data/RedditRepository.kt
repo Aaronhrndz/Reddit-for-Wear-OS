@@ -80,4 +80,29 @@ class RedditRepository(
     suspend fun getInbox(): List<com.reddit.wearos.data.model.RedditMessage> {
         return apiService.getInbox()
     }
+
+    suspend fun searchPosts(
+        query: String,
+        subreddit: String? = null,
+        sort: String = "relevance",
+        after: String? = null
+    ): Pair<List<RedditPost>, String?> {
+        val listing = apiService.searchPosts(query = query, subreddit = subreddit, sort = sort, after = after)
+        val posts = listing.data.children.map { it.data }
+        return Pair(posts, listing.data.after)
+    }
+
+    suspend fun searchSubreddits(query: String): List<RedditSubreddit> {
+        return apiService.searchSubreddits(query)
+    }
+
+    suspend fun getUserSubmitted(username: String, after: String? = null): Pair<List<RedditPost>, String?> {
+        val listing = apiService.getUserSubmitted(username = username, after = after)
+        val posts = listing.data.children.map { it.data }
+        return Pair(posts, listing.data.after)
+    }
+
+    suspend fun getUserComments(username: String, after: String? = null): List<RedditComment> {
+        return apiService.getUserComments(username = username, after = after)
+    }
 }

@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Reddit for Wear</string>
     <string name="tile_name">Reddit Quick Glance</string>
+    <string name="news_tile_name">Titulares Flash Reddit</string>
     <string name="login_title">Conectar Reddit</string>
     <string name="login_desc">Usa tu teléfono o ingresa tu Client ID personal para iniciar sesión</string>
     <string name="login_button_phone">Abrir en teléfono</string>

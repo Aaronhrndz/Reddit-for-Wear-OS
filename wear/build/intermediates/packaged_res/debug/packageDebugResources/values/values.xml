@@ -16,6 +16,7 @@
     <string name="login_guest">Continuar como invitado</string>
     <string name="login_title">Conectar Reddit</string>
     <string name="logout">Cerrar sesión</string>
+    <string name="news_tile_name">Titulares Flash Reddit</string>
     <string name="settings_title">Ajustes</string>
     <string name="tile_name">Reddit Quick Glance</string>
     <style name="MainActivityTheme.Starting" parent="@android:style/Theme.DeviceDefault">

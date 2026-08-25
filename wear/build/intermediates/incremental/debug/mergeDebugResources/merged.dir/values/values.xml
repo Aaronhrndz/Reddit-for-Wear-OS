@@ -279,6 +279,7 @@
     <string name="login_title">Conectar Reddit</string>
     <string name="logout">Cerrar sesión</string>
     <string name="navigation_menu">"Navigation menu"</string>
+    <string name="news_tile_name">Titulares Flash Reddit</string>
     <string name="not_selected">Not selected</string>
     <string name="range_end">"Range end"</string>
     <string name="range_start">"Range start"</string>

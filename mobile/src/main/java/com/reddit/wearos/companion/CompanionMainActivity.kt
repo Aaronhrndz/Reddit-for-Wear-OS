@@ -168,7 +168,7 @@ class CompanionMainActivity : ComponentActivity() {
         oauthState = state
         val challenge = generateCodeChallenge(verifier)
         val clientId = "0R-WAMhuoo-MyQ"
-        val redirectUri = "redditwear://auth"
+        val redirectUri = "https://redreader.org/auth"
         val scopes = "identity read mysubreddits vote save history"
 
         val authUrl = Uri.parse("https://www.reddit.com/api/v1/authorize.compact").buildUpon()
@@ -190,7 +190,9 @@ class CompanionMainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         val data = intent.data ?: return
-        if (data.scheme == "redditwear" && data.host == "auth") {
+        val isRedditWearAuth = data.scheme == "redditwear" && data.host == "auth"
+        val isRedReaderAuth = data.scheme == "https" && data.host == "redreader.org" && data.path?.startsWith("/auth") == true
+        if (isRedditWearAuth || isRedReaderAuth) {
             val code = data.getQueryParameter("code")
             if (!code.isNullOrEmpty()) {
                 exchangeOAuthCode(code)
@@ -203,7 +205,7 @@ class CompanionMainActivity : ComponentActivity() {
         loginStatus = "Intercambiando código OAuth 2.0 PKCE con Reddit..."
         val verifier = oauthVerifier ?: ""
         val clientId = "0R-WAMhuoo-MyQ"
-        val redirectUri = "redditwear://auth"
+        val redirectUri = "https://redreader.org/auth"
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
