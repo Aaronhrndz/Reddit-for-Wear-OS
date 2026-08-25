@@ -152,9 +152,11 @@ fun PostDetailScreen(
                         item {
                             WearVideoPlayer(
                                 videoUrl = videoUrl,
+                                posterUrl = post.getThumbnailUrl(),
+                                autoPlay = false,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(130.dp)
+                                    .height(155.dp)
                                     .padding(vertical = 4.dp)
                             )
                         }

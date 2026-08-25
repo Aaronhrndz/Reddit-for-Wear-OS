@@ -1,5 +1,6 @@
 package com.reddit.wearos.ui.components
 
+import android.graphics.Matrix
 import android.graphics.SurfaceTexture
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -17,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +34,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
+import coil.compose.AsyncImage
 import com.reddit.wearos.ui.theme.RedditOrange
 import kotlinx.coroutines.delay
 
@@ -40,17 +42,23 @@ import kotlinx.coroutines.delay
 fun WearVideoPlayer(
     videoUrl: String,
     modifier: Modifier = Modifier,
-    autoPlay: Boolean = true
+    posterUrl: String? = null,
+    autoPlay: Boolean = false
 ) {
     val context = LocalContext.current
+    var hasStartedPlayback by remember { mutableStateOf(autoPlay) }
     var isPlaying by remember { mutableStateOf(autoPlay) }
-    var isBuffering by remember { mutableStateOf(true) }
+    var isBuffering by remember { mutableStateOf(autoPlay) }
     var hasError by remember { mutableStateOf(false) }
     var isMuted by remember { mutableStateOf(true) }
 
     var currentPositionMs by remember { mutableIntStateOf(0) }
     var durationMs by remember { mutableIntStateOf(0) }
 
+    var videoWidth by remember { mutableIntStateOf(0) }
+    var videoHeight by remember { mutableIntStateOf(0) }
+
+    var textureViewRef by remember { mutableStateOf<TextureView?>(null) }
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     var surfaceRef by remember { mutableStateOf<Surface?>(null) }
     var retryTrigger by remember { mutableIntStateOf(0) }
@@ -60,8 +68,8 @@ fun WearVideoPlayer(
     }
 
     // Ticker para progreso de reproducción
-    LaunchedEffect(isPlaying, isBuffering, hasError) {
-        while (isPlaying && !isBuffering && !hasError) {
+    LaunchedEffect(isPlaying, isBuffering, hasError, hasStartedPlayback) {
+        while (hasStartedPlayback && isPlaying && !isBuffering && !hasError) {
             try {
                 mediaPlayer?.let { mp ->
                     if (mp.isPlaying) {
@@ -74,7 +82,7 @@ fun WearVideoPlayer(
         }
     }
 
-    // Limpieza al desmontar
+    // Limpieza al desmontar o reintentar
     DisposableEffect(retryTrigger) {
         onDispose {
             try {
@@ -85,6 +93,7 @@ fun WearVideoPlayer(
             mediaPlayer = null
             surfaceRef?.release()
             surfaceRef = null
+            textureViewRef = null
         }
     }
 
@@ -94,79 +103,149 @@ fun WearVideoPlayer(
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        if (!hasError) {
-            // Usamos TextureView en lugar de VideoView/SurfaceView para no perforar la ventana de Compose
+        if (!hasStartedPlayback) {
+            // Estado Inicial: Poster / Thumbnail con Botón Play Grande en el centro (NO AUTOPLAY)
+            if (!posterUrl.isNullOrEmpty()) {
+                AsyncImage(
+                    model = posterUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x33000000))
+                    .clickable {
+                        hasStartedPlayback = true
+                        isPlaying = true
+                        isBuffering = true
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(CircleShape)
+                        .background(RedditOrange),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = "Reproducir Video",
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+            }
+        } else if (!hasError) {
             AndroidView(
                 factory = { ctx ->
-                    TextureView(ctx).apply {
-                        layoutParams = FrameLayout.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        )
-                        surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                            override fun onSurfaceTextureAvailable(st: SurfaceTexture, width: Int, height: Int) {
-                                val s = Surface(st)
-                                surfaceRef = s
+                    val tv = TextureView(ctx)
+                    tv.layoutParams = FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    textureViewRef = tv
 
-                                try {
-                                    val mp = MediaPlayer().apply {
-                                        setSurface(s)
-                                        setAudioAttributes(
-                                            AudioAttributes.Builder()
-                                                .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
-                                                .setUsage(AudioAttributes.USAGE_MEDIA)
-                                                .build()
-                                        )
-                                        isLooping = true
-                                        
-                                        // Headers con User-Agent para que Reddit CDN no rechace la petición con 403
-                                        val headers = mapOf("User-Agent" to "android:com.reddit.wearos:v1.0.0 (WearOS client)")
-                                        setDataSource(ctx, Uri.parse(cleanUrl), headers)
+                    tv.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
+                        if (videoWidth > 0 && videoHeight > 0) {
+                            applyVideoAspectRatio(view as TextureView, videoWidth, videoHeight)
+                        }
+                    }
 
-                                        setOnPreparedListener { player ->
-                                            isBuffering = false
-                                            durationMs = player.duration.coerceAtLeast(0)
-                                            val vol = if (isMuted) 0f else 1f
-                                            player.setVolume(vol, vol)
-                                            if (isPlaying) {
-                                                player.start()
+                    tv.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+                        override fun onSurfaceTextureAvailable(st: SurfaceTexture, width: Int, height: Int) {
+                            val s = Surface(st)
+                            surfaceRef = s
+
+                            try {
+                                val mp = MediaPlayer().apply {
+                                    setSurface(s)
+                                    setAudioAttributes(
+                                        AudioAttributes.Builder()
+                                            .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+                                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                                            .build()
+                                    )
+                                    isLooping = true
+
+                                    val headers = mapOf("User-Agent" to "android:com.reddit.wearos:v1.0.0 (WearOS client)")
+                                    setDataSource(ctx, Uri.parse(cleanUrl), headers)
+
+                                    setOnVideoSizeChangedListener { _, w, h ->
+                                        if (w > 0 && h > 0) {
+                                            videoWidth = w
+                                            videoHeight = h
+                                            tv.post {
+                                                applyVideoAspectRatio(tv, w, h)
                                             }
                                         }
-
-                                        setOnInfoListener { _, what, _ ->
-                                            when (what) {
-                                                MediaPlayer.MEDIA_INFO_BUFFERING_START -> isBuffering = true
-                                                MediaPlayer.MEDIA_INFO_BUFFERING_END -> isBuffering = false
-                                                MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START -> isBuffering = false
-                                            }
-                                            true
-                                        }
-
-                                        setOnErrorListener { _, _, _ ->
-                                            hasError = true
-                                            isBuffering = false
-                                            true
-                                        }
-
-                                        prepareAsync()
                                     }
-                                    mediaPlayer = mp
-                                } catch (e: Exception) {
-                                    hasError = true
-                                    isBuffering = false
+
+                                    setOnPreparedListener { player ->
+                                        isBuffering = false
+                                        durationMs = player.duration.coerceAtLeast(0)
+                                        if (player.videoWidth > 0 && player.videoHeight > 0) {
+                                            videoWidth = player.videoWidth
+                                            videoHeight = player.videoHeight
+                                            tv.post {
+                                                applyVideoAspectRatio(tv, player.videoWidth, player.videoHeight)
+                                            }
+                                        }
+                                        val vol = if (isMuted) 0f else 1f
+                                        player.setVolume(vol, vol)
+                                        if (isPlaying) {
+                                            player.start()
+                                        }
+                                    }
+
+                                    setOnInfoListener { _, what, _ ->
+                                        when (what) {
+                                            MediaPlayer.MEDIA_INFO_BUFFERING_START -> isBuffering = true
+                                            MediaPlayer.MEDIA_INFO_BUFFERING_END -> isBuffering = false
+                                            MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START -> isBuffering = false
+                                        }
+                                        true
+                                    }
+
+                                    setOnErrorListener { _, _, _ ->
+                                        hasError = true
+                                        isBuffering = false
+                                        true
+                                    }
+
+                                    prepareAsync()
                                 }
+                                mediaPlayer = mp
+                            } catch (e: Exception) {
+                                hasError = true
+                                isBuffering = false
                             }
+                        }
 
-                            override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, width: Int, height: Int) {}
-
-                            override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
-                                try {
-                                    mediaPlayer?.setSurface(null)
-                                } catch (_: Exception) {}
-                                return true
+                        override fun onSurfaceTextureSizeChanged(st: SurfaceTexture, width: Int, height: Int) {
+                            if (videoWidth > 0 && videoHeight > 0) {
+                                applyVideoAspectRatio(tv, videoWidth, videoHeight)
                             }
+                        }
 
-                            override fun onSurfaceTextureUpdated(st: SurfaceTexture) {}
+                        override fun onSurfaceTextureDestroyed(st: SurfaceTexture): Boolean {
+                            try {
+                                mediaPlayer?.setSurface(null)
+                            } catch (_: Exception) {}
+                            return true
+                        }
+
+                        override fun onSurfaceTextureUpdated(st: SurfaceTexture) {}
+                    }
+                    tv
+                },
+                update = { tv ->
+                    if (videoWidth > 0 && videoHeight > 0) {
+                        tv.post {
+                            applyVideoAspectRatio(tv, videoWidth, videoHeight)
                         }
                     }
                 },
@@ -330,6 +409,35 @@ fun WearVideoPlayer(
             }
         }
     }
+}
+
+/**
+ * Escala TextureView manteniendo la relación de aspecto original del vídeo (Fit Center).
+ * Evita cualquier estiramiento o deformación vertical/horizontal.
+ */
+private fun applyVideoAspectRatio(textureView: TextureView, videoWidth: Int, videoHeight: Int) {
+    if (videoWidth <= 0 || videoHeight <= 0) return
+    val viewWidth = textureView.width.toFloat()
+    val viewHeight = textureView.height.toFloat()
+    if (viewWidth <= 0f || viewHeight <= 0f) return
+
+    val videoRatio = videoWidth.toFloat() / videoHeight.toFloat()
+    val viewRatio = viewWidth / viewHeight
+
+    var scaleX = 1.0f
+    var scaleY = 1.0f
+
+    if (videoRatio > viewRatio) {
+        // Vídeo panorámico/horizontal (más ancho que la vista) -> ajustar al ancho, letterbox arriba/abajo
+        scaleY = viewRatio / videoRatio
+    } else {
+        // Vídeo vertical/alto (más alto que la vista) -> ajustar a la altura, pillarbox izquierda/derecha
+        scaleX = videoRatio / viewRatio
+    }
+
+    val matrix = Matrix()
+    matrix.setScale(scaleX, scaleY, viewWidth / 2f, viewHeight / 2f)
+    textureView.setTransform(matrix)
 }
 
 private fun formatTime(ms: Int): String {
