@@ -1,9 +1,14 @@
 package com.reddit.wearos.ui.settings
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -79,24 +84,38 @@ fun SettingsScreen(
                     onClick = {},
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val currentName = username ?: tokenStorage.getUsername()
-                        val displayText = if (isLoggedIn) {
-                            if (!currentName.isNullOrEmpty()) "👤 Conectado como\nu/$currentName" else "👤 Conectado (Sesión activa)"
-                        } else {
-                            "👤 Modo Invitado\n(Sin cuenta vinculada)"
-                        }
-
-                        Text(
-                            text = displayText,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = TextPrimary,
-                            textAlign = TextAlign.Center
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = null,
+                            tint = if (isLoggedIn) RedditOrange else TextSecondary,
+                            modifier = Modifier.size(26.dp)
                         )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            val currentName = username ?: tokenStorage.getUsername()
+                            val displayText = if (isLoggedIn) {
+                                if (!currentName.isNullOrEmpty()) "u/$currentName" else "Sesión activa"
+                            } else {
+                                "Modo Invitado"
+                            }
+                            Text(
+                                text = displayText,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Text(
+                                text = if (isLoggedIn) "Cuenta vinculada" else "Sin cuenta vinculada",
+                                fontSize = 9.sp,
+                                color = TextSecondary
+                            )
+                        }
                     }
                 }
             }
@@ -109,7 +128,15 @@ fun SettingsScreen(
                             tokenStorage.clearTokens()
                             onLogout()
                         },
-                        label = { Text("🚪 Cerrar Sesión", fontSize = 11.sp) },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.ExitToApp,
+                                contentDescription = null,
+                                tint = Color.Red,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        label = { Text("Cerrar Sesión", fontSize = 11.sp) },
                         colors = ChipDefaults.secondaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -119,7 +146,15 @@ fun SettingsScreen(
                             RemotePhoneHelper.openPhoneCompanion(context)
                             onLogout()
                         },
-                        label = { Text("📱 Abrir Login en Móvil", fontSize = 11.sp) },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.PhoneAndroid,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        },
+                        label = { Text("Abrir Login en Móvil", fontSize = 11.sp) },
                         colors = ChipDefaults.primaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )

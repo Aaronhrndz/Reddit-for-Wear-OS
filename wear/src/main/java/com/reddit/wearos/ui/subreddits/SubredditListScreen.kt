@@ -1,9 +1,16 @@
 package com.reddit.wearos.ui.subreddits
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,7 +83,15 @@ fun SubredditListScreen(
                         repository.setSubreddit("home")
                         onSubredditSelected("home")
                     },
-                    label = { Text("🏠 Feed Personal", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    label = { Text("Feed Personal", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                     secondaryLabel = { Text("Tus suscripciones", fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.primaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
@@ -89,7 +104,15 @@ fun SubredditListScreen(
                         repository.setSubreddit("popular")
                         onSubredditSelected("popular")
                     },
-                    label = { Text("🔥 r/popular", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Whatshot,
+                            contentDescription = null,
+                            tint = RedditOrange,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    label = { Text("r/popular", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
                     secondaryLabel = { Text("Tendencias globales", fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.secondaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
@@ -102,7 +125,15 @@ fun SubredditListScreen(
                         repository.setSubreddit("all")
                         onSubredditSelected("all")
                     },
-                    label = { Text("🌐 r/all", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Public,
+                            contentDescription = null,
+                            tint = TextSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    label = { Text("r/all", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
                     secondaryLabel = { Text("Todo Reddit", fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.secondaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
@@ -112,13 +143,24 @@ fun SubredditListScreen(
             // Sección: Mis Subreddits Suscritos
             if (userSubreddits.isNotEmpty()) {
                 item {
-                    Text(
-                        text = "⭐ Mis Suscripciones (${userSubreddits.size})",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = RedditOrange,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
-                    )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = RedditOrange,
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Mis Suscripciones (${userSubreddits.size})",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RedditOrange
+                        )
+                    }
                 }
 
                 items(userSubreddits) { sub ->
@@ -150,13 +192,24 @@ fun SubredditListScreen(
 
             // Sección: Comunidades Sugeridas
             item {
-                Text(
-                    text = "💡 Comunidades Destacadas",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextSecondary,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Explore,
+                        contentDescription = null,
+                        tint = TextSecondary,
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Comunidades Destacadas",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextSecondary
+                    )
+                }
             }
 
             items(defaultSuggested.filter { it !in userSubreddits }) { sub ->

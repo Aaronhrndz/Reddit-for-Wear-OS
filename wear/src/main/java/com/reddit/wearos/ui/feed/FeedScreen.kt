@@ -7,6 +7,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -99,11 +107,25 @@ fun FeedScreen(
                             // Selector de Feeds Naranja Oficial Reddit (#FF4500)
                             Chip(
                                 onClick = onOpenSubreddits,
+                                icon = {
+                                    val icon = when (state.subreddit.lowercase()) {
+                                        "home", "principal" -> Icons.Default.Home
+                                        "popular" -> Icons.Default.Whatshot
+                                        "all" -> Icons.Default.Public
+                                        else -> Icons.Default.Public
+                                    }
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                },
                                 label = {
                                     val title = when (state.subreddit.lowercase()) {
-                                        "home", "principal" -> "🏠 Personal"
-                                        "popular" -> "🔥 r/popular"
-                                        "all" -> "🌐 r/all"
+                                        "home", "principal" -> "Personal"
+                                        "popular" -> "r/popular"
+                                        "all" -> "r/all"
                                         else -> "r/${state.subreddit}"
                                     }
                                     Text(
@@ -126,7 +148,7 @@ fun FeedScreen(
 
                             Spacer(modifier = Modifier.width(6.dp))
 
-                            // Botón de Refrescar Circular (o Spinner si está refrescando)
+                            // Botón de Refrescar Circular con Icono Material
                             Box(
                                 modifier = Modifier
                                     .size(42.dp)
@@ -147,13 +169,18 @@ fun FeedScreen(
                                         strokeWidth = 2.dp
                                     )
                                 } else {
-                                    Text("🔄", fontSize = 16.sp)
+                                    Icon(
+                                        imageVector = Icons.Default.Refresh,
+                                        contentDescription = "Refrescar",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                 }
                             }
 
                             Spacer(modifier = Modifier.width(6.dp))
 
-                            // Botón de Ajustes Circular
+                            // Botón de Ajustes Circular con Icono Material
                             Box(
                                 modifier = Modifier
                                     .size(42.dp)
@@ -163,12 +190,17 @@ fun FeedScreen(
                                     .clickable { onOpenSettings() },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("⚙️", fontSize = 16.sp)
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Ajustes",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(18.dp)
+                                )
                             }
                         }
                     }
 
-                    // LISTA DE PUBLICACIONES (Ocupa 100% de la pantalla)
+                    // LISTA DE PUBLICACIONES
                     itemsIndexed(state.posts) { index, post ->
                         if (index >= state.posts.size - 3 && state.hasMore && !state.isLoadingMore) {
                             LaunchedEffect(Unit) {
@@ -193,9 +225,17 @@ fun FeedScreen(
                     item {
                         Chip(
                             onClick = onOpenSettings,
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = null,
+                                    tint = TextSecondary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            },
                             label = {
                                 Text(
-                                    text = "⚙️ Ajustes de la App",
+                                    text = "Ajustes de la App",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -261,14 +301,22 @@ fun PostCard(
                 )
 
                 if (post.hasVideo()) {
-                    Box(
+                    Row(
                         modifier = Modifier
                             .clip(RoundedCornerShape(6.dp))
                             .background(RedditOrange)
-                            .padding(horizontal = 4.dp, vertical = 1.dp)
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(10.dp)
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
                         Text(
-                            text = "▶ VIDEO",
+                            text = "VIDEO",
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -311,7 +359,12 @@ fun PostCard(
                                 .background(Color(0x44000000)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("▶", fontSize = 20.sp, color = Color.White)
+                            Icon(
+                                imageVector = Icons.Default.PlayArrow,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
                         }
                     }
                 }
@@ -368,7 +421,7 @@ fun PostCard(
                     }
                 }
 
-                // Comentarios a la DERECHA
+                // Comentarios con Icono Material
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
@@ -376,8 +429,15 @@ fun PostCard(
                         .background(Color(0xFF141416))
                         .padding(horizontal = 8.dp, vertical = 5.dp)
                 ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ChatBubbleOutline,
+                        contentDescription = "Comentarios",
+                        tint = TextSecondary,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "💬 ${post.numComments}",
+                        text = "${post.numComments}",
                         fontSize = 10.sp,
                         color = TextSecondary,
                         fontWeight = FontWeight.SemiBold
