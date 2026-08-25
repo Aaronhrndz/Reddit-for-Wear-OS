@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_dark">#000000</color>
+    <color name="reddit_blue">#0079D3</color>
+    <color name="reddit_downvote">#7193FF</color>
+    <color name="reddit_orange">#FF4500</color>
+    <color name="reddit_upvote">#FF5722</color>
+    <color name="surface_dark">#121212</color>
+    <color name="surface_variant">#1E1E1E</color>
+    <string name="app_name">Reddit for Wear</string>
+    <string name="client_id_label">Reddit Client ID</string>
+    <string name="comments_empty">No hay comentarios en este post</string>
+    <string name="feed_empty">No hay publicaciones disponibles</string>
+    <string name="login_button_phone">Abrir en teléfono</string>
+    <string name="login_desc">Usa tu teléfono o ingresa tu Client ID personal para iniciar sesión</string>
+    <string name="login_guest">Continuar como invitado</string>
+    <string name="login_title">Conectar Reddit</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="tile_name">Reddit Quick Glance</string>
+    <style name="MainActivityTheme.Starting" parent="@android:style/Theme.DeviceDefault">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+</resources>

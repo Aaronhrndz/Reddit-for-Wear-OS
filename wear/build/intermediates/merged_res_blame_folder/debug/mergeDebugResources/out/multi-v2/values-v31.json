@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.reddit.wearos.wear-mergeDebugResources-77:/values-v31/values-v31.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\aaron\\reddit-wearos\\wear\\src\\main\\res\\values-v31\\styles.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "114",
+                        "endLines": "10",
+                        "endColumns": "12",
+                        "endOffsets": "764"
+                    },
+                    "to": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "10",
+                        "endColumns": "12",
+                        "endOffsets": "705"
+                    }
+                }
+            ]
+        }
+    ]
+}
