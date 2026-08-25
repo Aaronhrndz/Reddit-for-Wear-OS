@@ -418,6 +418,7 @@ fun InlineCommentCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
             .padding(horizontal = 2.dp, vertical = 2.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -427,13 +428,13 @@ fun InlineCommentCard(
             Canvas(
                 modifier = Modifier
                     .width(gutterWidth)
-                    .height(48.dp)
+                    .fillMaxHeight()
                     .padding(end = 3.dp)
             ) {
                 val strokeWidthPx = 1.5.dp.toPx()
                 val colStepPx = this.size.width / depth
 
-                // Columnas de ancestros (│)
+                // Columnas de ancestros continuas (│)
                 for (d in 0 until depth - 1) {
                     val x = colStepPx * d + (colStepPx / 2f)
                     drawLine(
@@ -447,13 +448,13 @@ fun InlineCommentCard(
 
                 // Rama actual conectora en L (└──)
                 val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
-                val cornerY = 16.dp.toPx()
+                val cornerY = 12.dp.toPx()
                 val path = Path().apply {
                     moveTo(currentX, 0f)
-                    lineTo(currentX, cornerY - 3.dp.toPx())
+                    lineTo(currentX, cornerY - 2.dp.toPx())
                     quadraticTo(
                         currentX, cornerY,
-                        currentX + 3.dp.toPx(), cornerY
+                        currentX + 2.dp.toPx(), cornerY
                     )
                     lineTo(this@Canvas.size.width, cornerY)
                 }
@@ -479,13 +480,23 @@ fun InlineCommentCard(
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera: u/author SIEMPRE en naranja
-                Text(
-                    text = "u/${comment.author}",
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = RedditOrange
-                )
+                // Cabecera con conector de respuesta y autor
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (depth > 0) {
+                        Text(
+                            text = "↳ ",
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RedditOrange
+                        )
+                    }
+                    Text(
+                        text = "u/${comment.author}",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RedditOrange
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 
