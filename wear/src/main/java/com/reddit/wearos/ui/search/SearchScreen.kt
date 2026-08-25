@@ -1,20 +1,28 @@
 ﻿package com.reddit.wearos.ui.search
 
-import android.app.Activity
-import android.content.Intent
-import android.speech.RecognizerIntent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Article
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +36,9 @@ import com.reddit.wearos.data.RedditRepository
 import com.reddit.wearos.data.model.RedditPost
 import com.reddit.wearos.data.model.RedditSubreddit
 import com.reddit.wearos.ui.components.PostCard
+import com.reddit.wearos.ui.theme.DarkSurface
 import com.reddit.wearos.ui.theme.RedditOrange
+import com.reddit.wearos.ui.theme.TextPrimary
 import com.reddit.wearos.ui.theme.TextSecondary
 import kotlinx.coroutines.launch
 
@@ -46,6 +56,7 @@ fun SearchScreen(
 ) {
     val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
     val scope = rememberCoroutineScope()
+    val keyboardController = LocalSoftwareKeyboardController.current
     var currentQuery by remember { mutableStateOf(initialQuery) }
     var selectedTab by remember { mutableStateOf(SearchTab.FEEDS) }
 
@@ -71,32 +82,10 @@ fun SearchScreen(
         }
     }
 
-    LaunchedEffect(currentQuery, selectedTab) {
+    LaunchedEffect(selectedTab) {
         if (currentQuery.isNotBlank()) {
             performSearch(currentQuery)
         }
-    }
-
-    val voiceLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-            val spoken = matches?.firstOrNull()
-            if (!spoken.isNullOrBlank()) {
-                currentQuery = spoken.trim()
-            }
-        }
-    }
-
-    fun launchVoiceSearch() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_PROMPT, "Buscar en Reddit...")
-        }
-        try {
-            voiceLauncher.launch(intent)
-        } catch (_: Exception) {}
     }
 
     Scaffold(
@@ -107,35 +96,84 @@ fun SearchScreen(
                 .fillMaxSize()
                 .rotaryWithScroll(scrollState),
             state = scrollState,
-            contentPadding = PaddingValues(top = 24.dp, bottom = 40.dp, start = 8.dp, end = 8.dp),
+            contentPadding = PaddingValues(top = 22.dp, bottom = 40.dp, start = 8.dp, end = 8.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+            // 1. CAMPO DE TEXTO PARA ABRIR TECLADO NATIVO
             item {
-                Chip(
-                    onClick = { launchVoiceSearch() },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            tint = RedditOrange,
-                            modifier = Modifier.size(16.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(DarkSurface)
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Buscar",
+                        tint = RedditOrange,
+                        modifier = Modifier.size(16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Box(modifier = Modifier.weight(1f)) {
+                        if (currentQuery.isEmpty()) {
+                            Text(
+                                text = "Buscar en Reddit...",
+                                color = TextSecondary,
+                                fontSize = 11.sp
+                            )
+                        }
+
+                        BasicTextField(
+                            value = currentQuery,
+                            onValueChange = { currentQuery = it },
+                            singleLine = true,
+                            textStyle = TextStyle(
+                                color = Color.White,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            cursorBrush = SolidColor(RedditOrange),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(
+                                onSearch = {
+                                    keyboardController?.hide()
+                                    performSearch(currentQuery)
+                                }
+                            ),
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    },
-                    label = {
-                        Text(
-                            text = if (currentQuery.isNotEmpty()) currentQuery else "Buscar...",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    },
-                    secondaryLabel = {
-                        Text("Toca para dictar por voz", fontSize = 8.sp, color = TextSecondary)
-                    },
-                    colors = ChipDefaults.secondaryChipColors(),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    }
+
+                    if (currentQuery.isNotEmpty()) {
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF333333))
+                                .clickable {
+                                    currentQuery = ""
+                                    subredditsResult = emptyList()
+                                    postsResult = emptyList()
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Limpiar",
+                                tint = Color.White,
+                                modifier = Modifier.size(12.dp)
+                            )
+                        }
+                    }
+                }
             }
 
+            // 2. BOTONES DE PESTAÑAS: FEEDS vs POSTS
             item {
                 Row(
                     modifier = Modifier
@@ -171,7 +209,7 @@ fun SearchScreen(
                         onClick = { selectedTab = SearchTab.POSTS },
                         icon = {
                             Icon(
-                                imageVector = Icons.Default.Article,
+                                imageVector = Icons.Outlined.Article,
                                 contentDescription = null,
                                 tint = if (selectedTab == SearchTab.POSTS) Color.White else TextSecondary,
                                 modifier = Modifier.size(12.dp)
@@ -193,6 +231,7 @@ fun SearchScreen(
                 }
             }
 
+            // 3. SPINNER DE CARGA
             if (isLoading) {
                 item {
                     Box(
@@ -209,6 +248,7 @@ fun SearchScreen(
                 }
             }
 
+            // 4. RESULTADOS DE FEEDS / SUBREDDITS
             if (!isLoading && selectedTab == SearchTab.FEEDS) {
                 if (subredditsResult.isEmpty() && currentQuery.isNotEmpty()) {
                     item {
@@ -255,6 +295,7 @@ fun SearchScreen(
                 }
             }
 
+            // 5. RESULTADOS DE POSTS
             if (!isLoading && selectedTab == SearchTab.POSTS) {
                 if (postsResult.isEmpty() && currentQuery.isNotEmpty()) {
                     item {
