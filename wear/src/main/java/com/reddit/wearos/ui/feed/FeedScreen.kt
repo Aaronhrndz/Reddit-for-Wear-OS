@@ -1,8 +1,6 @@
 package com.reddit.wearos.ui.feed
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -148,13 +146,12 @@ fun FeedScreen(
 
                             Spacer(modifier = Modifier.width(6.dp))
 
-                            // Botón de Refrescar Circular con Icono Material
+                            // Botón de Refrescar Circular sin borde
                             Box(
                                 modifier = Modifier
                                     .size(42.dp)
                                     .clip(CircleShape)
                                     .background(DarkSurface)
-                                    .border(BorderStroke(1.dp, Color(0xFF38383E)), CircleShape)
                                     .clickable {
                                         if (!state.isRefreshing) {
                                             viewModel.loadFeed(refresh = true)
@@ -180,13 +177,12 @@ fun FeedScreen(
 
                             Spacer(modifier = Modifier.width(6.dp))
 
-                            // Botón de Ajustes Circular con Icono Material
+                            // Botón de Ajustes Circular sin borde
                             Box(
                                 modifier = Modifier
                                     .size(42.dp)
                                     .clip(CircleShape)
                                     .background(DarkSurface)
-                                    .border(BorderStroke(1.dp, Color(0xFF38383E)), CircleShape)
                                     .clickable { onOpenSettings() },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -200,7 +196,7 @@ fun FeedScreen(
                         }
                     }
 
-                    // LISTA DE PUBLICACIONES
+                    // LISTA DE PUBLICACIONES (Tarjetas limpias con radio nativo y sin bordes)
                     itemsIndexed(state.posts) { index, post ->
                         if (index >= state.posts.size - 3 && state.hasMore && !state.isLoadingMore) {
                             LaunchedEffect(Unit) {
@@ -275,16 +271,14 @@ fun PostCard(
 ) {
     Card(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .border(BorderStroke(1.dp, Color(0xFF38383E)), RoundedCornerShape(14.dp)),
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         backgroundPainter = CardDefaults.cardBackgroundPainter(
             startBackgroundColor = DarkSurface,
             endBackgroundColor = DarkSurface
         )
     ) {
-        Column(modifier = Modifier.padding(9.dp)) {
+        Column(modifier = Modifier.padding(10.dp)) {
             // Header: Subreddit + Autor + Badge Video
             Row(
                 modifier = Modifier.fillMaxWidth(),
