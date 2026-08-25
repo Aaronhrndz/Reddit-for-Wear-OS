@@ -48,9 +48,7 @@ fun FeedScreen(
     onOpenSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollState = rememberSaveable(saver = ScalingLazyListState.Saver) {
-        ScalingLazyListState(initialCenterItemIndex = 1)
-    }
+    val scrollState = rememberScalingLazyListState(initialCenterItemIndex = 1)
 
     Scaffold(
         timeText = { TimeText() },
