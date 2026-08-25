@@ -109,8 +109,14 @@ fun SavedScreen(
                             PostCard(
                                 post = post,
                                 onClick = { onPostClick(post) },
-                                onVote = { dir -> viewModel.vote(post, dir) },
-                                onSave = { viewModel.toggleSave(post) }
+                                onUpvote = {
+                                    val newDir = if (post.likes == true) 0 else 1
+                                    viewModel.vote(post, newDir)
+                                },
+                                onDownvote = {
+                                    val newDir = if (post.likes == false) 0 else -1
+                                    viewModel.vote(post, newDir)
+                                }
                             )
                         }
 
