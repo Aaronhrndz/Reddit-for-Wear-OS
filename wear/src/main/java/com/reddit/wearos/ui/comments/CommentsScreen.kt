@@ -142,8 +142,8 @@ fun CommentCard(
 ) {
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
-    val isLastChild = flatComment.isLastChild
-    val activeAncestors = flatComment.activeAncestors
+    val passThroughColumns = flatComment.passThroughColumns
+    val continueCurrentColumnDown = flatComment.continueCurrentColumnDown
     val treeLineColor = Color(0xFF6E6E80)
 
     Row(
@@ -166,9 +166,9 @@ fun CommentCard(
                 val colStepPx = this.size.width / depth
                 val cornerY = 16.dp.toPx()
 
-                // 1. Columnas de ancestros (│) continuas de tope a tope sin cortes
+                // 1. Columnas de ancestros (│) continuas de tope a tope si passThroughColumns[d] es true
                 for (d in 0 until depth - 1) {
-                    if (d < activeAncestors.size && activeAncestors[d]) {
+                    if (d < passThroughColumns.size && passThroughColumns[d]) {
                         val x = colStepPx * d + (colStepPx / 2f)
                         drawLine(
                             color = treeLineColor,
@@ -183,7 +183,7 @@ fun CommentCard(
                 // 2. Rama conectora del nivel actual
                 val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
 
-                // Tramo vertical superior desde el padre hasta la altura del título
+                // Tramo vertical superior desde el padre (y=0) hasta la altura del título (cornerY)
                 drawLine(
                     color = treeLineColor,
                     start = Offset(currentX, 0f),
@@ -201,8 +201,8 @@ fun CommentCard(
                     cap = StrokeCap.Square
                 )
 
-                // Si NO es el último hijo de este nivel, la rama continúa hacia abajo (├── T)
-                if (!isLastChild) {
+                // Si tiene respuestas abajo o más hermanos posteriores, continúa hacia abajo (├── T)
+                if (continueCurrentColumnDown) {
                     drawLine(
                         color = treeLineColor,
                         start = Offset(currentX, cornerY),

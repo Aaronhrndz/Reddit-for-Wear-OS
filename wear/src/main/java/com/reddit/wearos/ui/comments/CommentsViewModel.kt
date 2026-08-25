@@ -16,8 +16,10 @@ import kotlinx.serialization.json.decodeFromJsonElement
 data class FlatComment(
     val comment: RedditComment,
     val depth: Int,
+    val hasReplies: Boolean = false,
     val isLastChild: Boolean = false,
-    val activeAncestors: List<Boolean> = emptyList(),
+    val passThroughColumns: List<Boolean> = emptyList(),
+    val continueCurrentColumnDown: Boolean = false,
     val isCollapsed: Boolean = false
 )
 
@@ -107,27 +109,38 @@ class CommentsViewModel(
     private fun flattenComments(
         comments: List<RedditComment>,
         depth: Int,
-        ancestors: List<Boolean> = emptyList()
+        passThrough: List<Boolean> = emptyList()
     ): List<FlatComment> {
         val result = mutableListOf<FlatComment>()
         for (i in comments.indices) {
             val c = comments[i]
             val isLast = (i == comments.size - 1)
-            val currentAncestors = if (depth > 0) ancestors else emptyList()
+            val replies = if (c.replies != null) {
+                com.reddit.wearos.data.model.parseCommentsFromListingElement(c.replies)
+            } else {
+                emptyList()
+            }
+            val hasReplies = replies.isNotEmpty()
+            val continueDown = hasReplies || !isLast
+
             result.add(
                 FlatComment(
                     comment = c.copy(depth = depth),
                     depth = depth,
+                    hasReplies = hasReplies,
                     isLastChild = isLast,
-                    activeAncestors = currentAncestors
+                    passThroughColumns = passThrough,
+                    continueCurrentColumnDown = continueDown
                 )
             )
-            if (c.replies != null) {
-                val subComments = com.reddit.wearos.data.model.parseCommentsFromListingElement(c.replies)
-                if (subComments.isNotEmpty()) {
-                    val nextAncestors = currentAncestors + (!isLast)
-                    result.addAll(flattenComments(subComments, depth + 1, nextAncestors))
+
+            if (hasReplies) {
+                val nextPassThrough = if (depth > 0) {
+                    passThrough + (!isLast)
+                } else {
+                    listOf(!isLast)
                 }
+                result.addAll(flattenComments(replies, depth + 1, nextPassThrough))
             }
         }
         return result
