@@ -10,6 +10,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import okhttp3.Protocol
 
 object NetworkClient {
 
@@ -22,13 +23,19 @@ object NetworkClient {
 
     fun createAuthHttpClient(): HttpClient {
         return HttpClient(OkHttp) {
+            engine {
+                config {
+                    protocols(listOf(Protocol.HTTP_1_1))
+                    retryOnConnectionFailure(true)
+                }
+            }
             install(ContentNegotiation) {
                 json(json)
             }
             install(HttpTimeout) {
-                requestTimeoutMillis = 12000
-                connectTimeoutMillis = 12000
-                socketTimeoutMillis = 12000
+                requestTimeoutMillis = 15000
+                connectTimeoutMillis = 15000
+                socketTimeoutMillis = 15000
             }
             install(Logging) {
                 level = LogLevel.INFO
@@ -38,13 +45,19 @@ object NetworkClient {
 
     fun createRedditApiHttpClient(tokenStorage: TokenStorage, authManager: RedditAuthManager): HttpClient {
         return HttpClient(OkHttp) {
+            engine {
+                config {
+                    protocols(listOf(Protocol.HTTP_1_1))
+                    retryOnConnectionFailure(true)
+                }
+            }
             install(ContentNegotiation) {
                 json(json)
             }
             install(HttpTimeout) {
-                requestTimeoutMillis = 12000
-                connectTimeoutMillis = 12000
-                socketTimeoutMillis = 12000
+                requestTimeoutMillis = 15000
+                connectTimeoutMillis = 15000
+                socketTimeoutMillis = 15000
             }
         }
     }
