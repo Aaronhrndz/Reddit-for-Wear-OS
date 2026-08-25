@@ -431,3 +431,11 @@ fun PostCard(
         }
     }
 }
+
+fun formatScore(score: Int): String {
+    return when {
+        score >= 1_000_000 -> String.format("%.1fM", score / 1_000_000.0)
+        score >= 1_000 -> String.format("%.1fk", score / 1_000.0)
+        else -> score.toString()
+    }
+}
