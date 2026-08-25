@@ -209,7 +209,7 @@ class PostDetailViewModel(
 
             if (hasReplies) {
                 val nextPassThrough = if (depth == 0) {
-                    listOf(!isLast)
+                    emptyList()
                 } else {
                     passThrough + (!isLast)
                 }

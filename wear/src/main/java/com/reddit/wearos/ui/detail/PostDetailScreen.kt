@@ -417,6 +417,7 @@ fun InlineCommentCard(
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
     val isLastChild = flatComment.isLastChild
+    val hasReplies = flatComment.hasReplies
     val passThroughColumns = flatComment.passThroughColumns
     val treeLineColor = Color(0xFF6E6E80)
 
@@ -476,8 +477,8 @@ fun InlineCommentCard(
                     cap = StrokeCap.Square
                 )
 
-                // Si NO es el último hijo de su padre, continúa hacia abajo (├── T)
-                if (!isLastChild) {
+                // Si NO es el último hijo o si tiene respuestas debajo, continúa hacia abajo (├── T)
+                if (!isLastChild || hasReplies) {
                     drawLine(
                         color = treeLineColor,
                         start = Offset(currentX, cornerY),
