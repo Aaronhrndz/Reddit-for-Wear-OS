@@ -31,7 +31,7 @@ class RedditApiService(
 
     companion object {
         const val TAG = "RedditApiService"
-        const val USER_AGENT = "android:com.reddit.wearos:v1.1.0 (by /u/Aaronhrndz)"
+        const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
     }
 
     private suspend fun getAuthHeader(): Pair<String, String>? {
@@ -75,15 +75,13 @@ class RedditApiService(
             }
         }
         if (isHome) {
+            urlsToTry.add("https://api.reddit.com/$sortPath")
+            urlsToTry.add("https://api.reddit.com/r/popular/$sortPath")
             urlsToTry.add("https://old.reddit.com/$sortPath.json")
-            urlsToTry.add("https://old.reddit.com/.json")
-            urlsToTry.add("https://www.reddit.com/$sortPath.json")
-            urlsToTry.add("https://www.reddit.com/.json")
         } else {
+            urlsToTry.add("https://api.reddit.com/r/$sub/$sortPath")
+            urlsToTry.add("https://api.reddit.com/r/$sub")
             urlsToTry.add("https://old.reddit.com/r/$sub/$sortPath.json")
-            urlsToTry.add("https://old.reddit.com/r/$sub.json")
-            urlsToTry.add("https://www.reddit.com/r/$sub/$sortPath.json")
-            urlsToTry.add("https://www.reddit.com/r/$sub.json")
         }
 
         var currentAuthHeader = authHeader
@@ -388,7 +386,7 @@ class RedditApiService(
     suspend fun getInbox(limit: Int = 25): List<RedditMessage> = withContext(Dispatchers.IO) {
         val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/message/inbox" else "https://old.reddit.com/message/inbox.json"
+        val url = if (isBearer) "https://oauth.reddit.com/message/inbox" else "https://api.reddit.com/message/inbox"
         try {
             val responseText = httpClient.get(url) {
                 authHeader?.let { (k, v) -> header(k, v) }
@@ -397,7 +395,7 @@ class RedditApiService(
                 parameter("raw_json", 1)
             }.bodyAsText()
 
-            if (responseText.trim().startsWith("<")) {
+            if (responseText.trim().startsWith("<") || responseText.isBlank()) {
                 return@withContext emptyList()
             }
 
@@ -405,6 +403,61 @@ class RedditApiService(
             response.data.children.map { it.data }
         } catch (e: Exception) {
             Log.e(TAG, "Error loading inbox: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun getUserSubmitted(
+        username: String,
+        after: String? = null,
+        limit: Int = 25
+    ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) "https://oauth.reddit.com/user/$username/submitted" else "https://api.reddit.com/user/$username/submitted"
+        try {
+            val responseText = httpClient.get(url) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+                parameter("limit", limit)
+                after?.let { parameter("after", it) }
+                parameter("raw_json", 1)
+            }.bodyAsText()
+
+            if (responseText.trim().startsWith("<") || responseText.isBlank()) {
+                return@withContext RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
+            }
+            NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(responseText)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching user submitted posts: ${e.message}")
+            RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
+        }
+    }
+
+    suspend fun getUserComments(
+        username: String,
+        after: String? = null,
+        limit: Int = 25
+    ): List<RedditComment> = withContext(Dispatchers.IO) {
+        val isBearer = isBearerAuth()
+        val authHeader = getAuthHeader()
+        val url = if (isBearer) "https://oauth.reddit.com/user/$username/comments" else "https://api.reddit.com/user/$username/comments"
+        try {
+            val responseText = httpClient.get(url) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+                parameter("limit", limit)
+                after?.let { parameter("after", it) }
+                parameter("raw_json", 1)
+            }.bodyAsText()
+
+            if (responseText.trim().startsWith("<") || responseText.isBlank()) {
+                return@withContext emptyList()
+            }
+            val rootElement = NetworkClient.json.parseToJsonElement(responseText)
+            com.reddit.wearos.data.model.parseCommentsFromListingElement(rootElement)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching user comments: ${e.message}")
             emptyList()
         }
     }
@@ -421,7 +474,7 @@ class RedditApiService(
         val url = if (isBearer) {
             if (!subreddit.isNullOrEmpty() && subreddit != "home") "https://oauth.reddit.com/r/$subreddit/search" else "https://oauth.reddit.com/search"
         } else {
-            if (!subreddit.isNullOrEmpty() && subreddit != "home") "https://old.reddit.com/r/$subreddit/search/.json" else "https://old.reddit.com/search/.json"
+            if (!subreddit.isNullOrEmpty() && subreddit != "home") "https://api.reddit.com/r/$subreddit/search" else "https://api.reddit.com/search"
         }
         try {
             val responseText = httpClient.get(url) {
@@ -450,7 +503,7 @@ class RedditApiService(
     suspend fun searchSubreddits(query: String, limit: Int = 20): List<RedditSubreddit> = withContext(Dispatchers.IO) {
         val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/subreddits/search" else "https://old.reddit.com/subreddits/search/.json"
+        val url = if (isBearer) "https://oauth.reddit.com/subreddits/search" else "https://api.reddit.com/subreddits/search"
         try {
             val responseText = httpClient.get(url) {
                 authHeader?.let { (k, v) -> header(k, v) }
@@ -467,53 +520,6 @@ class RedditApiService(
             response.data.children.map { it.data }
         } catch (e: Exception) {
             Log.e(TAG, "Error searching subreddits: ${e.message}")
-            emptyList()
-        }
-    }
-
-    suspend fun getUserSubmitted(username: String, after: String? = null, limit: Int = 25): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
-        val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/user/$username/submitted" else "https://old.reddit.com/user/$username/submitted/.json"
-        try {
-            val responseText = httpClient.get(url) {
-                authHeader?.let { (k, v) -> header(k, v) }
-                header("User-Agent", USER_AGENT)
-                parameter("limit", limit)
-                parameter("raw_json", 1)
-                after?.let { parameter("after", it) }
-            }.bodyAsText()
-
-            if (responseText.trim().startsWith("<") || responseText.isBlank()) {
-                return@withContext RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
-            }
-            NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(responseText)
-        } catch (e: Exception) {
-            Log.e(TAG, "Error loading user submitted: ${e.message}")
-            RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
-        }
-    }
-
-    suspend fun getUserComments(username: String, after: String? = null, limit: Int = 25): List<RedditComment> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
-        val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/user/$username/comments" else "https://old.reddit.com/user/$username/comments/.json"
-        try {
-            val responseText = httpClient.get(url) {
-                authHeader?.let { (k, v) -> header(k, v) }
-                header("User-Agent", USER_AGENT)
-                parameter("limit", limit)
-                parameter("raw_json", 1)
-                after?.let { parameter("after", it) }
-            }.bodyAsText()
-
-            if (responseText.trim().startsWith("<") || responseText.isBlank()) {
-                return@withContext emptyList()
-            }
-            val response: RedditListing<RedditComment> = NetworkClient.json.decodeFromString(responseText)
-            response.data.children.map { it.data }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error loading user comments: ${e.message}")
             emptyList()
         }
     }
