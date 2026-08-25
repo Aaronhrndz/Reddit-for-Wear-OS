@@ -83,44 +83,43 @@ fun SettingsScreen(
 
             // Estado de la cuenta
             item {
-                Card(
+                val currentName = username ?: tokenStorage.getUsername()
+                val displayText = if (isLoggedIn) {
+                    if (!currentName.isNullOrEmpty()) "u/$currentName" else "Sesión activa"
+                } else {
+                    "Modo Invitado"
+                }
+                Chip(
                     onClick = {},
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ChipDefaults.primaryChipColors(
+                        backgroundColor = if (isLoggedIn) RedditOrange else Color(0xFF24242E),
+                        contentColor = Color.White
+                    ),
+                    icon = {
                         Icon(
                             imageVector = Icons.Default.AccountCircle,
                             contentDescription = null,
-                            tint = if (isLoggedIn) RedditOrange else TextSecondary,
-                            modifier = Modifier.size(26.dp)
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column {
-                            val currentName = username ?: tokenStorage.getUsername()
-                            val displayText = if (isLoggedIn) {
-                                if (!currentName.isNullOrEmpty()) "u/$currentName" else "Sesión activa"
-                            } else {
-                                "Modo Invitado"
-                            }
-                            Text(
-                                text = displayText,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary
-                            )
-                            Text(
-                                text = if (isLoggedIn) "Cuenta vinculada" else "Sin cuenta vinculada",
-                                fontSize = 9.sp,
-                                color = TextSecondary
-                            )
-                        }
+                    },
+                    label = {
+                        Text(
+                            text = displayText,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    },
+                    secondaryLabel = {
+                        Text(
+                            text = if (isLoggedIn) "Cuenta vinculada" else "Sin cuenta vinculada",
+                            fontSize = 9.sp,
+                            color = Color.White.copy(alpha = 0.85f)
+                        )
                     }
-                }
+                )
             }
 
             // Bandeja de Mensajes

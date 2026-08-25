@@ -230,28 +230,22 @@ fun FeedScreen(
                         )
                     }
 
-                    // Pie de lista con acceso a Ajustes
-                    item {
-                        Chip(
-                            onClick = onOpenSettings,
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = null,
-                                    tint = TextSecondary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            },
-                            label = {
+                    if (state.posts.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 20.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Text(
-                                    text = "Ajustes de la App",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium
+                                    text = "Sin publicaciones",
+                                    fontSize = 11.sp,
+                                    color = TextSecondary,
+                                    textAlign = TextAlign.Center
                                 )
-                            },
-                            colors = ChipDefaults.secondaryChipColors(),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                            }
+                        }
                     }
 
                     if (state.isLoadingMore) {

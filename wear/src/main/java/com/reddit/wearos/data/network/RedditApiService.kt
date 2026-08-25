@@ -85,14 +85,16 @@ class RedditApiService(
             urlsToTry.add("https://www.reddit.com/r/$sub/$sortPath.json")
         }
 
+        var currentAuthHeader = authHeader
+
         for (url in urlsToTry) {
             try {
-                Log.d(TAG, "Intentando feed: url=$url, sort=$sortPath, authHeader=${authHeader?.first} -> ${authHeader?.second?.take(15)}...")
-                val response = httpClient.get(url) {
+                Log.d(TAG, "Intentando feed: url=$url, sort=$sortPath, authHeader=${currentAuthHeader?.first} -> ${currentAuthHeader?.second?.take(15)}...")
+                var response = httpClient.get(url) {
                     if (url.contains("oauth.reddit.com") && isBearer) {
-                        authHeader?.let { (k, v) -> header(k, v) }
-                    } else if (authHeader?.first == "Cookie") {
-                        header("Cookie", authHeader.second)
+                        currentAuthHeader?.let { (k, v) -> header(k, v) }
+                    } else if (currentAuthHeader?.first == "Cookie" && !url.contains("oauth.reddit.com")) {
+                        header("Cookie", currentAuthHeader.second)
                     }
                     header("User-Agent", USER_AGENT)
                     header("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -103,9 +105,31 @@ class RedditApiService(
                     parameter("_t", System.currentTimeMillis())
                 }
 
-                val status = response.status.value
-                val responseText = response.bodyAsText()
+                var status = response.status.value
+                var responseText = response.bodyAsText()
                 Log.d(TAG, "Respuesta de $url: status=$status, len=${responseText.length}, preview=${responseText.take(120).replace("\n", " ")}")
+
+                // Si recibimos 401 en oauth.reddit.com, intentamos refrescar el token de forma forzada
+                if (status == 401 && url.contains("oauth.reddit.com")) {
+                    Log.w(TAG, "401 recibido en OAuth. Intentando forceRefreshToken...")
+                    val newToken = authManager.forceRefreshToken()
+                    if (!newToken.isNullOrEmpty()) {
+                        currentAuthHeader = Pair("Authorization", if (newToken.startsWith("Bearer ")) newToken else "Bearer $newToken")
+                        response = httpClient.get(url) {
+                            header("Authorization", currentAuthHeader.second)
+                            header("User-Agent", USER_AGENT)
+                            header("Cache-Control", "no-cache, no-store, must-revalidate")
+                            header("Pragma", "no-cache")
+                            parameter("limit", limit)
+                            after?.let { parameter("after", it) }
+                            parameter("raw_json", 1)
+                            parameter("_t", System.currentTimeMillis())
+                        }
+                        status = response.status.value
+                        responseText = response.bodyAsText()
+                        Log.d(TAG, "Reintento tras refresh en $url: status=$status, len=${responseText.length}")
+                    }
+                }
 
                 if (status == 200 && !responseText.trim().startsWith("<") && responseText.isNotBlank()) {
                     val listing = NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(responseText)

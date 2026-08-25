@@ -130,4 +130,32 @@ class RedditAuthManager(
             return@withContext null
         }
     }
+
+    suspend fun forceRefreshToken(): String? = withContext(Dispatchers.IO) {
+        val refreshToken = tokenStorage.getRefreshToken() ?: return@withContext null
+        val clientId = tokenStorage.getClientId().ifEmpty { DEFAULT_CLIENT_ID }
+        val credentials = Base64.encodeToString("$clientId:".toByteArray(), Base64.NO_WRAP)
+
+        try {
+            val response: OAuthTokenResponse = httpClient.submitForm(
+                url = TOKEN_URL,
+                formParameters = Parameters.build {
+                    append("grant_type", "refresh_token")
+                    append("refresh_token", refreshToken)
+                }
+            ) {
+                header("Authorization", "Basic $credentials")
+                header("User-Agent", "android:com.reddit.wearos:v1.0.0 (by /u/wear_reddit_user)")
+            }.body()
+
+            tokenStorage.saveTokens(
+                accessToken = response.accessToken,
+                refreshToken = response.refreshToken ?: refreshToken,
+                expiresInSeconds = response.expiresIn
+            )
+            return@withContext response.accessToken
+        } catch (e: Exception) {
+            return@withContext null
+        }
+    }
 }
