@@ -3,6 +3,7 @@ package com.reddit.wearos.ui.comments
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,7 +14,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -117,6 +120,68 @@ fun CommentsScreen(
 }
 
 @Composable
+fun TreeGutter(
+    depth: Int,
+    modifier: Modifier = Modifier
+) {
+    if (depth <= 0) return
+
+    val depthColors = listOf(
+        RedditOrange,
+        RedditBlue,
+        Color(0xFF4CAF50),
+        Color(0xFFFFEB3B),
+        Color(0xFFAB47BC)
+    )
+
+    val maxDepth = depth.coerceAtMost(3)
+    val railSpacing = 7.dp
+    val startPadding = 2.dp
+    val totalWidth = startPadding + (railSpacing * maxDepth) + 3.dp
+
+    Canvas(
+        modifier = modifier
+            .width(totalWidth)
+            .fillMaxHeight()
+    ) {
+        val strokePx = 2.dp.toPx()
+        val branchY = 12.dp.toPx()
+
+        for (d in 1..maxDepth) {
+            val color = depthColors[(d - 1) % depthColors.size]
+            val x = (startPadding + railSpacing * (d - 1) + 2.dp).toPx()
+
+            if (d < maxDepth) {
+                // Línea vertical continua de guía del nivel superior
+                drawLine(
+                    color = color,
+                    start = Offset(x, 0f),
+                    end = Offset(x, size.height),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+            } else {
+                // Rama actual: baja del nivel superior y conecta horizontalmente a la caja del comentario
+                drawLine(
+                    color = color,
+                    start = Offset(x, 0f),
+                    end = Offset(x, branchY),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = color,
+                    start = Offset(x, branchY),
+                    end = Offset(size.width, branchY),
+                    strokeWidth = strokePx,
+                    cap = StrokeCap.Round
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun CommentCard(
     flatComment: FlatComment,
     onUpvote: () -> Unit,
@@ -125,14 +190,6 @@ fun CommentCard(
 ) {
     val comment = flatComment.comment
 
-    val depthBorderColors = listOf(
-        RedditOrange,
-        RedditBlue,
-        Color(0xFF4CAF50),
-        Color(0xFFFFEB3B),
-        Color(0xFFAB47BC)
-    )
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,18 +197,9 @@ fun CommentCard(
             .padding(horizontal = 4.dp, vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // LÍNEAS DE TREE / HERENCIA A LA IZQUIERDA
+        // ÁRBOL DE HERENCIA FUERA DE LA CAJA
         if (flatComment.depth > 0) {
-            for (d in 1..flatComment.depth.coerceAtMost(3)) {
-                val barColor = depthBorderColors[(d - 1) % depthBorderColors.size]
-                Box(
-                    modifier = Modifier
-                        .width(2.5.dp)
-                        .fillMaxHeight()
-                        .background(barColor, RoundedCornerShape(1.dp))
-                )
-                Spacer(modifier = Modifier.width(3.dp))
-            }
+            TreeGutter(depth = flatComment.depth)
         }
 
         // Caja de contenido del comentario
@@ -164,22 +212,12 @@ fun CommentCard(
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Cabecera: u/author SIEMPRE en naranja
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (flatComment.depth > 0) {
-                        Text(
-                            text = "↳ ",
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextSecondary
-                        )
-                    }
-                    Text(
-                        text = "u/${comment.author}",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = RedditOrange
-                    )
-                }
+                Text(
+                    text = "u/${comment.author}",
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RedditOrange
+                )
 
                 Spacer(modifier = Modifier.height(2.dp))
 
