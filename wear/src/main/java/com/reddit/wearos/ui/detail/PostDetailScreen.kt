@@ -474,9 +474,9 @@ fun InlineCommentCard(
                     cap = StrokeCap.Square
                 )
 
-                // Si NO es el último hijo de su nivel, continúa hacia abajo conectando con el siguiente hermano (├── T)
-                // Si es el último hijo, finaliza limpiamente en L (└──)
-                if (!isLastChild) {
+                // Si NO es el último hijo o si TIENE respuestas debajo, continúa hacia abajo conectando con sus hijos/hermanos (├── T)
+                // Si es el último hijo Y no tiene respuestas, finaliza limpiamente en L (└──)
+                if (!isLastChild || hasReplies) {
                     drawLine(
                         color = treeLineColor,
                         start = Offset(currentX, cornerY),
