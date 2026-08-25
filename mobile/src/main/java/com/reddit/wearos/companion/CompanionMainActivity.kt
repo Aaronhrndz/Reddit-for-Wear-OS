@@ -103,7 +103,6 @@ class CompanionMainActivity : ComponentActivity() {
                             connectedWatches = connectedWatchesCount,
                             isSyncing = isSyncing,
                             onStartLogin = { isWebLoginOpen = true },
-                            onStartOAuthLogin = { startOAuth2Flow() },
                             onCopyToClipboard = {
                                 if (tokenOrCookieInput.isNotBlank()) {
                                     copyToClipboard(tokenOrCookieInput)
@@ -160,111 +159,9 @@ class CompanionMainActivity : ComponentActivity() {
         val digest = md.digest()
         return android.util.Base64.encodeToString(digest, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
     }
-
-    private fun startOAuth2Flow() {
-        val verifier = generateRandomString(32)
-        val state = generateRandomString(16)
-        oauthVerifier = verifier
-        oauthState = state
-        val challenge = generateCodeChallenge(verifier)
-        val clientId = "0R-WAMhuoo-MyQ"
-        val redirectUri = "https://redreader.org/auth"
-        val scopes = "identity read mysubreddits vote save history"
-
-        val authUrl = Uri.parse("https://www.reddit.com/api/v1/authorize.compact").buildUpon()
-            .appendQueryParameter("client_id", clientId)
-            .appendQueryParameter("response_type", "code")
-            .appendQueryParameter("state", state)
-            .appendQueryParameter("redirect_uri", redirectUri)
-            .appendQueryParameter("duration", "permanent")
-            .appendQueryParameter("scope", scopes)
-            .appendQueryParameter("code_challenge", challenge)
-            .appendQueryParameter("code_challenge_method", "S256")
-            .build()
-
-        val intent = Intent(Intent.ACTION_VIEW, authUrl)
-        startActivity(intent)
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val data = intent.data ?: return
-        val isRedditWearAuth = data.scheme == "redditwear" && data.host == "auth"
-        val isRedReaderAuth = data.scheme == "https" && data.host == "redreader.org" && data.path?.startsWith("/auth") == true
-        if (isRedditWearAuth || isRedReaderAuth) {
-            val code = data.getQueryParameter("code")
-            if (!code.isNullOrEmpty()) {
-                exchangeOAuthCode(code)
-            }
-        }
-    }
-
-    private fun exchangeOAuthCode(code: String) {
-        isSyncing = true
-        loginStatus = "Intercambiando código OAuth 2.0 PKCE con Reddit..."
-        val verifier = oauthVerifier ?: ""
-        val clientId = "0R-WAMhuoo-MyQ"
-        val redirectUri = "https://redreader.org/auth"
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val client = io.ktor.client.HttpClient(io.ktor.client.engine.okhttp.OkHttp) {
-                    install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-                        json(kotlinx.serialization.json.Json { ignoreUnknownKeys = true })
-                    }
-                }
-
-                val credentials = android.util.Base64.encodeToString("$clientId:".toByteArray(), android.util.Base64.NO_WRAP)
-                val response: String = client.submitForm(
-                    url = "https://www.reddit.com/api/v1/access_token",
-                    formParameters = io.ktor.http.Parameters.build {
-                        append("grant_type", "authorization_code")
-                        append("code", code)
-                        append("redirect_uri", redirectUri)
-                        append("code_verifier", verifier)
-                    }
-                ) {
-                    header("Authorization", "Basic $credentials")
-                    header("User-Agent", "android:com.reddit.wearos:v1.1.0 (by /u/Aaronhrnndz)")
-                }.bodyAsText()
-
-                val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
-                val jsonElement = json.parseToJsonElement(response).jsonObject
-                val accessToken = jsonElement["access_token"]?.jsonPrimitive?.content ?: ""
-                val refreshToken = jsonElement["refresh_token"]?.jsonPrimitive?.contentOrNull
-                val expiresIn = jsonElement["expires_in"]?.jsonPrimitive?.longOrNull ?: 3600L
-
-                if (accessToken.isNotEmpty()) {
-                    withContext(Dispatchers.Main) {
-                        tokenOrCookieInput = accessToken
-                        copyToClipboard(accessToken)
-                    }
-                    val payload = AuthSyncPayload(
-                        clientId = clientId,
-                        accessToken = accessToken,
-                        refreshToken = refreshToken,
-                        expiresInSeconds = expiresIn,
-                        username = redditUsername
-                    )
-                    val syncSuccess = syncManager.sendAuthToWatch(payload)
-                    withContext(Dispatchers.Main) {
-                        isSyncing = false
-                        loginStatus = if (syncSuccess) "✅ ¡OAuth 2.0 vinculado con éxito en el reloj!" else "✅ Token OAuth generado. Conecta el reloj por BT."
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        isSyncing = false
-                        loginStatus = "❌ Error en OAuth: $response"
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    isSyncing = false
-                    loginStatus = "❌ Error al intercambiar token: ${e.localizedMessage}"
-                }
-            }
-        }
     }
 
     private fun syncSessionToWatch(sessionData: String, username: String) {
@@ -404,7 +301,6 @@ fun CompanionScreen(
     connectedWatches: Int,
     isSyncing: Boolean,
     onStartLogin: () -> Unit,
-    onStartOAuthLogin: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onSyncManualToken: () -> Unit,
     onRefreshWatches: () -> Unit
@@ -516,24 +412,6 @@ fun CompanionScreen(
             )
         }
 
-        // BOTÓN 2: OAUTH 2.0 OFICIAL (PLAY STORE COMPLIANT)
-        Button(
-            onClick = onStartOAuthLogin,
-            enabled = !isSyncing,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(
-                text = "🔑 Login Oficial Reddit OAuth 2.0",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-
         // Tarjeta Token con visualización completa y botón copiar
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -583,3 +461,4 @@ fun CompanionScreen(
         }
     }
 }
+
