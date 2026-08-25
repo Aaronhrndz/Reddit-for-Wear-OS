@@ -55,7 +55,7 @@ class RedditApiService(
 
     suspend fun getFeed(
         subreddit: String? = null,
-        sort: String = "hot",
+        sort: String = "new",
         after: String? = null,
         limit: Int = 25
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
@@ -65,7 +65,7 @@ class RedditApiService(
         val isHome = sub.isNullOrEmpty() || sub.equals("home", ignoreCase = true) || sub.equals("principal", ignoreCase = true) || sub.equals("frontpage", ignoreCase = true)
 
         val urlsToTry = mutableListOf<String>()
-        val sortPath = if (sort.isBlank()) "hot" else sort.lowercase()
+        val sortPath = if (sort.isBlank()) "new" else sort.lowercase()
         if (isBearer) {
             if (isHome) {
                 // En la API OAuth de Reddit, el feed personal se consulta directamente en /hot, /new, /rising, /top

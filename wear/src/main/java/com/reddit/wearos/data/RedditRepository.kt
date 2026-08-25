@@ -16,8 +16,8 @@ class RedditRepository(
     private val _currentSubreddit = MutableStateFlow("home")
     val currentSubreddit: StateFlow<String> = _currentSubreddit.asStateFlow()
 
-    // Criterio de ordenación actual (hot, new, rising, top)
-    private val _currentSort = MutableStateFlow("hot")
+    // Criterio de ordenación actual (new por defecto, hot, rising, top)
+    private val _currentSort = MutableStateFlow("new")
     val currentSort: StateFlow<String> = _currentSort.asStateFlow()
 
     fun setSubreddit(subreddit: String) {

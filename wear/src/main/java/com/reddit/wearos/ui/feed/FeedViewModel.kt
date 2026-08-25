@@ -15,7 +15,7 @@ sealed class FeedUiState {
     data class Success(
         val posts: List<RedditPost>,
         val subreddit: String,
-        val sort: String = "hot",
+        val sort: String = "new",
         val isLoadingMore: Boolean = false,
         val isRefreshing: Boolean = false,
         val hasMore: Boolean = true
