@@ -142,8 +142,8 @@ fun CommentCard(
 ) {
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
+    val isLastChild = flatComment.isLastChild
     val passThroughColumns = flatComment.passThroughColumns
-    val continueCurrentColumnDown = flatComment.continueCurrentColumnDown
     val treeLineColor = Color(0xFF6E6E80)
 
     Row(
@@ -163,10 +163,10 @@ fun CommentCard(
                     .padding(end = 2.dp)
             ) {
                 val strokeWidthPx = 1.8.dp.toPx()
-                val colStepPx = this.size.width / depth
+                val colStepPx = 14.dp.toPx()
                 val cornerY = 16.dp.toPx()
 
-                // 1. Columnas de ancestros (│) continuas de tope a tope si passThroughColumns[d] es true
+                // 1. Columnas de ancestros pass-through (d de 0 hasta depth - 2)
                 for (d in 0 until depth - 1) {
                     if (d < passThroughColumns.size && passThroughColumns[d]) {
                         val x = colStepPx * d + (colStepPx / 2f)
@@ -180,10 +180,11 @@ fun CommentCard(
                     }
                 }
 
-                // 2. Rama conectora del nivel actual
-                val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
+                // 2. Columna del nivel actual (columna depth - 1)
+                val currentCol = depth - 1
+                val currentX = colStepPx * currentCol + (colStepPx / 2f)
 
-                // Tramo vertical superior desde el padre (y=0) hasta la altura del título (cornerY)
+                // Tramo vertical desde el tope (y=0) hasta cornerY
                 drawLine(
                     color = treeLineColor,
                     start = Offset(currentX, 0f),
@@ -201,8 +202,8 @@ fun CommentCard(
                     cap = StrokeCap.Square
                 )
 
-                // Si tiene respuestas abajo o más hermanos posteriores, continúa hacia abajo (├── T)
-                if (continueCurrentColumnDown) {
+                // Si NO es el último hijo de su padre, continúa hacia abajo (├── T)
+                if (!isLastChild) {
                     drawLine(
                         color = treeLineColor,
                         start = Offset(currentX, cornerY),

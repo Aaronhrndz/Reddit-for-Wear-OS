@@ -83,7 +83,21 @@ class PostDetailViewModel(
                         -1 -> false
                         else -> null
                     }
-                    _uiState.value = state.copy(post = post.copy(likes = newLikes))
+                    val scoreDiff = when {
+                        post.likes == true && direction == 0 -> -1
+                        post.likes == true && direction == -1 -> -2
+                        post.likes == false && direction == 0 -> 1
+                        post.likes == false && direction == 1 -> 2
+                        post.likes == null && direction == 1 -> 1
+                        post.likes == null && direction == -1 -> -1
+                        else -> 0
+                    }
+                    _uiState.value = state.copy(
+                        post = post.copy(
+                            likes = newLikes,
+                            score = post.score + scoreDiff
+                        )
+                    )
                 }
             }
         }
@@ -99,6 +113,7 @@ class PostDetailViewModel(
                 subreddit = "",
                 subredditPrefixed = "",
                 selfText = comment.body,
+                likes = comment.likes,
                 score = comment.score
             )
             val success = repository.vote(postEquivalent, direction)
@@ -115,8 +130,8 @@ class PostDetailViewModel(
                             val scoreDiff = when {
                                 flat.comment.likes == true && direction == 0 -> -1
                                 flat.comment.likes == true && direction == -1 -> -2
-                                flat.comment.likes == false && direction == 1 -> 2
                                 flat.comment.likes == false && direction == 0 -> 1
+                                flat.comment.likes == false && direction == 1 -> 2
                                 flat.comment.likes == null && direction == 1 -> 1
                                 flat.comment.likes == null && direction == -1 -> -1
                                 else -> 0
@@ -181,7 +196,6 @@ class PostDetailViewModel(
                 emptyList()
             }
             val hasReplies = replies.isNotEmpty()
-            val continueDown = hasReplies || !isLast
 
             result.add(
                 FlatComment(
@@ -189,14 +203,13 @@ class PostDetailViewModel(
                     depth = depth,
                     hasReplies = hasReplies,
                     isLastChild = isLast,
-                    passThroughColumns = passThrough,
-                    continueCurrentColumnDown = continueDown
+                    passThroughColumns = passThrough
                 )
             )
 
             if (hasReplies) {
                 val nextPassThrough = if (depth == 0) {
-                    emptyList()
+                    listOf(!isLast)
                 } else {
                     passThrough + (!isLast)
                 }

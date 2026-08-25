@@ -19,7 +19,6 @@ data class FlatComment(
     val hasReplies: Boolean = false,
     val isLastChild: Boolean = false,
     val passThroughColumns: List<Boolean> = emptyList(),
-    val continueCurrentColumnDown: Boolean = false,
     val isCollapsed: Boolean = false
 )
 
@@ -121,7 +120,6 @@ class CommentsViewModel(
                 emptyList()
             }
             val hasReplies = replies.isNotEmpty()
-            val continueDown = hasReplies || !isLast
 
             result.add(
                 FlatComment(
@@ -129,14 +127,13 @@ class CommentsViewModel(
                     depth = depth,
                     hasReplies = hasReplies,
                     isLastChild = isLast,
-                    passThroughColumns = passThrough,
-                    continueCurrentColumnDown = continueDown
+                    passThroughColumns = passThrough
                 )
             )
 
             if (hasReplies) {
                 val nextPassThrough = if (depth == 0) {
-                    emptyList()
+                    listOf(!isLast)
                 } else {
                     passThrough + (!isLast)
                 }
