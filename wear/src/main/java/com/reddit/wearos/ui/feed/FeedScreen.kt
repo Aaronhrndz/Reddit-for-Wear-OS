@@ -19,9 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
@@ -291,16 +294,23 @@ fun PostCard(
         )
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
-            // Header: Subreddit + Autor + Badge Video
+            // Header: Subreddit (Naranja) + Autor + Badge Video
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val subText = if (post.subredditPrefixed.isNotEmpty()) post.subredditPrefixed else "r/${post.subreddit}"
                 Text(
-                    text = "${post.subredditPrefixed} • u/${post.author}",
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = RedditOrange, fontWeight = FontWeight.Bold)) {
+                            append(subText)
+                        }
+                        withStyle(SpanStyle(color = TextSecondary)) {
+                            append(" • u/${post.author}")
+                        }
+                    },
                     fontSize = 9.sp,
-                    color = TextSecondary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false)
