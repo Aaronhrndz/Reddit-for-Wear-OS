@@ -24,7 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.items
+import androidx.wear.compose.foundation.lazy.ScalingLazyListState
+import androidx.wear.compose.foundation.lazy.itemsIndexed
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
@@ -90,35 +91,125 @@ fun CommentsScreen(
                         Text(text = "Sin comentarios", color = TextSecondary, fontSize = 12.sp)
                     }
                 } else {
-                    ScalingLazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .rotaryWithScroll(scrollState),
-                        state = scrollState,
-                        autoCentering = null,
-                        contentPadding = PaddingValues(top = 22.dp, bottom = 42.dp, start = 6.dp, end = 6.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(state.comments) { flatComment ->
-                            CommentCard(
-                                flatComment = flatComment,
-                                onUpvote = {
-                                    val newDir = if (flatComment.comment.likes == true) 0 else 1
-                                    viewModel.voteComment(flatComment.comment, newDir)
-                                },
-                                onDownvote = {
-                                    val newDir = if (flatComment.comment.likes == false) 0 else -1
-                                    viewModel.voteComment(flatComment.comment, newDir)
-                                },
-                                onReply = {
-                                    val targetId = if (flatComment.comment.id.startsWith("t1_")) flatComment.comment.id else "t1_${flatComment.comment.id}"
-                                    launchReply(targetId, flatComment.comment.author)
-                                }
-                            )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        // 1. LISTA SCROLLABLE DE COMENTARIOS
+                        ScalingLazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .rotaryWithScroll(scrollState),
+                            state = scrollState,
+                            autoCentering = null,
+                            contentPadding = PaddingValues(top = 22.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            itemsIndexed(state.comments) { index, flatComment ->
+                                CommentCard(
+                                    flatComment = flatComment,
+                                    onUpvote = {
+                                        val newDir = if (flatComment.comment.likes == true) 0 else 1
+                                        viewModel.voteComment(flatComment.comment, newDir)
+                                    },
+                                    onDownvote = {
+                                        val newDir = if (flatComment.comment.likes == false) 0 else -1
+                                        viewModel.voteComment(flatComment.comment, newDir)
+                                    },
+                                    onReply = {
+                                        val targetId = if (flatComment.comment.id.startsWith("t1_")) flatComment.comment.id else "t1_${flatComment.comment.id}"
+                                        launchReply(targetId, flatComment.comment.author)
+                                    }
+                                )
+                            }
                         }
+
+                        // 2. COMPONENTE HERMANO: CANVAS DE ÁRBOL SINCRONIZADO FUERA DE LA LISTA
+                        CommentsTreeOverlay(
+                            scrollState = scrollState,
+                            comments = state.comments,
+                            modifier = Modifier.fillMaxSize()
+                        )
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Componente hermano fuera de la lista: Dibuja las líneas de árbol (Drilldown └──)
+ * sincronizadas en tiempo real con las posiciones de los ítems visibles, sin sufrir distorsión por la curvatura/escalado.
+ */
+@Composable
+fun CommentsTreeOverlay(
+    scrollState: ScalingLazyListState,
+    comments: List<FlatComment>,
+    commentStartIndex: Int = 0,
+    modifier: Modifier = Modifier
+) {
+    val treeLineColor = Color(0xFF707080)
+    val gutterUnitPx = with(androidx.compose.ui.platform.LocalDensity.current) { 14.dp.toPx() }
+    val baseMarginPx = with(androidx.compose.ui.platform.LocalDensity.current) { 8.dp.toPx() }
+    val strokeWidthPx = with(androidx.compose.ui.platform.LocalDensity.current) { 1.8.dp.toPx() }
+
+    Canvas(modifier = modifier) {
+        val visibleItems = scrollState.layoutInfo.visibleItemsInfo
+        if (visibleItems.isEmpty()) return@Canvas
+
+        // Mapa de índices visibles a coordenadas Y en pantalla
+        val itemPositions = mutableMapOf<Int, Pair<Float, Float>>()
+        for (item in visibleItems) {
+            val topY = item.offset.toFloat()
+            val height = item.size.toFloat()
+            itemPositions[item.index] = Pair(topY, height)
+        }
+
+        for (item in visibleItems) {
+            val commentIdx = item.index - commentStartIndex
+            if (commentIdx < 0 || commentIdx >= comments.size) continue
+
+            val current = comments[commentIdx]
+            val depth = current.depth.coerceAtMost(3)
+            if (depth <= 0) continue
+
+            val (topY, height) = itemPositions[item.index] ?: continue
+            val headerY = topY + 14.dp.toPx()
+            val targetX = baseMarginPx + (depth * gutterUnitPx)
+
+            // Buscar el ancestro padre anterior en la jerarquía
+            var parentIdx = commentIdx - 1
+            while (parentIdx >= 0 && comments[parentIdx].depth >= depth) {
+                parentIdx--
+            }
+
+            val parentItemIndex = parentIdx + commentStartIndex
+            val parentPos = itemPositions[parentItemIndex]
+            val startY = if (parentPos != null) {
+                parentPos.first + 14.dp.toPx()
+            } else {
+                (topY - 20.dp.toPx()).coerceAtLeast(0f)
+            }
+
+            val branchX = baseMarginPx + ((depth - 1) * gutterUnitPx) + (gutterUnitPx / 2f)
+
+            // Trazar línea vertical continua y conector en L (└──)
+            val path = Path().apply {
+                moveTo(branchX, startY)
+                lineTo(branchX, headerY - 3.dp.toPx())
+                quadraticTo(
+                    branchX, headerY,
+                    branchX + 3.dp.toPx(), headerY
+                )
+                lineTo(targetX, headerY)
+            }
+
+            drawPath(
+                path = path,
+                color = treeLineColor,
+                style = Stroke(
+                    width = strokeWidthPx,
+                    cap = StrokeCap.Round,
+                    join = StrokeJoin.Round
+                )
+            )
         }
     }
 }
@@ -132,174 +223,109 @@ fun CommentCard(
 ) {
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
-    val treeLineColor = Color(0xFF707080)
 
-    Row(
+    // Sangría proporcional al nivel de profundidad para que la tarjeta se alinee con las líneas hermanas
+    val startIndent = (depth * 14).dp
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .padding(horizontal = 2.dp, vertical = 2.dp),
-        verticalAlignment = Alignment.Top
+            .padding(start = startIndent, end = 2.dp, top = 2.dp, bottom = 2.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(DarkSurface)
+            .padding(horizontal = 7.dp, vertical = 5.dp)
     ) {
-        // Líneas de árbol estilo Explorador de Archivos (Treeview Drilldown └──)
-        if (depth > 0) {
-            val gutterWidth = (depth * 16).dp
-            Canvas(
-                modifier = Modifier
-                    .width(gutterWidth)
-                    .fillMaxHeight()
-                    .padding(end = 4.dp)
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Cabecera con autor en naranja
+            Text(
+                text = "u/${comment.author}",
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Bold,
+                color = RedditOrange
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            // Texto del comentario
+            Text(
+                text = comment.body,
+                fontSize = 11.sp,
+                color = TextPrimary,
+                lineHeight = 14.sp
+            )
+
+            Spacer(modifier = Modifier.height(3.dp))
+
+            // Barra inferior: Responder + Votación
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                val strokeWidthPx = 1.8.dp.toPx()
-                val colStepPx = this.size.width / depth
-
-                // Columnas de ancestros continuas (│)
-                for (d in 0 until depth - 1) {
-                    val x = colStepPx * d + (colStepPx / 2f)
-                    drawLine(
-                        color = treeLineColor,
-                        start = Offset(x, 0f),
-                        end = Offset(x, this.size.height),
-                        strokeWidth = strokeWidthPx,
-                        cap = StrokeCap.Round
+                // Botón Responder
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF1E1E1E))
+                        .clickable { onReply() }
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Reply,
+                        contentDescription = "Responder",
+                        tint = RedditOrange,
+                        modifier = Modifier.size(11.dp)
+                    )
+                    Spacer(modifier = Modifier.width(3.dp))
+                    Text(
+                        text = "Responder",
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = TextSecondary
                     )
                 }
 
-                // Rama actual conectora en L (└──)
-                val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
-                val cornerY = 13.dp.toPx()
-                val path = Path().apply {
-                    moveTo(currentX, 0f)
-                    lineTo(currentX, cornerY - 3.dp.toPx())
-                    quadraticTo(
-                        currentX, cornerY,
-                        currentX + 3.dp.toPx(), cornerY
-                    )
-                    lineTo(this@Canvas.size.width, cornerY)
-                }
-
-                drawPath(
-                    path = path,
-                    color = treeLineColor,
-                    style = Stroke(
-                        width = strokeWidthPx,
-                        cap = StrokeCap.Round,
-                        join = StrokeJoin.Round
-                    )
-                )
-            }
-        }
-
-        // Tarjeta de contenido del comentario
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .clip(RoundedCornerShape(8.dp))
-                .background(DarkSurface)
-                .padding(horizontal = 7.dp, vertical = 5.dp)
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera con conector de respuesta y autor
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (depth > 0) {
-                        Text(
-                            text = "↳ ",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = RedditOrange
+                // Votación
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFF1E1E1E))
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clickable { onUpvote() }
+                            .padding(1.dp)
+                    ) {
+                        RedditUpvoteIcon(
+                            isVoted = comment.likes == true,
+                            size = 11.dp
                         )
                     }
+
                     Text(
-                        text = "u/${comment.author}",
+                        text = formatScore(comment.score),
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
-                        color = RedditOrange
+                        color = when (comment.likes) {
+                            true -> RedditUpvote
+                            false -> RedditDownvote
+                            else -> TextPrimary
+                        },
+                        modifier = Modifier.padding(horizontal = 3.dp)
                     )
-                }
 
-                Spacer(modifier = Modifier.height(2.dp))
-
-                // Texto del comentario
-                Text(
-                    text = comment.body,
-                    fontSize = 11.sp,
-                    color = TextPrimary,
-                    lineHeight = 14.sp
-                )
-
-                Spacer(modifier = Modifier.height(3.dp))
-
-                // Barra inferior: Responder + Votación
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Botón Responder
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF1E1E1E))
-                            .clickable { onReply() }
-                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                            .clickable { onDownvote() }
+                            .padding(1.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Reply,
-                            contentDescription = "Responder",
-                            tint = RedditOrange,
-                            modifier = Modifier.size(11.dp)
+                        RedditDownvoteIcon(
+                            isVoted = comment.likes == false,
+                            size = 11.dp
                         )
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text(
-                            text = "Responder",
-                            fontSize = 8.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = TextSecondary
-                        )
-                    }
-
-                    // Votación
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF1E1E1E))
-                            .padding(horizontal = 4.dp, vertical = 2.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .clickable { onUpvote() }
-                                .padding(1.dp)
-                        ) {
-                            RedditUpvoteIcon(
-                                isVoted = comment.likes == true,
-                                size = 11.dp
-                            )
-                        }
-
-                        Text(
-                            text = formatScore(comment.score),
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = when (comment.likes) {
-                                true -> RedditUpvote
-                                false -> RedditDownvote
-                                else -> TextPrimary
-                            },
-                            modifier = Modifier.padding(horizontal = 3.dp)
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .clickable { onDownvote() }
-                                .padding(1.dp)
-                        ) {
-                            RedditDownvoteIcon(
-                                isVoted = comment.likes == false,
-                                size = 11.dp
-                            )
-                        }
                     }
                 }
             }
