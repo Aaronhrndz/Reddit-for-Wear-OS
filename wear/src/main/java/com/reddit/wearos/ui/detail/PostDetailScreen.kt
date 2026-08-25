@@ -74,8 +74,8 @@ fun PostDetailScreen(
                         .fillMaxSize()
                         .rotaryWithScroll(scrollState),
                     state = scrollState,
-                    autoCentering = AutoCenteringParams(itemIndex = 0, itemOffset = 0),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
+                    autoCentering = null,
+                    contentPadding = PaddingValues(top = 18.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     // CABECERA + TÍTULO INTEGRADO (Optimizado para pantalla circular)
