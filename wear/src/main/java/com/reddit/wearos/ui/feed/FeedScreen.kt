@@ -64,7 +64,7 @@ fun FeedScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(12.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -75,7 +75,7 @@ fun FeedScreen(
                             maxLines = 3,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Chip(
                             onClick = { viewModel.loadFeed(refresh = true) },
                             label = { Text("Reintentar") },
@@ -90,8 +90,8 @@ fun FeedScreen(
                         .fillMaxSize()
                         .rotaryWithScroll(scrollState),
                     state = scrollState,
-                    contentPadding = PaddingValues(top = 18.dp, bottom = 44.dp, start = 8.dp, end = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    contentPadding = PaddingValues(top = 16.dp, bottom = 40.dp, start = 4.dp, end = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     // PANEL SUPERIOR DE CONTROL (Visible al deslizar hacia arriba)
                     item {
@@ -204,7 +204,7 @@ fun FeedScreen(
                         }
                     }
 
-                    // LISTA DE PUBLICACIONES (Tarjetas limpias con radio nativo y sin bordes)
+                    // LISTA DE PUBLICACIONES
                     itemsIndexed(state.posts) { index, post ->
                         if (index >= state.posts.size - 3 && state.hasMore && !state.isLoadingMore) {
                             LaunchedEffect(Unit) {
@@ -281,12 +281,13 @@ fun PostCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 7.dp),
         backgroundPainter = CardDefaults.cardBackgroundPainter(
             startBackgroundColor = DarkSurface,
             endBackgroundColor = DarkSurface
         )
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             // Header: Subreddit + Autor + Badge Video
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -305,21 +306,21 @@ fun PostCard(
                 if (post.hasVideo()) {
                     Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
+                            .clip(RoundedCornerShape(4.dp))
                             .background(RedditOrange)
-                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                            .padding(horizontal = 4.dp, vertical = 1.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(10.dp)
+                            modifier = Modifier.size(9.dp)
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Text(
                             text = "VIDEO",
-                            fontSize = 8.sp,
+                            fontSize = 7.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -327,25 +328,26 @@ fun PostCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
-            // Título
+            // Título compacto y legible
             Text(
                 text = post.title,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary,
                 maxLines = 3,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                lineHeight = 15.sp
             )
 
             // Thumbnail si existe
             if (!post.thumbnail.isNullOrEmpty() && post.thumbnail.startsWith("http")) {
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(76.dp)
+                        .height(82.dp)
                         .clip(RoundedCornerShape(8.dp))
                 ) {
                     AsyncImage(
@@ -372,7 +374,7 @@ fun PostCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Footer con píldora de votar a la IZQUIERDA y comentarios a la DERECHA
             Row(
@@ -384,18 +386,18 @@ fun PostCard(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(14.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .background(Color(0xFF141416))
-                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
                 ) {
                     Box(
                         modifier = Modifier
                             .clickable { onUpvote() }
-                            .padding(4.dp)
+                            .padding(2.dp)
                     ) {
                         RedditUpvoteIcon(
                             isVoted = post.likes == true,
-                            size = 13.dp
+                            size = 12.dp
                         )
                     }
 
@@ -408,17 +410,17 @@ fun PostCard(
                             false -> RedditDownvote
                             else -> TextPrimary
                         },
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                        modifier = Modifier.padding(horizontal = 3.dp)
                     )
 
                     Box(
                         modifier = Modifier
                             .clickable { onDownvote() }
-                            .padding(4.dp)
+                            .padding(2.dp)
                     ) {
                         RedditDownvoteIcon(
                             isVoted = post.likes == false,
-                            size = 13.dp
+                            size = 12.dp
                         )
                     }
                 }
@@ -427,20 +429,20 @@ fun PostCard(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(14.dp))
+                        .clip(RoundedCornerShape(12.dp))
                         .background(Color(0xFF141416))
-                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.ChatBubbleOutline,
                         contentDescription = "Comentarios",
                         tint = TextSecondary,
-                        modifier = Modifier.size(12.dp)
+                        modifier = Modifier.size(11.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(3.dp))
                     Text(
                         text = "${post.numComments}",
-                        fontSize = 10.sp,
+                        fontSize = 9.sp,
                         color = TextSecondary,
                         fontWeight = FontWeight.SemiBold
                     )
