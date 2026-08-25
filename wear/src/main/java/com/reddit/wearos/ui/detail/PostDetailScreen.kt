@@ -3,6 +3,7 @@ package com.reddit.wearos.ui.detail
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,10 +18,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -105,7 +108,7 @@ fun PostDetailScreen(
                         .rotaryWithScroll(scrollState),
                     state = scrollState,
                     autoCentering = null,
-                    contentPadding = PaddingValues(top = 24.dp, bottom = 42.dp, start = 8.dp, end = 8.dp),
+                    contentPadding = PaddingValues(top = 24.dp, bottom = 42.dp, start = 6.dp, end = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     // CABECERA + TÍTULO INTEGRADO (Optimizado para pantalla circular)
@@ -397,127 +400,165 @@ fun InlineCommentCard(
 ) {
     val comment = flatComment.comment
     val depth = flatComment.depth.coerceAtMost(3)
+    val treeLineColor = Color(0xFF656575)
 
-    // Sangría limpia y escalonada por nivel de jerarquía
-    val startIndent = when (depth) {
-        0 -> 0.dp
-        1 -> 12.dp
-        2 -> 22.dp
-        else -> 30.dp
-    }
-
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = startIndent, end = 2.dp, top = 2.dp, bottom = 2.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(DarkSurface)
-            .then(
-                if (depth > 0) {
-                    Modifier.drawBehind {
-                        drawLine(
-                            color = Color(0xFF4A4A58),
-                            start = Offset(0f, 6.dp.toPx()),
-                            end = Offset(0f, size.height - 6.dp.toPx()),
-                            strokeWidth = 2.5.dp.toPx(),
-                            cap = StrokeCap.Round
-                        )
-                    }
-                } else Modifier
-            )
-            .padding(horizontal = 8.dp, vertical = 6.dp)
+            .height(IntrinsicSize.Min)
+            .padding(horizontal = 2.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            // Cabecera: u/author en naranja
-            Text(
-                text = "u/${comment.author}",
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Bold,
-                color = RedditOrange
-            )
-
-            Spacer(modifier = Modifier.height(2.dp))
-
-            // Texto del comentario
-            Text(
-                text = comment.body,
-                fontSize = 11.sp,
-                color = TextPrimary,
-                lineHeight = 14.sp
-            )
-
-            Spacer(modifier = Modifier.height(3.dp))
-
-            // Barra inferior con botón Responder y Barra de votación
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── continuo entre filas)
+        if (depth > 0) {
+            val gutterWidth = (depth * 14).dp
+            Canvas(
+                modifier = Modifier
+                    .width(gutterWidth)
+                    .fillMaxHeight()
+                    .padding(end = 3.dp)
             ) {
-                // Botón Responder
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFF1E1E1E))
-                        .clickable { onReply() }
-                        .padding(horizontal = 5.dp, vertical = 2.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Reply,
-                        contentDescription = "Responder",
-                        tint = RedditOrange,
-                        modifier = Modifier.size(11.dp)
-                    )
-                    Spacer(modifier = Modifier.width(3.dp))
-                    Text(
-                        text = "Responder",
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextSecondary
+                val strokeWidthPx = 1.8.dp.toPx()
+                val colStepPx = this.size.width / depth
+                val spacingExtensionPx = 6.dp.toPx()
+
+                // Líneas de ancestros (│) extendidas arriba y abajo para conectar filas
+                for (d in 0 until depth - 1) {
+                    val x = colStepPx * d + (colStepPx / 2f)
+                    drawLine(
+                        color = treeLineColor,
+                        start = Offset(x, -spacingExtensionPx),
+                        end = Offset(x, size.height + spacingExtensionPx),
+                        strokeWidth = strokeWidthPx,
+                        cap = StrokeCap.Square
                     )
                 }
 
-                // Votación
+                // Rama conectora en L (└──)
+                val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
+                val cornerY = 12.dp.toPx()
+                val path = Path().apply {
+                    moveTo(currentX, -spacingExtensionPx)
+                    lineTo(currentX, cornerY - 2.dp.toPx())
+                    quadraticTo(
+                        currentX, cornerY,
+                        currentX + 2.dp.toPx(), cornerY
+                    )
+                    lineTo(this@Canvas.size.width, cornerY)
+                }
+
+                drawPath(
+                    path = path,
+                    color = treeLineColor,
+                    style = Stroke(
+                        width = strokeWidthPx,
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
+                )
+            }
+        }
+
+        // Caja de contenido del comentario
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .background(DarkSurface)
+                .padding(horizontal = 7.dp, vertical = 5.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Cabecera: u/author en naranja sin icono
+                Text(
+                    text = "u/${comment.author}",
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RedditOrange
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                // Texto del comentario
+                Text(
+                    text = comment.body,
+                    fontSize = 11.sp,
+                    color = TextPrimary,
+                    lineHeight = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                // Barra inferior con botón Responder y Barra de votación
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFF1E1E1E))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
+                    // Botón Responder
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clickable { onUpvote() }
-                            .padding(1.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFF1E1E1E))
+                            .clickable { onReply() }
+                            .padding(horizontal = 5.dp, vertical = 2.dp)
                     ) {
-                        RedditUpvoteIcon(
-                            isVoted = comment.likes == true,
-                            size = 11.dp
+                        Icon(
+                            imageVector = Icons.Default.Reply,
+                            contentDescription = "Responder",
+                            tint = RedditOrange,
+                            modifier = Modifier.size(11.dp)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = "Responder",
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = TextSecondary
                         )
                     }
 
-                    Text(
-                        text = formatScore(comment.score),
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = when (comment.likes) {
-                            true -> RedditUpvote
-                            false -> RedditDownvote
-                            else -> TextPrimary
-                        },
-                        modifier = Modifier.padding(horizontal = 3.dp)
-                    )
-
-                    Box(
+                    // Votación
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clickable { onDownvote() }
-                            .padding(1.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFF1E1E1E))
+                            .padding(horizontal = 4.dp, vertical = 2.dp)
                     ) {
-                        RedditDownvoteIcon(
-                            isVoted = comment.likes == false,
-                            size = 11.dp
+                        Box(
+                            modifier = Modifier
+                                .clickable { onUpvote() }
+                                .padding(1.dp)
+                        ) {
+                            RedditUpvoteIcon(
+                                isVoted = comment.likes == true,
+                                size = 11.dp
+                            )
+                        }
+
+                        Text(
+                            text = formatScore(comment.score),
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = when (comment.likes) {
+                                true -> RedditUpvote
+                                false -> RedditDownvote
+                                else -> TextPrimary
+                            },
+                            modifier = Modifier.padding(horizontal = 3.dp)
                         )
+
+                        Box(
+                            modifier = Modifier
+                                .clickable { onDownvote() }
+                                .padding(1.dp)
+                        ) {
+                            RedditDownvoteIcon(
+                                isVoted = comment.likes == false,
+                                size = 11.dp
+                            )
+                        }
                     }
                 }
             }
