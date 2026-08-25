@@ -16,10 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -153,22 +150,23 @@ fun CommentCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
-            .padding(horizontal = 2.dp, vertical = 2.dp),
+            .padding(horizontal = 2.dp, vertical = 0.dp),
         verticalAlignment = Alignment.Top
     ) {
-        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── / ├── Continuas)
+        // Líneas de árbol estilo Explorador de Archivos (Drilldown └── / ├── 100% Continuas)
         if (depth > 0) {
             val gutterWidth = (depth * 14).dp
             Canvas(
                 modifier = Modifier
                     .width(gutterWidth)
                     .fillMaxHeight()
-                    .padding(end = 3.dp)
+                    .padding(end = 2.dp)
             ) {
                 val strokeWidthPx = 1.8.dp.toPx()
                 val colStepPx = this.size.width / depth
+                val cornerY = 16.dp.toPx()
 
-                // 1. Columnas de ancestros (│) continuas si activeAncestors[d] es true
+                // 1. Columnas de ancestros (│) continuas de tope a tope sin cortes
                 for (d in 0 until depth - 1) {
                     if (d < activeAncestors.size && activeAncestors[d]) {
                         val x = colStepPx * d + (colStepPx / 2f)
@@ -184,30 +182,26 @@ fun CommentCard(
 
                 // 2. Rama conectora del nivel actual
                 val currentX = colStepPx * (depth - 1) + (colStepPx / 2f)
-                val cornerY = 14.dp.toPx()
 
-                // Rama en L hacia la tarjeta
-                val path = Path().apply {
-                    moveTo(currentX, 0f)
-                    lineTo(currentX, cornerY - 2.dp.toPx())
-                    quadraticTo(
-                        currentX, cornerY,
-                        currentX + 2.dp.toPx(), cornerY
-                    )
-                    lineTo(this@Canvas.size.width, cornerY)
-                }
-
-                drawPath(
-                    path = path,
+                // Tramo vertical superior desde el padre hasta la altura del título
+                drawLine(
                     color = treeLineColor,
-                    style = Stroke(
-                        width = strokeWidthPx,
-                        cap = StrokeCap.Round,
-                        join = StrokeJoin.Round
-                    )
+                    start = Offset(currentX, 0f),
+                    end = Offset(currentX, cornerY),
+                    strokeWidth = strokeWidthPx,
+                    cap = StrokeCap.Square
                 )
 
-                // Si NO es el último hijo, la línea vertical continúa hacia abajo (├──)
+                // Tramo horizontal que entra a la tarjeta del comentario
+                drawLine(
+                    color = treeLineColor,
+                    start = Offset(currentX, cornerY),
+                    end = Offset(size.width, cornerY),
+                    strokeWidth = strokeWidthPx,
+                    cap = StrokeCap.Square
+                )
+
+                // Si NO es el último hijo de este nivel, la rama continúa hacia abajo (├── T)
                 if (!isLastChild) {
                     drawLine(
                         color = treeLineColor,
@@ -220,10 +214,11 @@ fun CommentCard(
             }
         }
 
-        // Tarjeta de contenido del comentario
+        // Tarjeta de contenido del comentario (con margen vertical interno para no cortar las líneas)
         Box(
             modifier = Modifier
                 .weight(1f)
+                .padding(vertical = 2.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(DarkSurface)
                 .padding(horizontal = 7.dp, vertical = 5.dp)
@@ -313,7 +308,7 @@ fun CommentCard(
                         Box(
                             modifier = Modifier
                                 .clickable { onDownvote() }
-                                .padding(1.dp)
+                            .padding(1.dp)
                         ) {
                             RedditDownvoteIcon(
                                 isVoted = comment.likes == false,
