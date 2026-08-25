@@ -62,26 +62,28 @@ class RedditApiService(
         val isHome = sub.isNullOrEmpty() || sub.equals("home", ignoreCase = true) || sub.equals("principal", ignoreCase = true) || sub.equals("frontpage", ignoreCase = true)
 
         val urlsToTry = mutableListOf<String>()
+        val sortPath = if (sort.isBlank()) "hot" else sort.lowercase()
         if (isBearer) {
             if (isHome) {
-                urlsToTry.add("https://oauth.reddit.com/best")
+                urlsToTry.add("https://oauth.reddit.com/$sortPath")
                 urlsToTry.add("https://oauth.reddit.com/hot")
+                urlsToTry.add("https://oauth.reddit.com/best")
             } else {
-                urlsToTry.add("https://oauth.reddit.com/r/$sub/$sort")
+                urlsToTry.add("https://oauth.reddit.com/r/$sub/$sortPath")
             }
         }
         if (isHome) {
-            urlsToTry.add("https://old.reddit.com/.json")
-            urlsToTry.add("https://www.reddit.com/.json")
-            urlsToTry.add("https://old.reddit.com/r/popular/hot.json")
+            urlsToTry.add("https://old.reddit.com/$sortPath.json")
+            urlsToTry.add("https://www.reddit.com/$sortPath.json")
+            urlsToTry.add("https://old.reddit.com/r/popular/$sortPath.json")
         } else {
-            urlsToTry.add("https://old.reddit.com/r/$sub/$sort.json")
-            urlsToTry.add("https://www.reddit.com/r/$sub/$sort.json")
+            urlsToTry.add("https://old.reddit.com/r/$sub/$sortPath.json")
+            urlsToTry.add("https://www.reddit.com/r/$sub/$sortPath.json")
         }
 
         for (url in urlsToTry) {
             try {
-                Log.d(TAG, "Intentando feed: url=$url, authHeader=${authHeader?.first} -> ${authHeader?.second?.take(15)}...")
+                Log.d(TAG, "Intentando feed: url=$url, sort=$sortPath, authHeader=${authHeader?.first} -> ${authHeader?.second?.take(15)}...")
                 val response = httpClient.get(url) {
                     if (url.contains("oauth.reddit.com") && isBearer) {
                         authHeader?.let { (k, v) -> header(k, v) }
@@ -89,9 +91,12 @@ class RedditApiService(
                         header("Cookie", authHeader.second)
                     }
                     header("User-Agent", USER_AGENT)
+                    header("Cache-Control", "no-cache, no-store, must-revalidate")
+                    header("Pragma", "no-cache")
                     parameter("limit", limit)
                     after?.let { parameter("after", it) }
                     parameter("raw_json", 1)
+                    parameter("_t", System.currentTimeMillis())
                 }
 
                 val status = response.status.value

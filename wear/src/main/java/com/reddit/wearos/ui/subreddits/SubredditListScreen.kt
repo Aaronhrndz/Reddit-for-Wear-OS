@@ -2,10 +2,13 @@ package com.reddit.wearos.ui.subreddits
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,6 +38,7 @@ fun SubredditListScreen(
     val scope = rememberCoroutineScope()
     var userSubreddits by remember { mutableStateOf<List<String>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    val currentSort by repository.currentSort.collectAsState()
 
     val defaultSuggested = listOf(
         "technology", "espanol", "AskReddit", "gaming", "science", "worldnews", "todayilearned", "aww"
@@ -66,9 +70,10 @@ fun SubredditListScreen(
             contentPadding = PaddingValues(top = 28.dp, bottom = 40.dp, start = 8.dp, end = 8.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
+            // SECCIÓN: ORDENAR PUBLICACIONES
             item {
                 Text(
-                    text = "Feeds y Comunidades",
+                    text = "Ordenar Feed",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = RedditOrange,
@@ -76,7 +81,101 @@ fun SubredditListScreen(
                 )
             }
 
-            // Feeds Principales
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    CompactChip(
+                        onClick = {
+                            repository.setSort("hot")
+                            onSubredditSelected(repository.currentSubreddit.value)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Whatshot,
+                                contentDescription = null,
+                                tint = if (currentSort == "hot") Color.White else TextSecondary,
+                                modifier = Modifier.size(13.dp)
+                            )
+                        },
+                        label = { Text("Hot", fontSize = 10.sp, fontWeight = if (currentSort == "hot") FontWeight.Bold else FontWeight.Normal) },
+                        colors = if (currentSort == "hot") ChipDefaults.primaryChipColors(backgroundColor = RedditOrange) else ChipDefaults.secondaryChipColors(),
+                        modifier = Modifier.weight(1f)
+                    )
+                    CompactChip(
+                        onClick = {
+                            repository.setSort("new")
+                            onSubredditSelected(repository.currentSubreddit.value)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.AutoAwesome,
+                                contentDescription = null,
+                                tint = if (currentSort == "new") Color.White else TextSecondary,
+                                modifier = Modifier.size(13.dp)
+                            )
+                        },
+                        label = { Text("New", fontSize = 10.sp, fontWeight = if (currentSort == "new") FontWeight.Bold else FontWeight.Normal) },
+                        colors = if (currentSort == "new") ChipDefaults.primaryChipColors(backgroundColor = RedditOrange) else ChipDefaults.secondaryChipColors(),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    CompactChip(
+                        onClick = {
+                            repository.setSort("rising")
+                            onSubredditSelected(repository.currentSubreddit.value)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.TrendingUp,
+                                contentDescription = null,
+                                tint = if (currentSort == "rising") Color.White else TextSecondary,
+                                modifier = Modifier.size(13.dp)
+                            )
+                        },
+                        label = { Text("Rising", fontSize = 10.sp, fontWeight = if (currentSort == "rising") FontWeight.Bold else FontWeight.Normal) },
+                        colors = if (currentSort == "rising") ChipDefaults.primaryChipColors(backgroundColor = RedditOrange) else ChipDefaults.secondaryChipColors(),
+                        modifier = Modifier.weight(1f)
+                    )
+                    CompactChip(
+                        onClick = {
+                            repository.setSort("top")
+                            onSubredditSelected(repository.currentSubreddit.value)
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.EmojiEvents,
+                                contentDescription = null,
+                                tint = if (currentSort == "top") Color.White else TextSecondary,
+                                modifier = Modifier.size(13.dp)
+                            )
+                        },
+                        label = { Text("Top", fontSize = 10.sp, fontWeight = if (currentSort == "top") FontWeight.Bold else FontWeight.Normal) },
+                        colors = if (currentSort == "top") ChipDefaults.primaryChipColors(backgroundColor = RedditOrange) else ChipDefaults.secondaryChipColors(),
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // SECCIÓN: FEEDS PRINCIPALES
+            item {
+                Text(
+                    text = "Feeds Principales",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RedditOrange,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 2.dp)
+                )
+            }
+
             item {
                 Chip(
                     onClick = {

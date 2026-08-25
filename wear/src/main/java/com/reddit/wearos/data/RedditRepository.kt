@@ -16,13 +16,21 @@ class RedditRepository(
     private val _currentSubreddit = MutableStateFlow("home")
     val currentSubreddit: StateFlow<String> = _currentSubreddit.asStateFlow()
 
+    // Criterio de ordenación actual (hot, new, rising, top)
+    private val _currentSort = MutableStateFlow("hot")
+    val currentSort: StateFlow<String> = _currentSort.asStateFlow()
+
     fun setSubreddit(subreddit: String) {
         _currentSubreddit.value = subreddit
     }
 
+    fun setSort(sort: String) {
+        _currentSort.value = sort
+    }
+
     suspend fun getFeed(
         subreddit: String = _currentSubreddit.value,
-        sort: String = "hot",
+        sort: String = _currentSort.value,
         after: String? = null
     ): Pair<List<RedditPost>, String?> {
         val target = if (subreddit.equals("home", ignoreCase = true) || subreddit.equals("principal", ignoreCase = true)) null else subreddit
