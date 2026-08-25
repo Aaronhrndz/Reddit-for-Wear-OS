@@ -7,6 +7,7 @@ import com.reddit.wearos.data.model.RedditPost
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 sealed class FeedUiState {
@@ -14,6 +15,7 @@ sealed class FeedUiState {
     data class Success(
         val posts: List<RedditPost>,
         val subreddit: String,
+        val sort: String = "hot",
         val isLoadingMore: Boolean = false,
         val isRefreshing: Boolean = false,
         val hasMore: Boolean = true
@@ -32,21 +34,36 @@ class FeedViewModel(
     private var isFetching = false
 
     init {
-        loadFeed(refresh = true)
+        // Observar cambios de Subreddit y de Criterio de Ordenación (Hot, New, Rising, Top)
+        viewModelScope.launch {
+            repository.currentSubreddit.collectLatest { sub ->
+                loadFeedInternal(subreddit = sub, sort = repository.currentSort.value, refresh = true)
+            }
+        }
+        viewModelScope.launch {
+            repository.currentSort.collectLatest { sort ->
+                loadFeedInternal(subreddit = repository.currentSubreddit.value, sort = sort, refresh = true)
+            }
+        }
     }
 
     fun loadFeed(subreddit: String? = null, refresh: Boolean = false) {
-        if (isFetching) return
+        val targetSub = subreddit ?: repository.currentSubreddit.value
+        val targetSort = repository.currentSort.value
+        loadFeedInternal(subreddit = targetSub, sort = targetSort, refresh = refresh)
+    }
+
+    private fun loadFeedInternal(subreddit: String, sort: String, refresh: Boolean) {
+        if (isFetching && !refresh) return
         isFetching = true
 
         viewModelScope.launch {
             val currentState = _uiState.value
-            val targetSubreddit = subreddit ?: repository.currentSubreddit.value
 
             if (refresh) {
                 afterCursor = null
                 if (currentState is FeedUiState.Success) {
-                    _uiState.value = currentState.copy(isRefreshing = true)
+                    _uiState.value = currentState.copy(isRefreshing = true, subreddit = subreddit, sort = sort)
                 } else {
                     _uiState.value = FeedUiState.Loading
                 }
@@ -56,7 +73,8 @@ class FeedViewModel(
 
             try {
                 val (newPosts, nextAfter) = repository.getFeed(
-                    subreddit = targetSubreddit,
+                    subreddit = subreddit,
+                    sort = sort,
                     after = if (refresh) null else afterCursor
                 )
                 afterCursor = nextAfter
@@ -69,7 +87,8 @@ class FeedViewModel(
 
                 _uiState.value = FeedUiState.Success(
                     posts = updatedPosts,
-                    subreddit = targetSubreddit,
+                    subreddit = subreddit,
+                    sort = sort,
                     isLoadingMore = false,
                     isRefreshing = false,
                     hasMore = nextAfter != null
@@ -103,8 +122,8 @@ class FeedViewModel(
                             val scoreDiff = when {
                                 post.likes == true && direction == 0 -> -1
                                 post.likes == true && direction == -1 -> -2
-                                post.likes == false && direction == 1 -> 2
                                 post.likes == false && direction == 0 -> 1
+                                post.likes == false && direction == 1 -> 2
                                 post.likes == null && direction == 1 -> 1
                                 post.likes == null && direction == -1 -> -1
                                 else -> 0

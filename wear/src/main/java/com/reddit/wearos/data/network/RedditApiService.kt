@@ -67,23 +67,11 @@ class RedditApiService(
         val sortPath = if (sort.isBlank()) "hot" else sort.lowercase()
         if (isBearer) {
             if (isHome) {
-                // Obtener suscripciones del usuario para construir un feed 100% personal sin filtraciones globales
-                if (cachedSubscribedSubs.isNullOrEmpty()) {
-                    try {
-                        val subs = getUserSubreddits()
-                        if (subs.isNotEmpty()) {
-                            cachedSubscribedSubs = subs.map { it.displayName }
-                        }
-                    } catch (_: Exception) {}
+                // En la API OAuth de Reddit, el feed personal se consulta directamente en /hot, /new, /rising, /top
+                urlsToTry.add("https://oauth.reddit.com/$sortPath")
+                if (sortPath == "hot") {
+                    urlsToTry.add("https://oauth.reddit.com/best")
                 }
-
-                val subs = cachedSubscribedSubs
-                if (!subs.isNullOrEmpty()) {
-                    val multi = subs.take(50).joinToString("+")
-                    urlsToTry.add("https://oauth.reddit.com/r/$multi/$sortPath")
-                }
-                urlsToTry.add("https://oauth.reddit.com/")
-                urlsToTry.add("https://oauth.reddit.com/best")
             } else {
                 urlsToTry.add("https://oauth.reddit.com/r/$sub/$sortPath")
             }

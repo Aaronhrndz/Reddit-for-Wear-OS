@@ -1,2 +1,0 @@
-C:\Users\aaron\reddit-wearos\wear\src\main\java\com\reddit\wearos\data\network\RedditApiService.kt
-C:\Users\aaron\reddit-wearos\wear\src\main\java\com\reddit\wearos\ui\feed\FeedScreen.kt

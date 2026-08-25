@@ -131,8 +131,16 @@ fun FeedScreen(
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 12.sp,
+                                        fontSize = 11.sp,
                                         color = Color.White
+                                    )
+                                },
+                                secondaryLabel = {
+                                    Text(
+                                        text = state.sort.uppercase(),
+                                        fontSize = 8.sp,
+                                        color = Color(0xFFEEEEEE),
+                                        fontWeight = FontWeight.Medium
                                     )
                                 },
                                 colors = ChipDefaults.primaryChipColors(
