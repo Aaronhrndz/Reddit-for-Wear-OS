@@ -21,8 +21,7 @@ import io.ktor.http.Parameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.*
 
 class RedditApiService(
     private val httpClient: HttpClient,
@@ -263,28 +262,57 @@ class RedditApiService(
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
         val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) {
-            "https://oauth.reddit.com/user/$username/saved"
-        } else {
-            "https://old.reddit.com/user/$username/saved.json"
+        val cleanUser = username.trim().removePrefix("u/").removePrefix("/u/")
+        val urlsToTry = mutableListOf<String>()
+        if (isBearer) {
+            urlsToTry.add("https://oauth.reddit.com/user/me/saved")
+            if (cleanUser.isNotEmpty()) urlsToTry.add("https://oauth.reddit.com/user/$cleanUser/saved")
         }
-        try {
-            val response = httpClient.get(url) {
-                if (url.contains("oauth.reddit.com") && isBearer) {
+        if (cleanUser.isNotEmpty()) {
+            urlsToTry.add("https://old.reddit.com/user/$cleanUser/saved.json")
+            urlsToTry.add("https://www.reddit.com/user/$cleanUser/saved.json")
+        }
+        urlsToTry.add("https://old.reddit.com/saved.json")
+        urlsToTry.add("https://www.reddit.com/saved.json")
+
+        for (url in urlsToTry) {
+            try {
+                val response = httpClient.get(url) {
                     authHeader?.let { (k, v) -> header(k, v) }
+                    header("User-Agent", USER_AGENT)
+                    parameter("limit", limit)
+                    after?.let { parameter("after", it) }
+                    parameter("raw_json", 1)
                 }
-                header("User-Agent", USER_AGENT)
-                parameter("limit", limit)
-                after?.let { parameter("after", it) }
-                parameter("raw_json", 1)
+                val status = response.status.value
+                val responseText = response.bodyAsText()
+                if (status == 200 && !responseText.trim().startsWith("<") && responseText.isNotBlank()) {
+                    val root = NetworkClient.json.parseToJsonElement(responseText).jsonObject
+                    val data = root["data"]?.jsonObject
+                    val afterKey = data?.get("after")?.jsonPrimitive?.contentOrNull
+                    val children = data?.get("children")?.jsonArray ?: kotlinx.serialization.json.JsonArray(emptyList())
+
+                    val postList = mutableListOf<ListingChild<RedditPost>>()
+                    for (child in children) {
+                        try {
+                            val childObj = child.jsonObject
+                            val kind = childObj["kind"]?.jsonPrimitive?.content
+                            if (kind == "t3") {
+                                val postData = NetworkClient.json.decodeFromJsonElement<RedditPost>(childObj["data"]!!)
+                                postList.add(ListingChild(kind = "t3", data = postData))
+                            }
+                        } catch (_: Exception) {}
+                    }
+                    if (postList.isNotEmpty() || afterKey != null) {
+                        return@withContext RedditListing(
+                            kind = "Listing",
+                            data = ListingData(children = postList, after = afterKey)
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error cargando guardados desde $url: ${e.message}")
             }
-            val status = response.status.value
-            val responseText = response.bodyAsText()
-            if (status == 200 && !responseText.trim().startsWith("<") && responseText.isNotBlank()) {
-                return@withContext NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(responseText)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error cargando guardados: ${e.message}")
         }
         RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
     }
