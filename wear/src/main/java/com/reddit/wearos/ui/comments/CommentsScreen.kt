@@ -90,7 +90,7 @@ fun CommentCard(
     onDownvote: () -> Unit
 ) {
     val comment = flatComment.comment
-    val indent = (flatComment.depth.coerceAtMost(3) * 6).dp
+    val indent = (flatComment.depth.coerceAtMost(3) * 5).dp
 
     val depthBorderColors = listOf(
         RedditOrange,
@@ -104,35 +104,32 @@ fun CommentCard(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = indent)
+            .padding(start = indent, top = 2.dp, bottom = 2.dp)
     ) {
         if (flatComment.depth > 0) {
             Box(
                 modifier = Modifier
                     .width(2.dp)
                     .fillMaxHeight()
-                    .background(indicatorColor)
+                    .background(indicatorColor, RoundedCornerShape(1.dp))
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(3.dp))
         }
 
-        Card(
-            onClick = {},
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp)),
-            backgroundPainter = CardDefaults.cardBackgroundPainter(
-                startBackgroundColor = DarkSurface,
-                endBackgroundColor = DarkSurface
-            )
+                .clip(RoundedCornerShape(8.dp))
+                .background(DarkSurface)
+                .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
-            Column(modifier = Modifier.padding(6.dp)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 // Header u/author
                 Text(
                     text = "u/${comment.author}",
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (flatComment.depth == 0) TextPrimary else TextSecondary
+                    color = if (flatComment.depth == 0) RedditOrange else TextSecondary
                 )
 
                 Spacer(modifier = Modifier.height(2.dp))
@@ -145,9 +142,9 @@ fun CommentCard(
                     lineHeight = 14.sp
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(3.dp))
 
-                // Barra de votación de comentarios de Reddit auténtica
+                // Barra de votación de comentarios compacta
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
@@ -156,14 +153,14 @@ fun CommentCard(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
+                            .clip(RoundedCornerShape(8.dp))
                             .background(Color(0xFF1E1E1E))
                             .padding(horizontal = 4.dp, vertical = 2.dp)
                     ) {
                         Box(
                             modifier = Modifier
                                 .clickable { onUpvote() }
-                                .padding(2.dp)
+                                .padding(1.dp)
                         ) {
                             RedditUpvoteIcon(
                                 isVoted = comment.likes == true,
@@ -186,7 +183,7 @@ fun CommentCard(
                         Box(
                             modifier = Modifier
                                 .clickable { onDownvote() }
-                                .padding(2.dp)
+                                .padding(1.dp)
                         ) {
                             RedditDownvoteIcon(
                                 isVoted = comment.likes == false,

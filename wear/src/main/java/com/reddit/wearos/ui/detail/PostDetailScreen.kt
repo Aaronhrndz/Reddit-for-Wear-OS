@@ -22,13 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import coil.compose.AsyncImage
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
+import com.reddit.wearos.ui.comments.FlatComment
 import com.reddit.wearos.ui.components.RedditDownvoteIcon
 import com.reddit.wearos.ui.components.RedditUpvoteIcon
 import com.reddit.wearos.ui.components.WearVideoPlayer
@@ -40,7 +41,7 @@ import com.reddit.wearos.util.RemotePhoneHelper
 @Composable
 fun PostDetailScreen(
     viewModel: PostDetailViewModel,
-    onViewComments: (String, String) -> Unit,
+    onViewComments: ((String, String) -> Unit)? = null,
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -166,8 +167,8 @@ fun PostDetailScreen(
                                 Box(
                                     modifier = Modifier
                                         .clickable {
-                                            val dir = if (post.likes == true) 0 else 1
-                                            viewModel.vote(dir)
+                                             val dir = if (post.likes == true) 0 else 1
+                                             viewModel.vote(dir)
                                         }
                                         .padding(3.dp)
                                 ) {
@@ -226,30 +227,6 @@ fun PostDetailScreen(
                         }
                     }
 
-                    // Botón para ver comentarios
-                    item {
-                        Chip(
-                            onClick = { onViewComments(post.subreddit, post.id) },
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.ChatBubbleOutline,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = "Ver comentarios (${post.numComments})",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            },
-                            colors = ChipDefaults.primaryChipColors(backgroundColor = RedditOrange),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
                     // Abrir en el teléfono Companion
                     item {
                         CompactChip(
@@ -275,8 +252,193 @@ fun PostDetailScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+
+                    // SECCIÓN DE COMENTARIOS DIRECTOS
+                    item {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.ChatBubbleOutline,
+                                contentDescription = null,
+                                tint = RedditOrange,
+                                modifier = Modifier.size(13.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Comentarios (${post.numComments})",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = TextSecondary
+                            )
+                        }
+                    }
+
+                    if (state.commentsLoading) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    indicatorColor = RedditOrange,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+                    } else if (state.comments.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Sin comentarios",
+                                    color = TextSecondary,
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+                    } else {
+                        items(state.comments) { flatComment ->
+                            InlineCommentCard(
+                                flatComment = flatComment,
+                                onUpvote = {
+                                    val newDir = if (flatComment.comment.likes == true) 0 else 1
+                                    viewModel.voteComment(flatComment.comment, newDir)
+                                },
+                                onDownvote = {
+                                    val newDir = if (flatComment.comment.likes == false) 0 else -1
+                                    viewModel.voteComment(flatComment.comment, newDir)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 }
+
+@Composable
+fun InlineCommentCard(
+    flatComment: FlatComment,
+    onUpvote: () -> Unit,
+    onDownvote: () -> Unit
+) {
+    val comment = flatComment.comment
+    val indent = (flatComment.depth.coerceAtMost(3) * 5).dp
+
+    val depthBorderColors = listOf(
+        RedditOrange,
+        RedditBlue,
+        Color(0xFF4CAF50),
+        Color(0xFFFFEB3B),
+        Color(0xFF9C27B0)
+    )
+    val indicatorColor = depthBorderColors[flatComment.depth % depthBorderColors.size]
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = indent, top = 2.dp, bottom = 2.dp)
+    ) {
+        if (flatComment.depth > 0) {
+            Box(
+                modifier = Modifier
+                    .width(2.dp)
+                    .fillMaxHeight()
+                    .background(indicatorColor, RoundedCornerShape(1.dp))
+            )
+            Spacer(modifier = Modifier.width(3.dp))
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(DarkSurface)
+                .padding(horizontal = 7.dp, vertical = 5.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // Header u/author
+                Text(
+                    text = "u/${comment.author}",
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (flatComment.depth == 0) RedditOrange else TextSecondary
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                // Texto del comentario
+                Text(
+                    text = comment.body,
+                    fontSize = 11.sp,
+                    color = TextPrimary,
+                    lineHeight = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                // Barra de votación de comentarios compacta
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color(0xFF1E1E1E))
+                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clickable { onUpvote() }
+                                .padding(1.dp)
+                        ) {
+                            RedditUpvoteIcon(
+                                isVoted = comment.likes == true,
+                                size = 11.dp
+                            )
+                        }
+
+                        Text(
+                            text = formatScore(comment.score),
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = when (comment.likes) {
+                                true -> RedditUpvote
+                                false -> RedditDownvote
+                                else -> TextPrimary
+                            },
+                            modifier = Modifier.padding(horizontal = 3.dp)
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .clickable { onDownvote() }
+                                .padding(1.dp)
+                        ) {
+                            RedditDownvoteIcon(
+                                isVoted = comment.likes == false,
+                                size = 11.dp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

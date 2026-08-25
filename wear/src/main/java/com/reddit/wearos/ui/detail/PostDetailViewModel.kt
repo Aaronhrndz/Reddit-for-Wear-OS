@@ -3,15 +3,24 @@ package com.reddit.wearos.ui.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reddit.wearos.data.RedditRepository
+import com.reddit.wearos.data.model.RedditComment
+import com.reddit.wearos.data.model.RedditListing
 import com.reddit.wearos.data.model.RedditPost
+import com.reddit.wearos.data.network.NetworkClient
+import com.reddit.wearos.ui.comments.FlatComment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.decodeFromJsonElement
 
 sealed class PostDetailUiState {
     object Loading : PostDetailUiState()
-    data class Success(val post: RedditPost) : PostDetailUiState()
+    data class Success(
+        val post: RedditPost,
+        val comments: List<FlatComment> = emptyList(),
+        val commentsLoading: Boolean = false
+    ) : PostDetailUiState()
     data class Error(val message: String) : PostDetailUiState()
 }
 
@@ -26,9 +35,14 @@ class PostDetailViewModel(
         viewModelScope.launch {
             _uiState.value = PostDetailUiState.Loading
             try {
-                val (post, _) = repository.getComments(subreddit, postId)
+                val (post, comments) = repository.getComments(subreddit, postId)
                 if (post != null) {
-                    _uiState.value = PostDetailUiState.Success(post)
+                    val flattened = flattenComments(comments, depth = 0)
+                    _uiState.value = PostDetailUiState.Success(
+                        post = post,
+                        comments = flattened,
+                        commentsLoading = false
+                    )
                 } else {
                     _uiState.value = PostDetailUiState.Error("Post no encontrado")
                 }
@@ -39,7 +53,22 @@ class PostDetailViewModel(
     }
 
     fun setPostDirectly(post: RedditPost) {
-        _uiState.value = PostDetailUiState.Success(post)
+        _uiState.value = PostDetailUiState.Success(post = post, comments = emptyList(), commentsLoading = true)
+        viewModelScope.launch {
+            try {
+                val (_, comments) = repository.getComments(post.subreddit, post.id)
+                val flattened = flattenComments(comments, depth = 0)
+                val current = _uiState.value
+                if (current is PostDetailUiState.Success) {
+                    _uiState.value = current.copy(comments = flattened, commentsLoading = false)
+                }
+            } catch (_: Exception) {
+                val current = _uiState.value
+                if (current is PostDetailUiState.Success) {
+                    _uiState.value = current.copy(commentsLoading = false)
+                }
+            }
+        }
     }
 
     fun vote(direction: Int) {
@@ -54,7 +83,50 @@ class PostDetailViewModel(
                         -1 -> false
                         else -> null
                     }
-                    _uiState.value = PostDetailUiState.Success(post.copy(likes = newLikes))
+                    _uiState.value = state.copy(post = post.copy(likes = newLikes))
+                }
+            }
+        }
+    }
+
+    fun voteComment(comment: RedditComment, direction: Int) {
+        viewModelScope.launch {
+            val postEquivalent = RedditPost(
+                id = comment.id,
+                name = "t1_${comment.id}",
+                title = "",
+                author = comment.author,
+                subreddit = "",
+                subredditPrefixed = "",
+                selfText = comment.body,
+                score = comment.score
+            )
+            val success = repository.vote(postEquivalent, direction)
+            if (success) {
+                val state = _uiState.value
+                if (state is PostDetailUiState.Success) {
+                    val updated = state.comments.map { flat ->
+                        if (flat.comment.id == comment.id) {
+                            val newLikes = when (direction) {
+                                1 -> true
+                                -1 -> false
+                                else -> null
+                            }
+                            val scoreDiff = when {
+                                flat.comment.likes == true && direction == 0 -> -1
+                                flat.comment.likes == true && direction == -1 -> -2
+                                flat.comment.likes == false && direction == 1 -> 2
+                                flat.comment.likes == false && direction == 0 -> 1
+                                flat.comment.likes == null && direction == 1 -> 1
+                                flat.comment.likes == null && direction == -1 -> -1
+                                else -> 0
+                            }
+                            flat.copy(comment = flat.comment.copy(likes = newLikes, score = flat.comment.score + scoreDiff))
+                        } else {
+                            flat
+                        }
+                    }
+                    _uiState.value = state.copy(comments = updated)
                 }
             }
         }
@@ -68,9 +140,25 @@ class PostDetailViewModel(
             viewModelScope.launch {
                 val success = repository.savePost(post, newSaveState)
                 if (success) {
-                    _uiState.value = PostDetailUiState.Success(post.copy(saved = newSaveState))
+                    _uiState.value = state.copy(post = post.copy(saved = newSaveState))
                 }
             }
         }
+    }
+
+    private fun flattenComments(comments: List<RedditComment>, depth: Int): List<FlatComment> {
+        val result = mutableListOf<FlatComment>()
+        for (c in comments) {
+            result.add(FlatComment(comment = c.copy(depth = depth), depth = depth))
+            if (c.replies != null) {
+                try {
+                    val listing: RedditListing<RedditComment> = NetworkClient.json.decodeFromJsonElement(c.replies)
+                    val subComments = listing.data.children.filter { it.kind == "t1" }.map { it.data }
+                    result.addAll(flattenComments(subComments, depth + 1))
+                } catch (_: Exception) {
+                }
+            }
+        }
+        return result
     }
 }
