@@ -158,20 +158,22 @@ fun PostDetailScreen(
                                     .padding(vertical = 4.dp)
                             )
                         }
-                    } else if (post.url.endsWith(".jpg") || post.url.endsWith(".png") || post.url.endsWith(".jpeg") || (!post.thumbnail.isNullOrEmpty() && post.thumbnail.startsWith("http"))) {
-                        item {
-                            val imgUrl = if (post.url.endsWith(".jpg") || post.url.endsWith(".png") || post.url.endsWith(".jpeg")) post.url else post.thumbnail ?: ""
-                            AsyncImage(
-                                model = imgUrl,
-                                contentDescription = null,
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(125.dp)
-                                    .padding(vertical = 4.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color.Black)
-                            )
+                    } else {
+                        val imgUrl = post.getImageUrl()
+                        if (!imgUrl.isNullOrEmpty()) {
+                            item {
+                                AsyncImage(
+                                    model = imgUrl,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(135.dp)
+                                        .padding(vertical = 4.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color.Black)
+                                )
+                            }
                         }
                     }
 

@@ -106,14 +106,18 @@ data class RedditPost(
             try {
                 val redditVideo = media.jsonObject["reddit_video"]?.jsonObject
                 val fallbackUrl = redditVideo?.get("fallback_url")?.jsonPrimitive?.content
-                if (!fallbackUrl.isNullOrEmpty()) return fallbackUrl
+                if (!fallbackUrl.isNullOrEmpty()) return fallbackUrl.replace("&amp;", "&")
+                val hlsUrl = redditVideo?.get("hls_url")?.jsonPrimitive?.content
+                if (!hlsUrl.isNullOrEmpty()) return hlsUrl.replace("&amp;", "&")
             } catch (_: Exception) {}
         }
         if (preview != null) {
             try {
                 val redditVideoPreview = preview.jsonObject["reddit_video_preview"]?.jsonObject
                 val fallbackUrl = redditVideoPreview?.get("fallback_url")?.jsonPrimitive?.content
-                if (!fallbackUrl.isNullOrEmpty()) return fallbackUrl
+                if (!fallbackUrl.isNullOrEmpty()) return fallbackUrl.replace("&amp;", "&")
+                val hlsUrl = redditVideoPreview?.get("hls_url")?.jsonPrimitive?.content
+                if (!hlsUrl.isNullOrEmpty()) return hlsUrl.replace("&amp;", "&")
             } catch (_: Exception) {}
         }
         if (url.contains("v.redd.it")) {
@@ -121,6 +125,59 @@ data class RedditPost(
             return "$clean/DASH_480.mp4"
         }
         return null
+    }
+
+    fun getImageUrl(): String? {
+        val lower = url.lowercase()
+        if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp") || lower.endsWith(".gif")) {
+            return url
+        }
+        if (url.contains("i.redd.it") || url.contains("i.imgur.com")) {
+            return url
+        }
+        if (preview != null) {
+            try {
+                val images = preview.jsonObject["images"]?.jsonArray
+                if (!images.isNullOrEmpty()) {
+                    val firstImg = images[0].jsonObject
+                    val sourceUrl = firstImg["source"]?.jsonObject?.get("url")?.jsonPrimitive?.content
+                    if (!sourceUrl.isNullOrEmpty()) {
+                        return sourceUrl.replace("&amp;", "&")
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        if (!thumbnail.isNullOrEmpty() && thumbnail.startsWith("http") && !thumbnail.contains("default") && !thumbnail.contains("self")) {
+            return thumbnail
+        }
+        return null
+    }
+
+    fun getThumbnailUrl(): String? {
+        if (preview != null) {
+            try {
+                val images = preview.jsonObject["images"]?.jsonArray
+                if (!images.isNullOrEmpty()) {
+                    val firstImg = images[0].jsonObject
+                    val resolutions = firstImg["resolutions"]?.jsonArray
+                    if (!resolutions.isNullOrEmpty()) {
+                        val target = resolutions.find {
+                            val w = it.jsonObject["width"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+                            w in 240..480
+                        } ?: resolutions.last()
+                        val resUrl = target.jsonObject["url"]?.jsonPrimitive?.content
+                        if (!resUrl.isNullOrEmpty()) {
+                            return resUrl.replace("&amp;", "&")
+                        }
+                    }
+                    val sourceUrl = firstImg["source"]?.jsonObject?.get("url")?.jsonPrimitive?.content
+                    if (!sourceUrl.isNullOrEmpty()) {
+                        return sourceUrl.replace("&amp;", "&")
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        return getImageUrl()
     }
 }
 

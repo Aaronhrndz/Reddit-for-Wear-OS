@@ -354,17 +354,19 @@ fun PostCard(
                 lineHeight = 15.sp
             )
 
-            // Thumbnail si existe
-            if (!post.thumbnail.isNullOrEmpty() && post.thumbnail.startsWith("http")) {
+            // Imagen o Preview de Alta Resolución si existe
+            val previewUrl = post.getThumbnailUrl()
+            if (!previewUrl.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(82.dp)
+                        .height(88.dp)
                         .clip(RoundedCornerShape(8.dp))
+                        .background(Color.Black)
                 ) {
                     AsyncImage(
-                        model = post.thumbnail,
+                        model = previewUrl,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
