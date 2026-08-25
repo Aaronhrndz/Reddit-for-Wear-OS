@@ -96,7 +96,7 @@ class CommentsViewModel(
 
     fun submitComment(postId: String, subreddit: String, thingId: String, text: String, onComplete: ((Boolean) -> Unit)? = null) {
         viewModelScope.launch {
-            val success = repository.submitComment(thingId, text)
+            val success = repository.addComment(thingId, text)
             if (success) {
                 loadComments(postId, subreddit)
             }
