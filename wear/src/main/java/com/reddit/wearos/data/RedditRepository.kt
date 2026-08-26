@@ -71,7 +71,7 @@ class RedditRepository(
     }
 
     suspend fun getSavedPosts(
-        username: String,
+        username: String = "me",
         after: String? = null
     ): Pair<List<RedditPost>, String?> {
         val listing = apiService.getSavedPosts(username = username, after = after)

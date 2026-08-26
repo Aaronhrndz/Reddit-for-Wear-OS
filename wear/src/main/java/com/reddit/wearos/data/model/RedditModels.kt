@@ -136,6 +136,20 @@ data class RedditPost(
         return null
     }
 
+    fun getAudioUrlCandidates(): List<String> {
+        val vUrl = getVideoUrl() ?: return emptyList()
+        if (vUrl.contains("v.redd.it")) {
+            val base = vUrl.substringBefore("?").substringBeforeLast("/")
+            return listOf(
+                "$base/DASH_AUDIO_128.mp4",
+                "$base/DASH_audio.mp4",
+                "$base/DASH_AUDIO_64.mp4",
+                "$base/DASH_audio"
+            )
+        }
+        return emptyList()
+    }
+
     fun getImageUrl(): String? {
         val lower = url.lowercase()
         if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".webp") || lower.endsWith(".gif")) {

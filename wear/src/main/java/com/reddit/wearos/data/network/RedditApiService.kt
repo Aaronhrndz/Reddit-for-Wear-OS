@@ -282,36 +282,70 @@ class RedditApiService(
     }
 
     suspend fun getSavedPosts(
-        username: String,
+        username: String = "me",
         after: String? = null,
         limit: Int = 25
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
         val isBearer = isBearerAuth()
-        val authHeader = getAuthHeader()
+        var currentAuthHeader = getAuthHeader()
         val cleanUser = username.trim().removePrefix("u/").removePrefix("/u/")
         val urlsToTry = mutableListOf<String>()
         if (isBearer) {
             urlsToTry.add("https://oauth.reddit.com/user/me/saved")
-            if (cleanUser.isNotEmpty()) urlsToTry.add("https://oauth.reddit.com/user/$cleanUser/saved")
+            if (cleanUser.isNotEmpty() && cleanUser != "me") {
+                urlsToTry.add("https://oauth.reddit.com/user/$cleanUser/saved")
+            }
         }
-        if (cleanUser.isNotEmpty()) {
+        if (cleanUser.isNotEmpty() && cleanUser != "me") {
+            urlsToTry.add("https://api.reddit.com/user/$cleanUser/saved.json")
             urlsToTry.add("https://old.reddit.com/user/$cleanUser/saved.json")
             urlsToTry.add("https://www.reddit.com/user/$cleanUser/saved.json")
         }
+        urlsToTry.add("https://api.reddit.com/user/me/saved.json")
+        urlsToTry.add("https://old.reddit.com/user/me/saved.json")
+        urlsToTry.add("https://www.reddit.com/user/me/saved.json")
+        urlsToTry.add("https://api.reddit.com/saved.json")
         urlsToTry.add("https://old.reddit.com/saved.json")
         urlsToTry.add("https://www.reddit.com/saved.json")
 
         for (url in urlsToTry) {
             try {
-                val response = httpClient.get(url) {
-                    authHeader?.let { (k, v) -> header(k, v) }
+                Log.d(TAG, "Consultando guardados: url=$url, auth=${currentAuthHeader?.first}")
+                var response = httpClient.get(url) {
+                    if (url.contains("oauth.reddit.com") && isBearer) {
+                        currentAuthHeader?.let { (k, v) -> header(k, v) }
+                    } else if (currentAuthHeader?.first == "Cookie") {
+                        header("Cookie", currentAuthHeader.second)
+                    } else if (currentAuthHeader != null) {
+                        header(currentAuthHeader.first, currentAuthHeader.second)
+                    }
                     header("User-Agent", USER_AGENT)
                     parameter("limit", limit)
                     after?.let { parameter("after", it) }
                     parameter("raw_json", 1)
                 }
-                val status = response.status.value
-                val responseText = response.bodyAsText()
+
+                var status = response.status.value
+                var responseText = response.bodyAsText()
+
+                if (status == 401 && url.contains("oauth.reddit.com")) {
+                    Log.w(TAG, "401 en guardados. Intentando refrescar token...")
+                    val newToken = authManager.forceRefreshToken()
+                    if (!newToken.isNullOrEmpty()) {
+                        currentAuthHeader = Pair("Authorization", if (newToken.startsWith("Bearer ")) newToken else "Bearer $newToken")
+                        response = httpClient.get(url) {
+                            header("Authorization", currentAuthHeader.second)
+                            header("User-Agent", USER_AGENT)
+                            parameter("limit", limit)
+                            after?.let { parameter("after", it) }
+                            parameter("raw_json", 1)
+                        }
+                        status = response.status.value
+                        responseText = response.bodyAsText()
+                    }
+                }
+
+                Log.d(TAG, "Respuesta guardados $url: status=$status, len=${responseText.length}")
                 if (status == 200 && !responseText.trim().startsWith("<") && responseText.isNotBlank()) {
                     val root = NetworkClient.json.parseToJsonElement(responseText).jsonObject
                     val data = root["data"]?.jsonObject
@@ -326,10 +360,31 @@ class RedditApiService(
                             if (kind == "t3") {
                                 val postData = NetworkClient.json.decodeFromJsonElement<RedditPost>(childObj["data"]!!)
                                 postList.add(ListingChild(kind = "t3", data = postData))
+                            } else if (kind == "t1") {
+                                val commentObj = childObj["data"]?.jsonObject
+                                if (commentObj != null) {
+                                    val subName = commentObj["subreddit"]?.jsonPrimitive?.contentOrNull ?: ""
+                                    val commentPost = RedditPost(
+                                        id = commentObj["id"]?.jsonPrimitive?.contentOrNull ?: "",
+                                        name = commentObj["name"]?.jsonPrimitive?.contentOrNull ?: "",
+                                        title = "💬 Comentario en r/$subName",
+                                        selfText = commentObj["body"]?.jsonPrimitive?.contentOrNull ?: "",
+                                        author = commentObj["author"]?.jsonPrimitive?.contentOrNull ?: "[desconocido]",
+                                        subreddit = subName,
+                                        score = commentObj["score"]?.jsonPrimitive?.contentOrNull?.toIntOrNull() ?: 0,
+                                        createdUtc = commentObj["created_utc"]?.jsonPrimitive?.contentOrNull?.toDoubleOrNull() ?: 0.0,
+                                        saved = true,
+                                        permalink = commentObj["permalink"]?.jsonPrimitive?.contentOrNull ?: ""
+                                    )
+                                    postList.add(ListingChild(kind = "t3", data = commentPost))
+                                }
                             }
-                        } catch (_: Exception) {}
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Error decodificando elemento guardado: ${e.message}")
+                        }
                     }
-                    if (postList.isNotEmpty() || afterKey != null) {
+                    if (postList.isNotEmpty() || afterKey != null || url.contains("oauth.reddit.com")) {
+                        Log.d(TAG, "✅ Guardados obtenidos: ${postList.size} items de $url")
                         return@withContext RedditListing(
                             kind = "Listing",
                             data = ListingData(children = postList, after = afterKey)
@@ -340,6 +395,7 @@ class RedditApiService(
                 Log.e(TAG, "Error cargando guardados desde $url: ${e.message}")
             }
         }
+        Log.w(TAG, "No se pudieron obtener guardados de ninguna URL.")
         RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
     }
 

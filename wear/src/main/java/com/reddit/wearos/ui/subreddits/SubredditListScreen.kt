@@ -281,10 +281,14 @@ fun SubredditListScreen(
                             .padding(8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            indicatorColor = RedditOrange
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                indicatorColor = RedditOrange
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("Cargando subs…", fontSize = 9.sp, color = TextSecondary)
+                        }
                     }
                 }
             }

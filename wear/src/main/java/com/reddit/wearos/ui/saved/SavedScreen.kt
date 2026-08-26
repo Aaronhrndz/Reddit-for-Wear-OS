@@ -42,7 +42,11 @@ fun SavedScreen(
         when (val state = uiState) {
             is SavedUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(indicatorColor = RedditOrange)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(indicatorColor = RedditOrange)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("Cargando guardados…", fontSize = 10.sp, color = TextSecondary)
+                    }
                 }
             }
             is SavedUiState.Error -> {

@@ -91,7 +91,11 @@ fun PostDetailScreen(
         when (val state = uiState) {
                 is PostDetailUiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(indicatorColor = RedditOrange)
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(indicatorColor = RedditOrange)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text("Cargando post…", fontSize = 10.sp, color = TextSecondary)
+                        }
                     }
                 }
                 is PostDetailUiState.Error -> {
@@ -339,10 +343,14 @@ fun PostDetailScreen(
                                     .padding(vertical = 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    indicatorColor = RedditOrange,
-                                    modifier = Modifier.size(20.dp)
-                                )
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator(
+                                        indicatorColor = RedditOrange,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text("Cargando comentarios…", fontSize = 9.sp, color = TextSecondary)
+                                }
                             }
                         }
                     } else if (state.comments.isEmpty()) {

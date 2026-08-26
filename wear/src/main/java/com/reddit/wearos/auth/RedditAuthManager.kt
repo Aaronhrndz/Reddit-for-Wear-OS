@@ -4,9 +4,11 @@ import android.content.Context
 import android.net.Uri
 import android.util.Base64
 import com.reddit.wearos.data.model.OAuthTokenResponse
+import com.reddit.wearos.data.model.RedditUser
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.Parameters
 import kotlinx.coroutines.Dispatchers
@@ -96,6 +98,16 @@ class RedditAuthManager(
             refreshToken = response.refreshToken,
             expiresInSeconds = response.expiresIn
         )
+
+        try {
+            val me: RedditUser = httpClient.get("https://oauth.reddit.com/api/v1/me") {
+                header("Authorization", "Bearer ${response.accessToken}")
+                header("User-Agent", "android:com.reddit.wearos:v1.0.0 (by /u/wear_reddit_user)")
+            }.body()
+            if (me.name.isNotEmpty()) {
+                tokenStorage.setUsername(me.name)
+            }
+        } catch (_: Exception) {}
     }
 
     suspend fun refreshTokenIfNeeded(): String? = withContext(Dispatchers.IO) {

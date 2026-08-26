@@ -17,7 +17,7 @@ sealed class SavedUiState {
 
 class SavedViewModel(
     private val repository: RedditRepository,
-    private val username: String
+    private val username: String = "me"
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SavedUiState>(SavedUiState.Loading)

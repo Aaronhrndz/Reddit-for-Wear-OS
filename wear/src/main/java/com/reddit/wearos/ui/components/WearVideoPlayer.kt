@@ -179,7 +179,7 @@ fun WearVideoPlayer(
                                     )
                                     isLooping = true
 
-                                    val headers = mapOf("User-Agent" to "android:com.reddit.wearos:v1.0.0 (WearOS client)")
+                                    val headers = mapOf("User-Agent" to "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0")
                                     setDataSource(ctx, Uri.parse(cleanUrl), headers)
 
                                     setOnVideoSizeChangedListener { _, w, h ->
@@ -206,6 +206,12 @@ fun WearVideoPlayer(
                                         player.setVolume(vol, vol)
                                         if (isPlaying) {
                                             player.start()
+                                            audioPlayer?.let { ap ->
+                                                if (!isMuted) {
+                                                    ap.seekTo(player.currentPosition)
+                                                    ap.start()
+                                                }
+                                            }
                                         }
                                     }
 
@@ -228,29 +234,58 @@ fun WearVideoPlayer(
                                 mediaPlayer = mp
 
                                 if (!audioUrl.isNullOrEmpty()) {
-                                    try {
-                                        val ap = MediaPlayer().apply {
-                                            setAudioAttributes(
-                                                AudioAttributes.Builder()
-                                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                                                    .build()
-                                            )
-                                            isLooping = true
-                                            setDataSource(ctx, Uri.parse(audioUrl), mapOf("User-Agent" to "android:com.reddit.wearos:v1.0.0 (WearOS client)"))
-                                            val vol = if (isMuted) 0f else 1f
-                                            setVolume(vol, vol)
-                                            setOnPreparedListener {
-                                                val vVol = if (isMuted) 0f else 1f
-                                                it.setVolume(vVol, vVol)
-                                                if (isPlaying) {
-                                                    it.start()
+                                    val baseAudio = audioUrl.substringBefore("?").substringBeforeLast("/")
+                                    val audioCandidates = listOf(
+                                        audioUrl,
+                                        "$baseAudio/DASH_AUDIO_128.mp4",
+                                        "$baseAudio/DASH_audio.mp4",
+                                        "$baseAudio/DASH_AUDIO_64.mp4",
+                                        "$baseAudio/DASH_audio",
+                                        "$baseAudio/DASH_2_A.mp4",
+                                        "$baseAudio/DASH_1_A.mp4"
+                                    ).distinct()
+
+                                    fun initAudioCandidate(index: Int) {
+                                        if (index >= audioCandidates.size) return
+                                        val candidateUrl = audioCandidates[index]
+                                        try {
+                                            val ap = MediaPlayer().apply {
+                                                setAudioAttributes(
+                                                    AudioAttributes.Builder()
+                                                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                                                        .build()
+                                                )
+                                                isLooping = true
+                                                val aHeaders = mapOf("User-Agent" to "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0")
+                                                setDataSource(ctx, Uri.parse(candidateUrl), aHeaders)
+                                                val vol = if (isMuted) 0f else 1f
+                                                setVolume(vol, vol)
+                                                setOnPreparedListener { player ->
+                                                    val vVol = if (isMuted) 0f else 1f
+                                                    player.setVolume(vVol, vVol)
+                                                    mediaPlayer?.let { vPlayer ->
+                                                        if (vPlayer.isPlaying) {
+                                                            player.seekTo(vPlayer.currentPosition)
+                                                            player.start()
+                                                        }
+                                                    }
                                                 }
+                                                setOnErrorListener { _, _, _ ->
+                                                    try {
+                                                        release()
+                                                    } catch (_: Exception) {}
+                                                    initAudioCandidate(index + 1)
+                                                    true
+                                                }
+                                                prepareAsync()
                                             }
-                                            prepareAsync()
+                                            audioPlayer = ap
+                                        } catch (_: Exception) {
+                                            initAudioCandidate(index + 1)
                                         }
-                                        audioPlayer = ap
-                                    } catch (_: Exception) {}
+                                    }
+                                    initAudioCandidate(0)
                                 }
                             } catch (e: Exception) {
                                 hasError = true
@@ -391,6 +426,7 @@ fun WearVideoPlayer(
                                     val targetMs = (newFraction * durationMs).toInt()
                                     try {
                                         mediaPlayer?.seekTo(targetMs)
+                                        audioPlayer?.seekTo(targetMs)
                                         currentPositionMs = targetMs
                                     } catch (_: Exception) {}
                                 }

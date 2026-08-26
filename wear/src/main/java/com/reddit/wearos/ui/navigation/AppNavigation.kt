@@ -125,7 +125,7 @@ fun AppNavigation(
         }
 
         composable(Screen.Saved.route) {
-            val username = tokenStorage.getUsername() ?: "Aaronhrndz"
+            val username = tokenStorage.getUsername() ?: "me"
             val savedViewModel = remember { com.reddit.wearos.ui.saved.SavedViewModel(repository, username) }
             com.reddit.wearos.ui.saved.SavedScreen(
                 viewModel = savedViewModel,

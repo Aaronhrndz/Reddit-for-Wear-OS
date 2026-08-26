@@ -1,4 +1,4 @@
-﻿package com.reddit.wearos.ui.components
+package com.reddit.wearos.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +27,19 @@ import androidx.wear.compose.material.Text
 import coil.compose.AsyncImage
 import com.reddit.wearos.data.model.RedditPost
 import com.reddit.wearos.ui.theme.*
+import androidx.compose.foundation.shape.CircleShape
+
+private val avatarColors = listOf(
+    Color(0xFFE53935), Color(0xFF8E24AA), Color(0xFF3949AB),
+    Color(0xFF039BE5), Color(0xFF00897B), Color(0xFF43A047),
+    Color(0xFFFDD835), Color(0xFFFF6F00), Color(0xFF6D4C41),
+    Color(0xFF546E7A), Color(0xFFD81B60), Color(0xFF5E35B1)
+)
+
+fun avatarColorForName(name: String): Color {
+    val hash = name.fold(0) { acc, c -> acc * 31 + c.code }
+    return avatarColors[(hash and 0x7FFFFFFF) % avatarColors.size]
+}
 
 fun formatScore(score: Int): String {
     return when {
@@ -59,21 +72,42 @@ fun PostCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val subText = if (post.subredditPrefixed.isNotEmpty()) post.subredditPrefixed else "r/${post.subreddit}"
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(SpanStyle(color = RedditOrange, fontWeight = FontWeight.Bold)) {
-                            append(subText)
-                        }
-                        withStyle(SpanStyle(color = TextSecondary)) {
-                            append(" • u/${post.author}")
-                        }
-                    },
-                    fontSize = 9.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false)
-                )
+                Row(
+                    modifier = Modifier.weight(1f, fill = false),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val initial = post.author.firstOrNull()?.uppercase() ?: "?"
+                    val avatarColor = avatarColorForName(post.author)
+                    Box(
+                        modifier = Modifier
+                            .size(15.dp)
+                            .clip(CircleShape)
+                            .background(avatarColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = initial,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    val subText = if (post.subredditPrefixed.isNotEmpty()) post.subredditPrefixed else "r/${post.subreddit}"
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(color = RedditOrange, fontWeight = FontWeight.Bold)) {
+                                append(subText)
+                            }
+                            withStyle(SpanStyle(color = TextSecondary)) {
+                                append(" • u/${post.author}")
+                            }
+                        },
+                        fontSize = 9.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
                 if (post.hasVideo()) {
                     Row(

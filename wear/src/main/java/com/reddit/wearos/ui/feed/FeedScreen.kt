@@ -64,7 +64,11 @@ fun FeedScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(indicatorColor = RedditOrange)
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(indicatorColor = RedditOrange)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text("Cargando feed…", fontSize = 10.sp, color = TextSecondary)
+                        }
                     }
                 }
                 is FeedUiState.Error -> {
@@ -305,10 +309,14 @@ fun FeedScreen(
                                     .padding(8.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(22.dp),
-                                    indicatorColor = RedditOrange
-                                )
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(22.dp),
+                                        indicatorColor = RedditOrange
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text("Cargando más…", fontSize = 9.sp, color = TextSecondary)
+                                }
                             }
                         }
                     }

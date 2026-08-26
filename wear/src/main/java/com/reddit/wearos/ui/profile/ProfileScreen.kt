@@ -1,4 +1,4 @@
-﻿package com.reddit.wearos.ui.profile
+package com.reddit.wearos.ui.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -244,10 +244,14 @@ fun ProfileScreen(
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            indicatorColor = RedditOrange
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                indicatorColor = RedditOrange
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("Cargando perfil…", fontSize = 9.sp, color = TextSecondary)
+                        }
                     }
                 }
             }
