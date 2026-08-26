@@ -74,12 +74,22 @@ fun LoginScreen(
                     onClick = { RemotePhoneHelper.openPhoneCompanion(context) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.PhoneAndroid,
+                            contentDescription = null,
+                            tint = RedditOrange,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "📱 Abrir Login en Móvil",
+                            text = "Abrir Login en Móvil",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = TextPrimary,
