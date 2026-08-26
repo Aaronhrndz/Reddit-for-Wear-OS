@@ -69,7 +69,8 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .rotaryWithScroll(scrollState),
             state = scrollState,
-            contentPadding = PaddingValues(top = 28.dp, bottom = 40.dp, start = 8.dp, end = 8.dp),
+            autoCentering = null,
+            contentPadding = PaddingValues(top = 26.dp, bottom = 20.dp, start = 10.dp, end = 10.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
