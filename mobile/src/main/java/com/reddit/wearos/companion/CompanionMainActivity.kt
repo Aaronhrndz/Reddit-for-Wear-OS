@@ -7,7 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.webkit.CookieManager
+import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -19,27 +22,22 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -78,6 +76,7 @@ class CompanionMainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         syncManager = WatchSyncManager(this)
 
         checkConnectedWatches()
@@ -131,7 +130,6 @@ class CompanionMainActivity : ComponentActivity() {
                                 }
                             },
                             onLogout = { performLogout() },
-                            onStartOAuthLogin = { startOAuth2Flow() },
                             onRefreshWatches = { checkConnectedWatches() }
                         )
                     }
@@ -163,127 +161,6 @@ class CompanionMainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val nodes = syncManager.getConnectedWatches()
             connectedWatchesCount = nodes.size
-        }
-    }
-
-    private var oauthVerifier: String? = null
-    private var oauthState: String? = null
-
-    private fun generateRandomString(length: Int = 32): String {
-        val random = java.security.SecureRandom()
-        val bytes = ByteArray(length)
-        random.nextBytes(bytes)
-        return android.util.Base64.encodeToString(bytes, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
-    }
-
-    private fun generateCodeChallenge(verifier: String): String {
-        val bytes = verifier.toByteArray(Charsets.US_ASCII)
-        val md = java.security.MessageDigest.getInstance("SHA-256")
-        md.update(bytes, 0, bytes.size)
-        val digest = md.digest()
-        return android.util.Base64.encodeToString(digest, android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING)
-    }
-    private fun startOAuth2Flow() {
-        val verifier = generateRandomString(32)
-        val state = generateRandomString(16)
-        oauthVerifier = verifier
-        oauthState = state
-        val challenge = generateCodeChallenge(verifier)
-        val clientId = "0R-WAMhuoo-MyQ"
-        val redirectUri = "redditwear://auth"
-        val scopes = "identity read mysubreddits vote save history"
-
-        val authUrl = Uri.parse("https://www.reddit.com/api/v1/authorize.compact").buildUpon()
-            .appendQueryParameter("client_id", clientId)
-            .appendQueryParameter("response_type", "code")
-            .appendQueryParameter("state", state)
-            .appendQueryParameter("redirect_uri", redirectUri)
-            .appendQueryParameter("duration", "permanent")
-            .appendQueryParameter("scope", scopes)
-            .appendQueryParameter("code_challenge", challenge)
-            .appendQueryParameter("code_challenge_method", "S256")
-            .build()
-
-        val intent = Intent(Intent.ACTION_VIEW, authUrl)
-        startActivity(intent)
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        setIntent(intent)
-        val data = intent.data ?: return
-        if (data.scheme == "redditwear" && data.host == "auth") {
-            val code = data.getQueryParameter("code")
-            if (!code.isNullOrEmpty()) {
-                exchangeOAuthCode(code)
-            }
-        }
-    }
-
-    private fun exchangeOAuthCode(code: String) {
-        isSyncing = true
-        loginStatus = "Intercambiando código OAuth 2.0 con Reddit..."
-        val verifier = oauthVerifier ?: ""
-        val clientId = "0R-WAMhuoo-MyQ"
-        val redirectUri = "redditwear://auth"
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val client = io.ktor.client.HttpClient(io.ktor.client.engine.okhttp.OkHttp) {
-                    install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-                        json(kotlinx.serialization.json.Json { ignoreUnknownKeys = true })
-                    }
-                }
-
-                val credentials = android.util.Base64.encodeToString("$clientId:".toByteArray(), android.util.Base64.NO_WRAP)
-                val response: String = client.submitForm(
-                    url = "https://www.reddit.com/api/v1/access_token",
-                    formParameters = io.ktor.http.Parameters.build {
-                        append("grant_type", "authorization_code")
-                        append("code", code)
-                        append("redirect_uri", redirectUri)
-                        append("code_verifier", verifier)
-                    }
-                ) {
-                    header("Authorization", "Basic $credentials")
-                    header("User-Agent", "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0")
-                }.bodyAsText()
-
-                val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
-                val jsonElement = json.parseToJsonElement(response).jsonObject
-                val accessToken = jsonElement["access_token"]?.jsonPrimitive?.content ?: ""
-                val refreshToken = jsonElement["refresh_token"]?.jsonPrimitive?.contentOrNull
-                val expiresIn = jsonElement["expires_in"]?.jsonPrimitive?.longOrNull ?: 3600L
-
-                if (accessToken.isNotEmpty()) {
-                    withContext(Dispatchers.Main) {
-                        tokenOrCookieInput = accessToken
-                        copyToClipboard(accessToken)
-                    }
-                    val payload = AuthSyncPayload(
-                        clientId = clientId,
-                        accessToken = accessToken,
-                        refreshToken = refreshToken,
-                        expiresInSeconds = expiresIn,
-                        username = redditUsername
-                    )
-                    val syncSuccess = syncManager.sendAuthToWatch(payload)
-                    withContext(Dispatchers.Main) {
-                        isSyncing = false
-                        loginStatus = if (syncSuccess) "Cuenta vinculada con éxito en tu reloj" else "Token OAuth generado. Conecta el reloj por BT."
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        isSyncing = false
-                        loginStatus = "Error en OAuth: $response"
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    isSyncing = false
-                    loginStatus = "Error al intercambiar token: ${e.localizedMessage}"
-                }
-            }
         }
     }
 
@@ -376,7 +253,7 @@ fun RedditWebLoginView(
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                         ) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text("Volver", fontSize = 11.sp)
                         }
@@ -390,16 +267,25 @@ fun RedditWebLoginView(
                     .fillMaxWidth(),
                 factory = { context ->
                     WebView(context).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT
+                        )
                         isFocusable = true
                         isFocusableInTouchMode = true
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true
-                        settings.databaseEnabled = true
+                        webChromeClient = WebChromeClient()
+                        webViewClient = object : WebViewClient() {}
+                        settings.apply {
+                            javaScriptEnabled = true
+                            domStorageEnabled = true
+                            databaseEnabled = true
+                            useWideViewPort = true
+                            loadWithOverviewMode = true
+                            javaScriptCanOpenWindowsAutomatically = true
+                            userAgentString = CompanionMainActivity.USER_AGENT
+                        }
                         CookieManager.getInstance().setAcceptCookie(true)
                         CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
-                        settings.userAgentString = CompanionMainActivity.USER_AGENT
-
-                        webViewClient = object : WebViewClient() {}
                         loadUrl("https://www.reddit.com/login")
                     }
                 }
@@ -441,7 +327,6 @@ fun CompanionScreen(
     connectedWatches: Int,
     isSyncing: Boolean,
     onStartLogin: () -> Unit,
-    onStartOAuthLogin: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onSyncManualToken: () -> Unit,
     onLogout: () -> Unit,
@@ -552,83 +437,53 @@ fun CompanionScreen(
             }
         }
 
-        // BOTÓN 1: LOGIN OFICIAL CON NAVEGADOR NATIVO (1 TAP - NUNCA FALLA TECLADO)
+        // BOTONES DE LOGIN Y LOGOUT
         Button(
-            onClick = onStartOAuthLogin,
+            onClick = onStartLogin,
             enabled = !isSyncing,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
             shape = RoundedCornerShape(12.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.VpnKey,
+                imageVector = Icons.Default.Language,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(18.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Login Oficial Navegador (OAuth)",
+                text = "Iniciar Sesión (Login Web)",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
         }
 
-        // BOTONES DE LOGIN WEB Y LOGOUT
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        Button(
+            onClick = onLogout,
+            enabled = !isSyncing,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C2C34)),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Button(
-                onClick = onStartLogin,
-                enabled = !isSyncing,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Language,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Login Web",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-
-            Button(
-                onClick = onLogout,
-                enabled = !isSyncing,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C2C34)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ExitToApp,
-                    contentDescription = null,
-                    tint = Color(0xFFFF6B6B),
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Cerrar Sesión",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFF6B6B)
-                )
-            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                contentDescription = null,
+                tint = Color(0xFFFF6B6B),
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "Cerrar Sesión / Limpiar Cuenta",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFFF6B6B)
+            )
         }
 
         // Tarjeta Token con visualización completa y botón copiar

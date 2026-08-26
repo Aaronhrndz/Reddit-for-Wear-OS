@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="one">%d klukkustund</item>
+    <item quantity="other">%d klukkustundir</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="one">%d mínúta</item>
+    <item quantity="other">%d mínútur</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="one">%d sekúnda</item>
+    <item quantity="other">%d sekúndur</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="one">%d klukkustund</item>
+      <item quantity="other">%d klukkustundir</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="one">%d mínúta</item>
+      <item quantity="other">%d mínútur</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="one">%d sekúnda</item>
+      <item quantity="other">%d sekúndur</item>
+    </plurals>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Svara"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Myndsímtal"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Hafna"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Leggja á"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Símtal berst"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Símtal í gangi"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Síar símtal sem berst"</string>
+    <string msgid="406453423630273620" name="close_drawer">"Loka yfirlitsvalmynd"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"Loka blaði"</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Kveikja</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">%1$s virkar ekki nema þú gerir þjónustu Google Play virka.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Virkja þjónustu Google Play</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">Setja upp</string>
+    <string name="common_google_play_services_install_text">%1$s getur ekki keyrt án þjónustu Google Play, sem vantar í tækið þitt.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Sækja þjónustu Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Staða þjónustu Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Villa í þjónustu Google Play</string>
+    <string name="common_google_play_services_unknown_issue">%1$s á í vandræðum með þjónustu Google Play. Reyndu aftur.</string>
+    <string name="common_google_play_services_unsupported_text">%1$s getur ekki keyrt án þjónustu Google Play, sem er ekki studd af tækinu þínu.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">Uppfæra</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">%1$s getur ekki keyrt nema þú uppfærir þjónustu Google Play.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Uppfæra þjónustu Google Play</string>
+    <string name="common_google_play_services_updating_text">%1$s getur ekki keyrt án þjónustu Google Play, sem verið er að uppfæra.</string>
+    <string name="common_google_play_services_wear_update_text">Nýja útgáfu af þjónustu Google Play vantar. Hún uppfærir sig sjálf innan skamms.</string>
+    <string name="common_open_on_phone">Opna í símanum</string>
+    <string name="common_signin_button_text">Skrá inn</string>
+    <string name="common_signin_button_text_long">Skrá inn með Google</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"Tókst ekki"</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"Opnað í símanum þínum"</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"Tókst"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"Ógildur innsláttur"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"Sprettigluggi"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"Fellivalmynd"</string>
+    <string name="horologist_picker_confirm_button_content_description">Staðfesta</string>
+    <string name="horologist_picker_day">Dagur</string>
+    <string name="horologist_picker_month">Mánuður</string>
+    <string name="horologist_picker_next_button_content_description">Áfram</string>
+    <string name="horologist_picker_year">Ár</string>
+    <string name="horologist_placeholderchip_content_description">Hleður</string>
+    <string name="horologist_split_toggle_chip_off_state_description">Slökkt</string>
+    <string name="horologist_split_toggle_chip_on_state_description">Kveikt</string>
+    <string name="horologist_stepper_decrease_content_description">Lækka</string>
+    <string name="horologist_stepper_increase_content_description">Hækka</string>
+    <string name="horologist_time_picker_hour">Klst.</string>
+    <string name="horologist_time_picker_min">Mín.</string>
+    <string name="horologist_time_picker_minute">Mínúta</string>
+    <string name="horologist_time_picker_period">Tímabil</string>
+    <string name="horologist_time_picker_second">Sekúnda</string>
+    <string name="horologist_toggle_button_off_state_description">Slökkt</string>
+    <string name="horologist_toggle_button_on_state_description">Kveikt</string>
+    <string name="horologist_toggle_chip_off_state_description">Slökkt</string>
+    <string name="horologist_toggle_chip_on_state_description">Kveikt</string>
+    <string msgid="6827826412747255547" name="in_progress">"Í vinnslu"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"Hakað við að hluta til"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"Yfirlitsvalmynd"</string>
+    <string msgid="6610465462668679431" name="not_selected">"Ekki valið"</string>
+    <string msgid="5941395253238309765" name="range_end">"Lok sviðs"</string>
+    <string msgid="7097486360902471446" name="range_start">"Upphaf sviðs"</string>
+    <string msgid="6043586758067023" name="selected">"Valið"</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"Viðvörun"</string>
+    <string msgid="4139871816613051306" name="state_empty">"Autt"</string>
+    <string msgid="5834637030682409883" name="state_off">"Slökkt"</string>
+    <string msgid="1490883874751719580" name="state_on">"Kveikt"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="2561197295334830845" name="switch_role">"Skipta"</string>
+    <string msgid="1672349317127674378" name="tab">"Flipi"</string>
+    <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g> prósent."</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"ábending"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"sýna ábendingu"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"Staðfesta"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"Klukkustund"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"Mínúta"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"Punktur"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"Sekúnda"</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"Aðgerðaskúffa"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"Yfirlitsskúffa"</string>
+</resources>

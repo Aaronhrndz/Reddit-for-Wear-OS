@@ -1,46 +1,46 @@
 [
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-hdpi/ic_launcher.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/drawable_ic_reddit_logo.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/drawable/ic_reddit_logo.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-hdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-mdpi/ic_launcher.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-mdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/drawable_ic_reddit_logo.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/drawable/ic_reddit_logo.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.reddit.wearos.companion.mobile-debug-45:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "com.reddit.wearos.companion.mobile-main-47:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "com.reddit.wearos.companion.mobile-debug-46:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.reddit.wearos.companion.mobile-main-48:/mipmap-xxxhdpi/ic_launcher_round.png"
     }
 ]

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="one">%d час</item>
+    <item quantity="few">%d часа</item>
+    <item quantity="many">%d часов</item>
+    <item quantity="other">%d часа</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="one">%d минута</item>
+    <item quantity="few">%d минуты</item>
+    <item quantity="many">%d минут</item>
+    <item quantity="other">%d минуты</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="one">%d секунда</item>
+    <item quantity="few">%d секунды</item>
+    <item quantity="many">%d секунд</item>
+    <item quantity="other">%d секунды</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="one">%d час</item>
+      <item quantity="few">%d часа</item>
+      <item quantity="many">%d часов</item>
+      <item quantity="other">%d часа</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="one">%d минута</item>
+      <item quantity="few">%d минуты</item>
+      <item quantity="many">%d минут</item>
+      <item quantity="other">%d минуты</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="one">%d секунда</item>
+      <item quantity="few">%d секунды</item>
+      <item quantity="many">%d секунд</item>
+      <item quantity="other">%d секунды</item>
+    </plurals>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Ответить"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Видео"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Отклонить"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Завершить"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Входящий вызов"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Текущий вызов"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Фильтрация входящего вызова"</string>
+    <string msgid="406453423630273620" name="close_drawer">"Закрыть меню навигации"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"Закрыть лист"</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Включить</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">Для работы приложения \"%1$s\" требуется включить сервисы Google Play.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Включите сервисы Google Play</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">Установить</string>
+    <string name="common_google_play_services_install_text">Для работы приложения \"%1$s\" требуется установить сервисы Google Play.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Установите сервисы Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Доступность сервисов Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Ошибка сервисов Google Play</string>
+    <string name="common_google_play_services_unknown_issue">Приложению \"%1$s\" не удается подключиться к сервисам Google Play. Повторите попытку.</string>
+    <string name="common_google_play_services_unsupported_text">Для работы с приложением \"%1$s\" требуются сервисы Google Play. Они не поддерживаются на вашем устройстве.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">Обновить</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">Чтобы запустить приложение \"%1$s\", обновите сервисы Google Play.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Обновите сервисы Google Play</string>
+    <string name="common_google_play_services_updating_text">Сервисы Google Play, необходимые для работы приложения \"%1$s\", в настоящий момент обновляются.</string>
+    <string name="common_google_play_services_wear_update_text">Версия сервисов Google Play устарела. Они автоматически обновятся в ближайшее время.</string>
+    <string name="common_open_on_phone">Открыть на телефоне</string>
+    <string name="common_signin_button_text">Войти</string>
+    <string name="common_signin_button_text_long">Войти через аккаунт Google</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"Ошибка"</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"Открыто на телефоне"</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"Готово"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"Неправильный ввод"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"Всплывающее окно"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"Раскрывающееся меню"</string>
+    <string name="horologist_picker_confirm_button_content_description">Подтвердить</string>
+    <string name="horologist_picker_day">День</string>
+    <string name="horologist_picker_month">Месяц</string>
+    <string name="horologist_picker_next_button_content_description">Далее</string>
+    <string name="horologist_picker_year">Год</string>
+    <string name="horologist_placeholderchip_content_description">Загрузка…</string>
+    <string name="horologist_split_toggle_chip_off_state_description">Отключено</string>
+    <string name="horologist_split_toggle_chip_on_state_description">Включено</string>
+    <string name="horologist_stepper_decrease_content_description">Уменьшить</string>
+    <string name="horologist_stepper_increase_content_description">Увеличить</string>
+    <string name="horologist_time_picker_hour">Часы</string>
+    <string name="horologist_time_picker_min">Минуты</string>
+    <string name="horologist_time_picker_minute">Минуты</string>
+    <string name="horologist_time_picker_period">Период</string>
+    <string name="horologist_time_picker_second">Секунды</string>
+    <string name="horologist_toggle_button_off_state_description">Отключено</string>
+    <string name="horologist_toggle_button_on_state_description">Включено</string>
+    <string name="horologist_toggle_chip_off_state_description">Отключено</string>
+    <string name="horologist_toggle_chip_on_state_description">Включено</string>
+    <string msgid="6827826412747255547" name="in_progress">"Выполняется"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"Отмечено частично"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"Меню навигации"</string>
+    <string msgid="6610465462668679431" name="not_selected">"Не выбрано"</string>
+    <string msgid="5941395253238309765" name="range_end">"Конец диапазона"</string>
+    <string msgid="7097486360902471446" name="range_start">"Начало диапазона"</string>
+    <string msgid="6043586758067023" name="selected">"Выбрано"</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"Оповещение"</string>
+    <string msgid="4139871816613051306" name="state_empty">"Пусто"</string>
+    <string msgid="5834637030682409883" name="state_off">"Отключено"</string>
+    <string msgid="1490883874751719580" name="state_on">"Включено"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">">999"</string>
+    <string msgid="2561197295334830845" name="switch_role">"Переключатель"</string>
+    <string msgid="1672349317127674378" name="tab">"Вкладка"</string>
+    <string msgid="5946805113151406391" name="template_percent">"Процентов: <ns1:g id="PERCENTAGE">%1$d</ns1:g>."</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"Подсказка"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"Показать подсказку"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"Подтвердить"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"Часы"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"Минуты"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"Период"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"Секунды"</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"Панель действий"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"Панель навигации"</string>
+</resources>

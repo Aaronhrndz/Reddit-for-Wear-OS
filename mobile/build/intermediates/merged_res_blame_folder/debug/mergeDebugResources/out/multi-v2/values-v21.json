@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.reddit.wearos.companion.mobile-mergeDebugResources-43:/values-v21/values-v21.xml",
+            "outputFile": "com.reddit.wearos.companion.mobile-mergeDebugResources-44:/values-v21/values-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\4e3bdd4d2f51cf77c1bbaef543da9f6c\\transformed\\core-1.13.0\\res\\values-v21\\values-v21.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\e35223af396dbf82684022dab5782706\\transformed\\core-1.13.0\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,13",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="zero">%d stundu</item>
+    <item quantity="one">%d stunda</item>
+    <item quantity="other">%d stundas</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="zero">%d minūšu</item>
+    <item quantity="one">%d minūte</item>
+    <item quantity="other">%d minūtes</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="zero">%d sekunžu</item>
+    <item quantity="one">%d sekunde</item>
+    <item quantity="other">%d sekundes</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="zero">%d stundu</item>
+      <item quantity="one">%d stunda</item>
+      <item quantity="other">%d stundas</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="zero">%d minūšu</item>
+      <item quantity="one">%d minūte</item>
+      <item quantity="other">%d minūtes</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="zero">%d sekunžu</item>
+      <item quantity="one">%d sekunde</item>
+      <item quantity="other">%d sekundes</item>
+    </plurals>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Atbildēt"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Video"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Noraidīt"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Pārtraukt"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Ienākošais zvans"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Pašreizējais zvans"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Ienākošā zvana filtrēšana"</string>
+    <string msgid="406453423630273620" name="close_drawer">"Aizvērt navigācijas izvēlni"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"Aizvērt izklājlapu"</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Iespējot</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">Lai lietotne %1$s darbotos, ir jāiespējo Google Play pakalpojumi.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Google Play pakalpojumu iespējošana</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">Instalēt</string>
+    <string name="common_google_play_services_install_text">Lai lietotne %1$s darbotos, ierīcē ir jāinstalē Google Play pakalpojumi.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Google Play pakalpojumu iegūšana</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play pakalpojumu pieejamība</string>
+    <string name="common_google_play_services_notification_ticker">Google Play pakalpojumu kļūda</string>
+    <string name="common_google_play_services_unknown_issue">Lietotnē %1$s ir radusies problēma ar Google Play pakalpojumu darbību. Lūdzu, mēģiniet vēlreiz.</string>
+    <string name="common_google_play_services_unsupported_text">Lai lietotne %1$s darbotos, ir nepieciešami Google Play pakalpojumi, taču jūsu ierīce tos neatbalsta.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">Atjaunināt</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">Lai lietotne %1$s darbotos, jums ir jāatjaunina Google Play pakalpojumi.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Google Play pakalpojumu atjaunināšana</string>
+    <string name="common_google_play_services_updating_text">Lai lietotne %1$s darbotos, ir jāinstalē Google Play pakalpojumi. Pašlaik notiek to atjaunināšana.</string>
+    <string name="common_google_play_services_wear_update_text">Ir nepieciešama jauna Google Play pakalpojumu versija. Drīzumā tā tiks instalēta.</string>
+    <string name="common_open_on_phone">Atvērt tālrunī</string>
+    <string name="common_signin_button_text">Pierakstīties</string>
+    <string name="common_signin_button_text_long">Pierakstīties ar Google kontu</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"Kļūme"</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"Atvērts jūsu tālrunī"</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"Gatavs"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"Nederīga ievade"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"Uznirstošais logs"</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"Nolaižamā izvēlne"</string>
+    <string name="horologist_picker_confirm_button_content_description">Apstiprināt</string>
+    <string name="horologist_picker_day">Diena</string>
+    <string name="horologist_picker_month">Mēnesis</string>
+    <string name="horologist_picker_next_button_content_description">Nākamais</string>
+    <string name="horologist_picker_year">Gads</string>
+    <string name="horologist_placeholderchip_content_description">Notiek ielāde…</string>
+    <string name="horologist_split_toggle_chip_off_state_description">Izslēgts</string>
+    <string name="horologist_split_toggle_chip_on_state_description">Ieslēgts</string>
+    <string name="horologist_stepper_decrease_content_description">Samazināt</string>
+    <string name="horologist_stepper_increase_content_description">Palielināt</string>
+    <string name="horologist_time_picker_hour">Stunda</string>
+    <string name="horologist_time_picker_min">Min</string>
+    <string name="horologist_time_picker_minute">Minūte</string>
+    <string name="horologist_time_picker_period">Periods</string>
+    <string name="horologist_time_picker_second">Sekunde</string>
+    <string name="horologist_toggle_button_off_state_description">Izslēgts</string>
+    <string name="horologist_toggle_button_on_state_description">Ieslēgts</string>
+    <string name="horologist_toggle_chip_off_state_description">Izslēgts</string>
+    <string name="horologist_toggle_chip_on_state_description">Ieslēgts</string>
+    <string msgid="6827826412747255547" name="in_progress">"Notiek apstrāde"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"Daļēji atzīmēta"</string>
+    <string msgid="542007171693138492" name="navigation_menu">"Navigācijas izvēlne"</string>
+    <string msgid="6610465462668679431" name="not_selected">"Nav atlasīts"</string>
+    <string msgid="5941395253238309765" name="range_end">"Diapazona beigas"</string>
+    <string msgid="7097486360902471446" name="range_start">"Diapazona sākums"</string>
+    <string msgid="6043586758067023" name="selected">"Atlasīts"</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"Brīdinājums"</string>
+    <string msgid="4139871816613051306" name="state_empty">"Tukšs"</string>
+    <string msgid="5834637030682409883" name="state_off">"Izslēgts"</string>
+    <string msgid="1490883874751719580" name="state_on">"Ieslēgts"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="2561197295334830845" name="switch_role">"Slēdzis"</string>
+    <string msgid="1672349317127674378" name="tab">"Cilne"</string>
+    <string msgid="5946805113151406391" name="template_percent">"Procenti: <ns1:g id="PERCENTAGE">%1$d</ns1:g>."</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"rīka padoms"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"rādīt rīka padomu"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"Apstiprināt"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"Stunda"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"Minūte"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"Periods"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"Sekunde"</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"Darbību atvilktne"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"Navigācijas atvilktne"</string>
+</resources>

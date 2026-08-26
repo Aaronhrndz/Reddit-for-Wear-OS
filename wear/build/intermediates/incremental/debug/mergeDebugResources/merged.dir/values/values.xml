@@ -447,32 +447,32 @@
     <declare-styleable name="BoxInsetLayout_Layout">
         
         <attr name="boxedEdges">
-            
+            <!-- Default boxing setting. There are no insets forced on the child views. -->
             <flag name="none" value="0x00"/>
-            
+            <!-- The view will force an inset on the left edge of the children. -->
             <flag name="left" value="0x01"/>
-            
+            <!-- The view will force an inset on the top edge of the children. -->
             <flag name="top" value="0x02"/>
-            
+            <!-- The view will force an inset on the right edge of the children. -->
             <flag name="right" value="0x04"/>
-            
+            <!-- The view will force an inset on the bottom edge of the children. -->
             <flag name="bottom" value="0x08"/>
-            
+            <!-- The view will force an inset on all of the edges of the children. -->
             <flag name="all" value="0x0F"/>
         </attr>
         
         <attr name="layout_boxedEdges">
-            
+            <!-- Default boxing setting. There are no insets forced on the child views. -->
             <flag name="none" value="0x00"/>
-            
+            <!-- The view will force an inset on the left edge of the children. -->
             <flag name="left" value="0x01"/>
-            
+            <!-- The view will force an inset on the top edge of the children. -->
             <flag name="top" value="0x02"/>
-            
+            <!-- The view will force an inset on the right edge of the children. -->
             <flag name="right" value="0x04"/>
-            
+            <!-- The view will force an inset on the bottom edge of the children. -->
             <flag name="bottom" value="0x08"/>
-            
+            <!-- The view will force an inset on all of the edges of the children. -->
             <flag name="all" value="0x0F"/>
         </attr>
     </declare-styleable>
@@ -573,14 +573,23 @@
         <attr format="reference" name="fontProviderCerts"/>
         
         <attr name="fontProviderFetchStrategy">
-            
+            <!-- The blocking font fetch works as follows.
+              First, check the local cache, then if the requested font is not cached, request the
+              font from the provider and wait until it is finished.  You can change the length of
+              the timeout by modifying fontProviderFetchTimeout.  If the timeout happens, the
+              default typeface will be used instead. -->
             <enum name="blocking" value="0"/>
-            
+            <!-- The async font fetch works as follows.
+              First, check the local cache, then if the requeted font is not cached, trigger a
+              request the font and continue with layout inflation. Once the font fetch succeeds, the
+              target text view will be refreshed with the downloaded font data. The
+              fontProviderFetchTimeout will be ignored if async loading is specified. -->
             <enum name="async" value="1"/>
         </attr>
         
         <attr format="integer" name="fontProviderFetchTimeout">
-            
+            <!-- A special value for the timeout. In this case, the blocking font fetching will not
+              timeout and wait until a reply is received from the font provider. -->
             <enum name="forever" value="-1"/>
         </attr>
         
@@ -849,9 +858,12 @@
     <declare-styleable name="WearableNavigationDrawerView">
         
         <attr format="enum" name="navigationStyle">
-            
+            <!-- Single page navigation drawer style. This is the default drawer style. It is ideal
+                 for 1-5 items, but works with up to 7 items. If more than 7 items exist, then the
+                 drawer will be displayed as empty. -->
             <enum name="singlePage" value="0"/>
-            
+            <!-- Multi-page navigation drawer style. Each item is on its own page. Useful when more
+                 than 7 items exist. -->
             <enum name="multiPage" value="1"/>
         </attr>
     </declare-styleable>

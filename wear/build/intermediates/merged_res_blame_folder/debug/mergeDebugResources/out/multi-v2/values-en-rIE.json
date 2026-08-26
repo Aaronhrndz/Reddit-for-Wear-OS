@@ -4,24 +4,7 @@
             "outputFile": "com.reddit.wearos.wear-mergeDebugResources-77:/values-en-rIE/values-en-rIE.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\db1e50b7cc1e17514a6629f8de5b4cb8\\transformed\\horologist-compose-material-0.6.17\\res\\values-en-rIE\\values-en-rIE.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,138,219,304,389,468,545,622",
-                        "endColumns": "82,80,84,84,78,76,76,74",
-                        "endOffsets": "133,214,299,384,463,540,617,692"
-                    },
-                    "to": {
-                        "startLines": "20,21,22,23,29,30,31,32",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "988,1071,1152,1237,1640,1719,1796,1873",
-                        "endColumns": "82,80,84,84,78,76,76,74",
-                        "endOffsets": "1066,1147,1232,1317,1714,1791,1868,1943"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\344048d4096c71dacb1ac63c9768c221\\transformed\\horologist-composables-0.6.17\\res\\values-en-rIE\\values-en-rIE.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\6f38c12ad5829ded4b952c54bdf6ccfa\\transformed\\horologist-composables-0.6.17\\res\\values-en-rIE\\values-en-rIE.xml",
                     "from": {
                         "startLines": "2,6,10,14,15,16,17,18,19,20,21,22,23,24",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -37,6 +20,23 @@
                         "endLines": "5,9,13,14,15,16,17,18,19,24,25,26,27,28",
                         "endColumns": "12,12,12,88,53,57,82,55,82,60,58,64,67,64",
                         "endOffsets": "216,388,560,649,703,761,844,900,983,1378,1437,1502,1570,1635"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\2af3f6ec8ea2cb448140a35b75e43b5d\\transformed\\horologist-compose-material-0.6.17\\res\\values-en-rIE\\values-en-rIE.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,138,219,304,389,468,545,622",
+                        "endColumns": "82,80,84,84,78,76,76,74",
+                        "endOffsets": "133,214,299,384,463,540,617,692"
+                    },
+                    "to": {
+                        "startLines": "20,21,22,23,29,30,31,32",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "988,1071,1152,1237,1640,1719,1796,1873",
+                        "endColumns": "82,80,84,84,78,76,76,74",
+                        "endOffsets": "1066,1147,1232,1317,1714,1791,1868,1943"
                     }
                 }
             ]

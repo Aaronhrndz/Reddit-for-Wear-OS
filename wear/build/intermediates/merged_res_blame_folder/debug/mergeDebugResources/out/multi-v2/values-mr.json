@@ -4,7 +4,7 @@
             "outputFile": "com.reddit.wearos.wear-mergeDebugResources-77:/values-mr/values-mr.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\bf80abbd46d333c73814ee9e2315cb9f\\transformed\\ui-release\\res\\values-mr\\values-mr.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\30a1fb68583bb0d4d0a8e8f762ed980d\\transformed\\ui-release\\res\\values-mr\\values-mr.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\40421361d6c94e4d077295d2b0c287d6\\transformed\\wear-1.3.0\\res\\values-mr\\values-mr.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\93c13cc9b1072277f4e3d3e1a7556a05\\transformed\\wear-1.3.0\\res\\values-mr\\values-mr.xml",
                     "from": {
                         "startLines": "2,3,4,5,6",
                         "startColumns": "4,4,4,4,4",
@@ -38,24 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\db1e50b7cc1e17514a6629f8de5b4cb8\\transformed\\horologist-compose-material-0.6.17\\res\\values-mr\\values-mr.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,142,229,313,395,478,561,642",
-                        "endColumns": "86,86,83,81,82,82,80,80",
-                        "endOffsets": "137,224,308,390,473,556,637,718"
-                    },
-                    "to": {
-                        "startLines": "65,66,67,68,74,75,76,77",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "5412,5499,5586,5670,6067,6150,6233,6314",
-                        "endColumns": "86,86,83,81,82,82,80,80",
-                        "endOffsets": "5494,5581,5665,5747,6145,6228,6309,6390"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\344048d4096c71dacb1ac63c9768c221\\transformed\\horologist-composables-0.6.17\\res\\values-mr\\values-mr.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\6f38c12ad5829ded4b952c54bdf6ccfa\\transformed\\horologist-composables-0.6.17\\res\\values-mr\\values-mr.xml",
                     "from": {
                         "startLines": "2,6,10,14,15,16,17,18,19,20,21,22,23,24",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -74,41 +57,41 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\c67ef869b6d5835e2f3370c28371f76c\\transformed\\play-services-basement-18.4.0\\res\\values-mr\\values.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\56d907badd332ec54f36e92c623d1746\\transformed\\play-services-base-18.5.0\\res\\values-mr\\values.xml",
                     "from": {
-                        "startLines": "4",
-                        "startColumns": "0",
-                        "startOffsets": "195",
-                        "endColumns": "138",
-                        "endOffsets": "333"
+                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
+                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                        "startOffsets": "193,296,460,579,687,828,945,1049,1142,1288,1392,1542,1662,1797,1946,2002,2064",
+                        "endColumns": "102,163,118,107,140,116,103,92,145,103,149,119,134,148,55,61,76",
+                        "endOffsets": "295,459,578,686,827,944,1048,1141,1287,1391,1541,1661,1796,1945,2001,2063,2140"
                     },
                     "to": {
-                        "startLines": "43",
-                        "startColumns": "4",
-                        "startOffsets": "3148",
-                        "endColumns": "142",
-                        "endOffsets": "3286"
+                        "startLines": "35,36,37,38,39,40,41,42,44,45,46,47,48,49,50,51,52",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "2167,2274,2442,2565,2677,2822,2943,3051,3291,3441,3549,3703,3827,3966,4119,4179,4245",
+                        "endColumns": "106,167,122,111,144,120,107,96,149,107,153,123,138,152,59,65,80",
+                        "endOffsets": "2269,2437,2560,2672,2817,2938,3046,3143,3436,3544,3698,3822,3961,4114,4174,4240,4321"
                     }
                 },
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\b7e9a5a3bb07e13e11bbb0961b94926e\\transformed\\foundation-release\\res\\values-mr\\values-mr.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\2af3f6ec8ea2cb448140a35b75e43b5d\\transformed\\horologist-compose-material-0.6.17\\res\\values-mr\\values-mr.xml",
                     "from": {
-                        "startLines": "2,3",
-                        "startColumns": "4,4",
-                        "startOffsets": "55,140",
-                        "endColumns": "84,84",
-                        "endOffsets": "135,220"
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,142,229,313,395,478,561,642",
+                        "endColumns": "86,86,83,81,82,82,80,80",
+                        "endOffsets": "137,224,308,390,473,556,637,718"
                     },
                     "to": {
-                        "startLines": "93,94",
-                        "startColumns": "4,4",
-                        "startOffsets": "7647,7732",
-                        "endColumns": "84,84",
-                        "endOffsets": "7727,7812"
+                        "startLines": "65,66,67,68,74,75,76,77",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "5412,5499,5586,5670,6067,6150,6233,6314",
+                        "endColumns": "86,86,83,81,82,82,80,80",
+                        "endOffsets": "5494,5581,5665,5747,6145,6228,6309,6390"
                     }
                 },
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\be2028ccaf358b4e6ce694981337bab5\\transformed\\compose-material3-1.0.0-alpha24\\res\\values-mr\\values-mr.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\4230a84e59cfd0a5e8646a24c4fdbb6f\\transformed\\compose-material3-1.0.0-alpha24\\res\\values-mr\\values-mr.xml",
                     "from": {
                         "startLines": "2,6,10,14,15,16,17,18",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -127,24 +110,24 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\7a367b76211e0b6fa5c33605c9113fe7\\transformed\\play-services-base-18.5.0\\res\\values-mr\\values.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\80e0fb00f7f924d8c05b6d7641804b83\\transformed\\play-services-basement-18.4.0\\res\\values-mr\\values.xml",
                     "from": {
-                        "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
-                        "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
-                        "startOffsets": "193,296,460,579,687,828,945,1049,1142,1288,1392,1542,1662,1797,1946,2002,2064",
-                        "endColumns": "102,163,118,107,140,116,103,92,145,103,149,119,134,148,55,61,76",
-                        "endOffsets": "295,459,578,686,827,944,1048,1141,1287,1391,1541,1661,1796,1945,2001,2063,2140"
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "195",
+                        "endColumns": "138",
+                        "endOffsets": "333"
                     },
                     "to": {
-                        "startLines": "35,36,37,38,39,40,41,42,44,45,46,47,48,49,50,51,52",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "2167,2274,2442,2565,2677,2822,2943,3051,3291,3441,3549,3703,3827,3966,4119,4179,4245",
-                        "endColumns": "106,167,122,111,144,120,107,96,149,107,153,123,138,152,59,65,80",
-                        "endOffsets": "2269,2437,2560,2672,2817,2938,3046,3143,3436,3544,3698,3822,3961,4114,4174,4240,4321"
+                        "startLines": "43",
+                        "startColumns": "4",
+                        "startOffsets": "3148",
+                        "endColumns": "142",
+                        "endOffsets": "3286"
                     }
                 },
                 {
-                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\a38b5fb92876919991e009033b75bf98\\transformed\\core-1.13.1\\res\\values-mr\\values-mr.xml",
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\c0cb544886972716b0da2aa102b3bb1e\\transformed\\core-1.13.1\\res\\values-mr\\values-mr.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -158,6 +141,23 @@
                         "startOffsets": "1259,1359,1463,1564,1667,1769,1874,7286",
                         "endColumns": "99,103,100,102,101,104,116,100",
                         "endOffsets": "1354,1458,1559,1662,1764,1869,1986,7382"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\aaron\\.gradle\\caches\\transforms-4\\8702cff2079a3cc7c1f6d8d9b071002a\\transformed\\foundation-release\\res\\values-mr\\values-mr.xml",
+                    "from": {
+                        "startLines": "2,3",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,140",
+                        "endColumns": "84,84",
+                        "endOffsets": "135,220"
+                    },
+                    "to": {
+                        "startLines": "93,94",
+                        "startColumns": "4,4",
+                        "startOffsets": "7647,7732",
+                        "endColumns": "84,84",
+                        "endOffsets": "7727,7812"
                     }
                 }
             ]
