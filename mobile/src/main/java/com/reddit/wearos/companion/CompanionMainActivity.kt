@@ -218,6 +218,16 @@ fun RedditWebLoginView(
         val c3 = cm.getCookie("https://oauth.reddit.com") ?: ""
         val c4 = cm.getCookie("https://accounts.reddit.com") ?: ""
         val combined = listOf(c1, c2, c3, c4).filter { it.isNotEmpty() }.joinToString("; ")
+
+        val tokenV2Match = Regex("""token_v2=([^;]+)""").find(combined)
+        if (tokenV2Match != null) {
+            val token = tokenV2Match.groupValues[1].trim()
+            if (token.length > 50) return token
+        }
+        val sessionMatch = Regex("""reddit_session=([^;]+)""").find(combined)
+        if (sessionMatch != null) {
+            return "reddit_session=${sessionMatch.groupValues[1].trim()}"
+        }
         return combined
     }
 
@@ -288,11 +298,10 @@ fun RedditWebLoginView(
                             useWideViewPort = true
                             loadWithOverviewMode = true
                             javaScriptCanOpenWindowsAutomatically = true
-                            userAgentString = CompanionMainActivity.USER_AGENT
                         }
                         CookieManager.getInstance().setAcceptCookie(true)
                         CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
-                        loadUrl("https://www.reddit.com/login")
+                        loadUrl("https://old.reddit.com/login")
                     }
                 }
             )
