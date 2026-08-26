@@ -338,37 +338,48 @@ fun RedditWebLoginView(
         return combined
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0F0F0F))
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Surface(
+                color = Color(0xFF1E1E1E),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Login Reddit u/$username", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(
-                        onClick = {
-                            val cm = CookieManager.getInstance()
-                            cm.removeAllCookies { cm.flush() }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF442222)),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
-                    ) {
-                        Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = Color(0xFFFF8888), modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Limpiar", fontSize = 10.sp, color = Color(0xFFFF8888))
-                    }
-                    Button(
-                        onClick = onCancel,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
-                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
-                    ) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Volver", fontSize = 10.sp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Login Reddit u/$username", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = {
+                                val cm = CookieManager.getInstance()
+                                cm.removeAllCookies { cm.flush() }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF442222)),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = Color(0xFFFF8888), modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Limpiar", fontSize = 11.sp, color = Color(0xFFFF8888))
+                        }
+                        Button(
+                            onClick = onCancel,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Volver", fontSize = 11.sp)
+                        }
                     }
                 }
             }
@@ -395,21 +406,26 @@ fun RedditWebLoginView(
             )
 
             // Botón manual de confirmación
-            Button(
-                onClick = {
-                    val token = extractSessionToken()
-                    onSessionCaptured(token, username)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
-                shape = RoundedCornerShape(10.dp)
+            Surface(
+                color = Color(0xFF1A1A1A),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Copiar y Sincronizar con el Reloj", fontWeight = FontWeight.Bold)
+                Button(
+                    onClick = {
+                        val token = extractSessionToken()
+                        onSessionCaptured(token, username)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp)
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Copiar y Sincronizar con el Reloj", fontWeight = FontWeight.Bold)
+                }
             }
         }
     }
@@ -436,7 +452,9 @@ fun CompanionScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 10.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(14.dp)
