@@ -261,9 +261,20 @@ fun RedditWebLoginView(
             }
 
             AndroidView(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
                 factory = { context ->
                     WebView(context).apply {
+                        isFocusable = true
+                        isFocusableInTouchMode = true
+                        requestFocus()
+                        setOnTouchListener { v, _ ->
+                            if (!v.hasFocus()) {
+                                v.requestFocus()
+                            }
+                            false
+                        }
                         settings.javaScriptEnabled = true
                         settings.domStorageEnabled = true
                         CookieManager.getInstance().setAcceptCookie(true)
