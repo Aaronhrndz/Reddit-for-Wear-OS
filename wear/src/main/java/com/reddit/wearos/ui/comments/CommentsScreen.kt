@@ -186,13 +186,12 @@ fun CommentCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Botón Responder en Pildorita con alto contraste y borde sutil
+                    // Botón Responder en Pildorita plana sin bordes con fondo ligeramente más claro
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF282834))
-                            .border(1.dp, Color(0xFF404052), RoundedCornerShape(14.dp))
+                            .background(Color(0xFF353542))
                             .clickable { onReply() }
                             .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
@@ -211,13 +210,12 @@ fun CommentCard(
                         )
                     }
 
-                    // Votación en Pildorita
+                    // Votación en Pildorita plana sin bordes con fondo ligeramente más claro
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF282834))
-                            .border(1.dp, Color(0xFF404052), RoundedCornerShape(14.dp))
+                            .background(Color(0xFF353542))
                             .padding(horizontal = 5.dp, vertical = 3.dp)
                     ) {
                         Box(

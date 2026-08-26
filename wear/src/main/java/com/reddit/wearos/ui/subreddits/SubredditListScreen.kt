@@ -66,7 +66,8 @@ fun SubredditListScreen(
                 .fillMaxSize()
                 .rotaryWithScroll(scrollState),
             state = scrollState,
-            contentPadding = PaddingValues(top = 28.dp, bottom = 40.dp, start = 8.dp, end = 8.dp),
+            autoCentering = null,
+            contentPadding = PaddingValues(top = 26.dp, bottom = 24.dp, start = 8.dp, end = 8.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             // SECCIÓN: ORDENAR PUBLICACIONES

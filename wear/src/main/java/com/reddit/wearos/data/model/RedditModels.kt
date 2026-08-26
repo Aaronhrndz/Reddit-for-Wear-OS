@@ -62,17 +62,17 @@ data class ListingData<T>(
 
 @Serializable
 data class ListingChild<T>(
-    val kind: String,
+    val kind: String = "t3",
     val data: T
 )
 
 @Serializable
 data class RedditPost(
-    val id: String,
+    val id: String = "",
     val name: String = "", // e.g. t3_xxxx
-    val title: String,
-    val author: String,
-    val subreddit: String,
+    val title: String = "",
+    val author: String = "",
+    val subreddit: String = "",
     @SerialName("subreddit_name_prefixed")
     val subredditPrefixed: String = "r/$subreddit",
     val score: Int = 0,

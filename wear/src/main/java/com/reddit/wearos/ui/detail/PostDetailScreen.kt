@@ -331,30 +331,6 @@ fun PostDetailScreen(
                     }
 
                     // SECCIÓN DE COMENTARIOS INLINE
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp, bottom = 4.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.ChatBubbleOutline,
-                                contentDescription = null,
-                                tint = RedditOrange,
-                                modifier = Modifier.size(12.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Comentarios (${post.numComments})",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextPrimary
-                            )
-                        }
-                    }
-
                     if (state.commentsLoading) {
                         item {
                             Box(
@@ -371,12 +347,20 @@ fun PostDetailScreen(
                         }
                     } else if (state.comments.isEmpty()) {
                         item {
-                            Box(
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
+                                    .padding(top = 10.dp, bottom = 8.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.ChatBubbleOutline,
+                                    contentDescription = null,
+                                    tint = TextSecondary,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "Sin comentarios",
                                     color = TextSecondary,
@@ -385,6 +369,29 @@ fun PostDetailScreen(
                             }
                         }
                     } else {
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 10.dp, bottom = 4.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.ChatBubbleOutline,
+                                    contentDescription = null,
+                                    tint = RedditOrange,
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Comentarios (${state.comments.size})",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = TextPrimary
+                                )
+                            }
+                        }
                         items(state.comments) { flatComment ->
                             InlineCommentCard(
                                 flatComment = flatComment,
@@ -466,13 +473,12 @@ fun InlineCommentCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Botón Responder en Pildorita de alto contraste y borde
+                    // Botón Responder en Pildorita plana sin bordes con fondo ligeramente más claro
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF282834))
-                            .border(1.dp, Color(0xFF404052), RoundedCornerShape(14.dp))
+                            .background(Color(0xFF353542))
                             .clickable { onReply() }
                             .padding(horizontal = 7.dp, vertical = 3.dp)
                     ) {
@@ -491,13 +497,12 @@ fun InlineCommentCard(
                         )
                     }
 
-                    // Votación en Pildorita
+                    // Votación en Pildorita plana sin bordes con fondo ligeramente más claro
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFF282834))
-                            .border(1.dp, Color(0xFF404052), RoundedCornerShape(14.dp))
+                            .background(Color(0xFF353542))
                             .padding(horizontal = 5.dp, vertical = 3.dp)
                     ) {
                         Box(
