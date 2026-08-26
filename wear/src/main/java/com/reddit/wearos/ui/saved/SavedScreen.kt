@@ -45,7 +45,7 @@ fun SavedScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(indicatorColor = RedditOrange)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text("Cargando guardados…", fontSize = 10.sp, color = TextSecondary)
+                        Text("Cargando posts guardados…", fontSize = 10.sp, color = TextSecondary)
                     }
                 }
             }
