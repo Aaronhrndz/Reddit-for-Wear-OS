@@ -35,6 +35,9 @@ class AuthWearableListenerService : WearableListenerService() {
                     username = payload.username
                 )
 
+                // Disparar recarga reactiva instantánea del feed
+                app.repository.triggerFeedRefresh()
+
                 Handler(Looper.getMainLooper()).post {
                     val nameStr = if (!payload.username.isNullOrEmpty()) " (${payload.username})" else ""
                     Toast.makeText(applicationContext, "Reddit conectado$nameStr", Toast.LENGTH_SHORT).show()

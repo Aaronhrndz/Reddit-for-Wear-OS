@@ -10,21 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class TokenStorage(context: Context) {
 
-    private val prefs: SharedPreferences = try {
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
-
-        EncryptedSharedPreferences.create(
-            context,
-            "reddit_secure_prefs",
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-    } catch (e: Exception) {
-        context.getSharedPreferences("reddit_fallback_prefs", Context.MODE_PRIVATE)
-    }
+    private val prefs: SharedPreferences = context.getSharedPreferences("reddit_wear_auth_prefs", Context.MODE_PRIVATE)
 
     private val _isLoggedIn = MutableStateFlow(!getAccessToken().isNullOrEmpty())
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()

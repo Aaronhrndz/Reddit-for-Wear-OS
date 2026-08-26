@@ -46,6 +46,13 @@ class FeedViewModel(
                 loadFeedInternal(subreddit = repository.currentSubreddit.value, sort = sort, refresh = true)
             }
         }
+        viewModelScope.launch {
+            repository.refreshTrigger.collectLatest { trigger ->
+                if (trigger > 0) {
+                    loadFeedInternal(subreddit = repository.currentSubreddit.value, sort = repository.currentSort.value, refresh = true)
+                }
+            }
+        }
     }
 
     fun loadFeed(subreddit: String? = null, refresh: Boolean = false) {

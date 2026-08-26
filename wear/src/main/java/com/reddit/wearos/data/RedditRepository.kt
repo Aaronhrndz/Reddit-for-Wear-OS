@@ -20,12 +20,20 @@ class RedditRepository(
     private val _currentSort = MutableStateFlow("new")
     val currentSort: StateFlow<String> = _currentSort.asStateFlow()
 
+    // Trigger reactivo para forzar recarga instantánea desde servicios externos
+    private val _refreshTrigger = MutableStateFlow(0)
+    val refreshTrigger: StateFlow<Int> = _refreshTrigger.asStateFlow()
+
     fun setSubreddit(subreddit: String) {
         _currentSubreddit.value = subreddit
     }
 
     fun setSort(sort: String) {
         _currentSort.value = sort
+    }
+
+    fun triggerFeedRefresh() {
+        _refreshTrigger.value += 1
     }
 
     fun getLastDiagnostic(): String = apiService.lastDiagnostic

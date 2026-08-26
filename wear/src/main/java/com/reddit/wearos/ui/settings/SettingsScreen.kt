@@ -29,6 +29,12 @@ import com.reddit.wearos.util.RemotePhoneHelper
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+
 @OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun SettingsScreen(
@@ -45,15 +51,21 @@ fun SettingsScreen(
     val context = LocalContext.current
     val isLoggedIn by tokenStorage.isLoggedIn.collectAsState()
     var username by remember { mutableStateOf(tokenStorage.getUsername()) }
+    var userAvatarUrl by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn && username.isNullOrEmpty()) {
+        if (isLoggedIn) {
             scope.launch {
                 try {
                     val me = repository.getMe()
-                    if (!me?.name.isNullOrEmpty()) {
-                        username = me?.name
-                        tokenStorage.setUsername(me?.name)
+                    if (me != null) {
+                        if (!me.name.isNullOrEmpty()) {
+                            username = me.name
+                            tokenStorage.setUsername(me.name)
+                        }
+                        if (!me.iconImg.isNullOrEmpty()) {
+                            userAvatarUrl = me.iconImg.substringBefore("?").replace("&amp;", "&")
+                        }
                     }
                 } catch (_: Exception) {
                 }
@@ -99,12 +111,39 @@ fun SettingsScreen(
                         contentColor = Color.White
                     ),
                     icon = {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
-                        )
+                        if (!userAvatarUrl.isNullOrEmpty()) {
+                            AsyncImage(
+                                model = userAvatarUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                            )
+                        } else if (!currentName.isNullOrEmpty()) {
+                            val initial = currentName.firstOrNull()?.uppercase() ?: "?"
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White.copy(alpha = 0.25f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = initial,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                            }
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.AccountCircle,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     },
                     label = {
                         Text(
