@@ -99,55 +99,45 @@ data class RedditPost(
         return isVideo || url.endsWith(".mp4") || url.endsWith(".gifv") || url.contains("v.redd.it") || url.contains("redgifs.com") || getVideoUrl() != null
     }
 
-    fun getVideoUrl(): String? {
-        if (url.endsWith(".mp4")) return url
-        if (url.endsWith(".gifv")) return url.replace(".gifv", ".mp4")
+    fun getVideoUrl(): String? = getVideoUrls().firstOrNull()
+
+    /**
+     * URLs de vídeo candidatas en orden de preferencia:
+     * 1. HLS oficial (mismo stream que la app de Reddit, audio muxed CMAF)
+     * 2. MP4 progresivo de fallback (solo vídeo, sin audio)
+     */
+    fun getVideoUrls(): List<String> {
+        val candidates = mutableListOf<String>()
+        if (url.endsWith(".mp4")) candidates.add(url)
+        if (url.endsWith(".gifv")) candidates.add(url.replace(".gifv", ".mp4"))
         if (media != null) {
             try {
                 val redditVideo = media.jsonObject["reddit_video"]?.jsonObject
-                val hlsUrl = redditVideo?.get("hls_url")?.jsonPrimitive?.content
-                if (!hlsUrl.isNullOrEmpty()) return hlsUrl.replace("&amp;", "&")
-                val fallbackUrl = redditVideo?.get("fallback_url")?.jsonPrimitive?.content
-                if (!fallbackUrl.isNullOrEmpty()) return fallbackUrl.replace("&amp;", "&")
+                redditVideo?.get("hls_url")?.jsonPrimitive?.content?.let { hls ->
+                    if (hls.isNotEmpty()) candidates.add(hls.replace("&amp;", "&"))
+                }
+                redditVideo?.get("fallback_url")?.jsonPrimitive?.content?.let { fb ->
+                    if (fb.isNotEmpty()) candidates.add(fb.replace("&amp;", "&"))
+                }
             } catch (_: Exception) {}
         }
-        if (preview != null) {
+        if (preview != null && candidates.isEmpty()) {
             try {
                 val redditVideoPreview = preview.jsonObject["reddit_video_preview"]?.jsonObject
-                val hlsUrl = redditVideoPreview?.get("hls_url")?.jsonPrimitive?.content
-                if (!hlsUrl.isNullOrEmpty()) return hlsUrl.replace("&amp;", "&")
-                val fallbackUrl = redditVideoPreview?.get("fallback_url")?.jsonPrimitive?.content
-                if (!fallbackUrl.isNullOrEmpty()) return fallbackUrl.replace("&amp;", "&")
+                redditVideoPreview?.get("hls_url")?.jsonPrimitive?.content?.let { hls ->
+                    if (hls.isNotEmpty()) candidates.add(hls.replace("&amp;", "&"))
+                }
+                redditVideoPreview?.get("fallback_url")?.jsonPrimitive?.content?.let { fb ->
+                    if (fb.isNotEmpty()) candidates.add(fb.replace("&amp;", "&"))
+                }
             } catch (_: Exception) {}
         }
-        if (url.contains("v.redd.it")) {
+        if (candidates.isEmpty() && url.contains("v.redd.it")) {
             val clean = url.substringBefore("?")
-            return "$clean/HLSPlaylist.m3u8"
+            candidates.add("$clean/HLSPlaylist.m3u8")
+            candidates.add("$clean/DASH_480.mp4")
         }
-        return null
-    }
-
-    fun getAudioUrl(): String? {
-        val vUrl = getVideoUrl() ?: return null
-        if (vUrl.contains("v.redd.it")) {
-            val base = vUrl.substringBefore("?").substringBeforeLast("/")
-            return "$base/DASH_AUDIO_128.mp4"
-        }
-        return null
-    }
-
-    fun getAudioUrlCandidates(): List<String> {
-        val vUrl = getVideoUrl() ?: return emptyList()
-        if (vUrl.contains("v.redd.it")) {
-            val base = vUrl.substringBefore("?").substringBeforeLast("/")
-            return listOf(
-                "$base/DASH_AUDIO_128.mp4",
-                "$base/DASH_audio.mp4",
-                "$base/DASH_AUDIO_64.mp4",
-                "$base/DASH_audio"
-            )
-        }
-        return emptyList()
+        return candidates.distinct()
     }
 
     fun getImageUrl(): String? {

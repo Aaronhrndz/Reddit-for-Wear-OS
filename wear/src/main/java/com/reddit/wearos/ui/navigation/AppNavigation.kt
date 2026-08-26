@@ -28,6 +28,8 @@ fun AppNavigation(
 ) {
     val navController = rememberSwipeDismissableNavController()
     val feedViewModel = remember { FeedViewModel(repository) }
+    val savedUsername = tokenStorage.getUsername() ?: "me"
+    val savedViewModel = remember { com.reddit.wearos.ui.saved.SavedViewModel(repository, savedUsername) }
     val startDestination = if (tokenStorage.getAccessToken() != null) Screen.Feed.route else Screen.Login.route
 
     SwipeDismissableNavHost(
@@ -125,8 +127,6 @@ fun AppNavigation(
         }
 
         composable(Screen.Saved.route) {
-            val username = tokenStorage.getUsername() ?: "me"
-            val savedViewModel = remember { com.reddit.wearos.ui.saved.SavedViewModel(repository, username) }
             com.reddit.wearos.ui.saved.SavedScreen(
                 viewModel = savedViewModel,
                 onPostClick = { post ->

@@ -156,7 +156,7 @@ fun PostDetailScreen(
                         item {
                             WearVideoPlayer(
                                 videoUrl = videoUrl,
-                                audioUrl = post.getAudioUrl(),
+                                fallbackUrl = post.getVideoUrls().getOrNull(1),
                                 posterUrl = post.getThumbnailUrl(),
                                 autoPlay = false,
                                 modifier = Modifier
