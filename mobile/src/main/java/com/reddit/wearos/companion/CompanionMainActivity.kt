@@ -118,12 +118,23 @@ class CompanionMainActivity : ComponentActivity() {
                                     Toast.makeText(this@CompanionMainActivity, "Introduce un token o sesión", Toast.LENGTH_SHORT).show()
                                 }
                             },
+                            onLogout = { performLogout() },
                             onRefreshWatches = { checkConnectedWatches() }
                         )
                     }
                 }
             }
         }
+    }
+
+    private fun performLogout() {
+        val cm = CookieManager.getInstance()
+        cm.removeAllCookies {
+            cm.flush()
+        }
+        tokenOrCookieInput = ""
+        loginStatus = "Sesión cerrada en el móvil"
+        Toast.makeText(this, "🚪 Sesión cerrada y cookies eliminadas", Toast.LENGTH_SHORT).show()
     }
 
     private fun copyToClipboard(text: String) {
@@ -222,17 +233,30 @@ fun RedditWebLoginView(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Login Reddit u/$username", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
-                Button(
-                    onClick = onCancel,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                ) {
-                    Text("Volver", fontSize = 11.sp)
+                Text("Login Reddit u/$username", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Button(
+                        onClick = {
+                            val cm = CookieManager.getInstance()
+                            cm.removeAllCookies { cm.flush() }
+                            currentCookies = ""
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF442222)),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Text("🧹 Limpiar", fontSize = 10.sp, color = Color(0xFFFF8888))
+                    }
+                    Button(
+                        onClick = onCancel,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 2.dp)
+                    ) {
+                        Text("Volver", fontSize = 10.sp)
+                    }
                 }
             }
 
@@ -293,6 +317,7 @@ fun CompanionScreen(
     onStartLogin: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onSyncManualToken: () -> Unit,
+    onLogout: () -> Unit,
     onRefreshWatches: () -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -384,22 +409,44 @@ fun CompanionScreen(
             }
         }
 
-        // BOTÓN 1: WEB LOGIN IN-APP (FUNCIONA DIRECTO)
-        Button(
-            onClick = onStartLogin,
-            enabled = !isSyncing,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
-            shape = RoundedCornerShape(12.dp)
+        // BOTONES DE LOGIN Y LOGOUT
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                text = "🚀 Login Web In-App (Rápido)",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            Button(
+                onClick = onStartLogin,
+                enabled = !isSyncing,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "🚀 Login Web",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            Button(
+                onClick = onLogout,
+                enabled = !isSyncing,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C2C34)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = "🚪 Cerrar Sesión",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFFF6B6B)
+                )
+            }
         }
 
         // Tarjeta Token con visualización completa y botón copiar
