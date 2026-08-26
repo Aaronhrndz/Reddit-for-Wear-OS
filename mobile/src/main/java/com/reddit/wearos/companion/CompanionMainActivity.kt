@@ -290,7 +290,34 @@ fun RedditWebLoginView(
                         isFocusable = true
                         isFocusableInTouchMode = true
                         webChromeClient = WebChromeClient()
-                        webViewClient = object : WebViewClient() {}
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                super.onPageFinished(view, url)
+                                view?.evaluateJavascript(
+                                    """
+                                    (function() {
+                                        try {
+                                            var btns = document.querySelectorAll('button, a');
+                                            for (var i = 0; i < btns.length; i++) {
+                                                var text = (btns[i].innerText || '').toLowerCase();
+                                                if (text.includes('accept') || text.includes('agree') || text.includes('aceptar') || text.includes('got it')) {
+                                                    btns[i].click();
+                                                }
+                                            }
+                                            var overlays = document.querySelectorAll('#cookie-banner, .cookie-banner, [id*="cookie"], [class*="cookie"], [class*="overlay"], [class*="backdrop"]');
+                                            for (var j = 0; j < overlays.length; j++) {
+                                                if (overlays[j].tagName !== 'BODY' && overlays[j].tagName !== 'HTML') {
+                                                    overlays[j].style.display = 'none';
+                                                    overlays[j].style.pointerEvents = 'none';
+                                                }
+                                            }
+                                        } catch(e) {}
+                                    })();
+                                    """.trimIndent(),
+                                    null
+                                )
+                            }
+                        }
                         settings.apply {
                             javaScriptEnabled = true
                             domStorageEnabled = true
