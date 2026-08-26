@@ -67,7 +67,7 @@ class CompanionMainActivity : ComponentActivity() {
     private var connectedWatchesCount by mutableStateOf(0)
     private var isSyncing by mutableStateOf(false)
     private var isWebLoginOpen by mutableStateOf(false)
-    private var redditUsername by mutableStateOf("aaronhrndz")
+    private var redditUsername by mutableStateOf("Aaronhrnndz")
     private var tokenOrCookieInput by mutableStateOf("")
 
     companion object {
@@ -78,6 +78,9 @@ class CompanionMainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         syncManager = WatchSyncManager(this)
+
+        val prefs = getSharedPreferences("companion_prefs", Context.MODE_PRIVATE)
+        redditUsername = prefs.getString("saved_username", "Aaronhrnndz") ?: "Aaronhrnndz"
 
         checkConnectedWatches()
 
@@ -107,7 +110,10 @@ class CompanionMainActivity : ComponentActivity() {
                     } else {
                         CompanionScreen(
                             username = redditUsername,
-                            onUsernameChange = { redditUsername = it },
+                            onUsernameChange = {
+                                redditUsername = it
+                                prefs.edit().putString("saved_username", it).apply()
+                            },
                             tokenInput = tokenOrCookieInput,
                             onTokenInputChange = { tokenOrCookieInput = it },
                             loginStatus = loginStatus,
