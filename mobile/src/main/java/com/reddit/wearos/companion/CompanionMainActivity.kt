@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.CookieManager
@@ -14,6 +15,8 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import java.security.MessageDigest
+import java.security.SecureRandom
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -27,9 +30,11 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -46,6 +51,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Parameters
@@ -68,10 +74,15 @@ class CompanionMainActivity : ComponentActivity() {
     private var isSyncing by mutableStateOf(false)
     private var isWebLoginOpen by mutableStateOf(false)
     private var redditUsername by mutableStateOf("Aaronhrnndz")
+    private var clientIdInput by mutableStateOf("pA-pE4qfVj5W_A")
     private var tokenOrCookieInput by mutableStateOf("")
+
+    private var oauthVerifier: String? = null
+    private var oauthState: String? = null
 
     companion object {
         const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
+        const val DEFAULT_CLIENT_ID = "pA-pE4qfVj5W_A"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,8 +92,10 @@ class CompanionMainActivity : ComponentActivity() {
 
         val prefs = getSharedPreferences("companion_prefs", Context.MODE_PRIVATE)
         redditUsername = prefs.getString("saved_username", "Aaronhrnndz") ?: "Aaronhrnndz"
+        clientIdInput = prefs.getString("saved_client_id", DEFAULT_CLIENT_ID) ?: DEFAULT_CLIENT_ID
 
         checkConnectedWatches()
+        handleAuthRedirect(intent)
 
         setContent {
             MaterialTheme(
@@ -114,11 +127,17 @@ class CompanionMainActivity : ComponentActivity() {
                                 redditUsername = it
                                 prefs.edit().putString("saved_username", it).apply()
                             },
+                            clientId = clientIdInput,
+                            onClientIdChange = {
+                                clientIdInput = it
+                                prefs.edit().putString("saved_client_id", it).apply()
+                            },
                             tokenInput = tokenOrCookieInput,
                             onTokenInputChange = { tokenOrCookieInput = it },
                             loginStatus = loginStatus,
                             connectedWatches = connectedWatchesCount,
                             isSyncing = isSyncing,
+                            onStartOAuthLogin = { startOAuth2Flow(clientIdInput) },
                             onStartLogin = { isWebLoginOpen = true },
                             onCopyToClipboard = {
                                 if (tokenOrCookieInput.isNotBlank()) {
@@ -139,6 +158,158 @@ class CompanionMainActivity : ComponentActivity() {
                             onRefreshWatches = { checkConnectedWatches() }
                         )
                     }
+                }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleAuthRedirect(intent)
+    }
+
+    private fun handleAuthRedirect(intent: Intent?) {
+        val data = intent?.data ?: return
+        val isRedditWearScheme = data.scheme == "redditwear" && data.host == "auth"
+        val isLocalhost = (data.scheme == "http" || data.scheme == "https") && data.host == "localhost"
+        if (isRedditWearScheme || isLocalhost) {
+            val code = data.getQueryParameter("code")
+            if (!code.isNullOrEmpty()) {
+                val effectiveRedirect = if (isLocalhost) "http://localhost:8080" else "redditwear://auth"
+                exchangeOAuthCode(code, effectiveRedirect)
+            }
+        }
+    }
+
+    private fun generateRandomString(length: Int = 32): String {
+        val random = SecureRandom()
+        val bytes = ByteArray(length)
+        random.nextBytes(bytes)
+        return Base64.encodeToString(bytes, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+    }
+
+    private fun generateCodeChallenge(verifier: String): String {
+        val bytes = verifier.toByteArray(Charsets.US_ASCII)
+        val md = MessageDigest.getInstance("SHA-256")
+        md.update(bytes, 0, bytes.size)
+        val digest = md.digest()
+        return Base64.encodeToString(digest, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+    }
+
+    private fun startOAuth2Flow(customClientId: String) {
+        val verifier = generateRandomString(32)
+        val state = generateRandomString(16)
+        oauthVerifier = verifier
+        oauthState = state
+        val challenge = generateCodeChallenge(verifier)
+        val effectiveClientId = customClientId.trim().ifEmpty { DEFAULT_CLIENT_ID }
+        val redirectUri = "redditwear://auth"
+        val scopes = "identity read mysubreddits vote save history"
+
+        val authUrl = Uri.parse("https://www.reddit.com/api/v1/authorize.compact").buildUpon()
+            .appendQueryParameter("client_id", effectiveClientId)
+            .appendQueryParameter("response_type", "code")
+            .appendQueryParameter("state", state)
+            .appendQueryParameter("redirect_uri", redirectUri)
+            .appendQueryParameter("duration", "permanent")
+            .appendQueryParameter("scope", scopes)
+            .appendQueryParameter("code_challenge", challenge)
+            .appendQueryParameter("code_challenge_method", "S256")
+            .build()
+
+        val intent = Intent(Intent.ACTION_VIEW, authUrl)
+        startActivity(intent)
+    }
+
+    private fun exchangeOAuthCode(code: String, redirectUri: String = "redditwear://auth") {
+        isSyncing = true
+        loginStatus = "Intercambiando código OAuth 2.0 permanente con Reddit..."
+        val verifier = oauthVerifier ?: ""
+        val effectiveClientId = clientIdInput.trim().ifEmpty { DEFAULT_CLIENT_ID }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val client = HttpClient(OkHttp) {
+                    install(ContentNegotiation) {
+                        json(Json { ignoreUnknownKeys = true })
+                    }
+                }
+
+                val credentials = Base64.encodeToString("$effectiveClientId:".toByteArray(), Base64.NO_WRAP)
+                val responseText: String = client.submitForm(
+                    url = "https://www.reddit.com/api/v1/access_token",
+                    formParameters = Parameters.build {
+                        append("grant_type", "authorization_code")
+                        append("code", code)
+                        append("redirect_uri", redirectUri)
+                        if (verifier.isNotEmpty()) {
+                            append("code_verifier", verifier)
+                        }
+                    }
+                ) {
+                    header("Authorization", "Basic $credentials")
+                    header("User-Agent", "android:com.reddit.wearos:v1.4.0 (by /u/$redditUsername)")
+                }.bodyAsText()
+
+                val json = Json { ignoreUnknownKeys = true }
+                val jsonElement = json.parseToJsonElement(responseText).jsonObject
+                val accessToken = jsonElement["access_token"]?.jsonPrimitive?.content ?: ""
+                val refreshToken = jsonElement["refresh_token"]?.jsonPrimitive?.contentOrNull
+                val expiresIn = jsonElement["expires_in"]?.jsonPrimitive?.longOrNull ?: 3600L
+
+                if (accessToken.isNotEmpty()) {
+                    var detectedUsername = redditUsername
+                    try {
+                        val meJson = client.get("https://oauth.reddit.com/api/v1/me") {
+                            header("Authorization", "Bearer $accessToken")
+                            header("User-Agent", "android:com.reddit.wearos:v1.4.0 (by /u/$redditUsername)")
+                        }.bodyAsText()
+                        val meParsed = json.parseToJsonElement(meJson).jsonObject
+                        val parsedName = meParsed["name"]?.jsonPrimitive?.contentOrNull
+                        if (!parsedName.isNullOrEmpty()) {
+                            detectedUsername = parsedName
+                            withContext(Dispatchers.Main) {
+                                redditUsername = parsedName
+                                getSharedPreferences("companion_prefs", Context.MODE_PRIVATE)
+                                    .edit().putString("saved_username", parsedName).apply()
+                            }
+                        }
+                    } catch (_: Exception) {}
+
+                    withContext(Dispatchers.Main) {
+                        tokenOrCookieInput = accessToken
+                        copyToClipboard(accessToken)
+                    }
+
+                    val payload = AuthSyncPayload(
+                        clientId = effectiveClientId,
+                        accessToken = accessToken,
+                        refreshToken = refreshToken,
+                        expiresInSeconds = expiresIn,
+                        username = detectedUsername
+                    )
+
+                    val syncSuccess = syncManager.sendAuthToWatch(payload)
+                    withContext(Dispatchers.Main) {
+                        isSyncing = false
+                        loginStatus = if (syncSuccess) {
+                            "✅ Sesión permanente vinculada (u/$detectedUsername) en tu Galaxy Watch"
+                        } else {
+                            "✅ Token OAuth permanente obtenido. Conecta el reloj vía Bluetooth para sincronizar."
+                        }
+                        Toast.makeText(this@CompanionMainActivity, "OAuth permanente configurado con éxito", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        isSyncing = false
+                        loginStatus = "Error en respuesta OAuth: $responseText"
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    isSyncing = false
+                    loginStatus = "Error al intercambiar token: ${e.localizedMessage}"
                 }
             }
         }
@@ -363,11 +534,14 @@ fun RedditWebLoginView(
 fun CompanionScreen(
     username: String,
     onUsernameChange: (String) -> Unit,
+    clientId: String,
+    onClientIdChange: (String) -> Unit,
     tokenInput: String,
     onTokenInputChange: (String) -> Unit,
     loginStatus: String,
     connectedWatches: Int,
     isSyncing: Boolean,
+    onStartOAuthLogin: () -> Unit,
     onStartLogin: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onSyncManualToken: () -> Unit,
@@ -386,7 +560,7 @@ fun CompanionScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = "Reddit for Wear OS",
@@ -440,13 +614,147 @@ fun CompanionScreen(
             }
         }
 
+        // SECCIÓN 1: LOGIN OFICIAL PERMANENTE (OAUTH 2.0 CON REFRESH TOKEN)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1B281E))
+        ) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.VpnKey,
+                        contentDescription = null,
+                        tint = Color(0xFF81C784),
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Conexión Permanente (OAuth 2.0)", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 15.sp)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Obtiene un Refresh Token oficial que no caduca. El reloj auto-renueva el acceso en segundo plano.",
+                    fontSize = 11.sp,
+                    color = Color(0xFFB0BEC5)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text("Client ID de Reddit (Opcional / Personal)", fontSize = 12.sp, color = Color(0xFFCCCCCC), fontWeight = FontWeight.SemiBold)
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = clientId,
+                    onValueChange = onClientIdChange,
+                    singleLine = true,
+                    placeholder = { Text("pA-pE4qfVj5W_A", fontSize = 12.sp, color = Color.Gray) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = Color(0xFF4CAF50),
+                        unfocusedBorderColor = Color(0xFF388E3C)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    onClick = onStartOAuthLogin,
+                    enabled = !isSyncing,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VpnKey,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Iniciar Sesión Permanente (OAuth)",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+            }
+        }
+
+        // SECCIÓN 2: MÉTODO ALTERNATIVO (LOGIN WEB / COOKIES)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
+        ) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Text("Método Alternativo / Pruebas (Cookies Web)", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Inicio mediante navegador in-app (caduca a las 24h). Úsalo si no deseas usar OAuth.",
+                    fontSize = 11.sp,
+                    color = Color(0xFFAAAAAA)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = onStartLogin,
+                        enabled = !isSyncing,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Language,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Login Web",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
+
+                    Button(
+                        onClick = onLogout,
+                        enabled = !isSyncing,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF372727)),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = null,
+                            tint = Color(0xFFFF8A80),
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Cerrar Sesión",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFFF8A80)
+                        )
+                    }
+                }
+            }
+        }
+
         // Campo de Usuario
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
-                Text("Tu Usuario de Reddit", fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Usuario de Reddit", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
                 Spacer(modifier = Modifier.height(6.dp))
                 OutlinedTextField(
                     value = username,
@@ -469,63 +777,14 @@ fun CompanionScreen(
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
-                Text("Estado de la Cuenta", fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Estado de la Sincronización", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = loginStatus,
                     fontSize = 13.sp,
-                    color = if (loginStatus.contains("éxito") || loginStatus.contains("sincronizado")) Color(0xFF4CAF50) else Color(0xFFCCCCCC)
+                    color = if (loginStatus.contains("éxito") || loginStatus.contains("sincronizado") || loginStatus.contains("vinculada")) Color(0xFF4CAF50) else Color(0xFFCCCCCC)
                 )
             }
-        }
-
-        // BOTONES DE LOGIN Y LOGOUT
-        Button(
-            onClick = onStartLogin,
-            enabled = !isSyncing,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Language,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Iniciar Sesión (Login Web)",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-
-        Button(
-            onClick = onLogout,
-            enabled = !isSyncing,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2C2C34)),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                contentDescription = null,
-                tint = Color(0xFFFF6B6B),
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = "Cerrar Sesión / Limpiar Cuenta",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFFF6B6B)
-            )
         }
 
         // Tarjeta Token con visualización completa y botón copiar
@@ -585,7 +844,7 @@ fun CompanionScreen(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Sincronizar Este Token con el Reloj", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Reenviar Este Token al Reloj", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }

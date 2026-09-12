@@ -34,21 +34,24 @@ class RedditApiService(
         const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
     }
 
+    private suspend fun isBearerAuth(): Boolean {
+        val refreshToken = tokenStorage.getRefreshToken()
+        if (!refreshToken.isNullOrEmpty()) return true
+        val clientId = tokenStorage.getClientId()
+        if (clientId.isNotEmpty() && clientId != "cookie_session") return true
+        val token = tokenStorage.getAccessToken() ?: return false
+        return token.startsWith("Bearer ") || (!token.contains("=") && !token.contains(";"))
+    }
+
     private suspend fun getAuthHeader(): Pair<String, String>? {
+        val isBearer = isBearerAuth()
         val token = authManager.refreshTokenIfNeeded() ?: tokenStorage.getAccessToken() ?: return null
-        return if (token.startsWith("Bearer ")) {
-            Pair("Authorization", token)
-        } else if (token.startsWith("eyJ") && !token.contains("=") && !token.contains(";")) {
-            Pair("Authorization", "Bearer $token")
+        return if (isBearer) {
+            Pair("Authorization", if (token.startsWith("Bearer ")) token else "Bearer $token")
         } else {
             val cookieVal = if (!token.contains("=")) "reddit_session=$token" else token
             Pair("Cookie", cookieVal)
         }
-    }
-
-    private suspend fun isBearerAuth(): Boolean {
-        val token = tokenStorage.getAccessToken() ?: return false
-        return token.startsWith("Bearer ") || (token.startsWith("eyJ") && !token.contains("=") && !token.contains(";"))
     }
 
     var lastDiagnostic: String = "Iniciando consulta..."
@@ -288,7 +291,12 @@ class RedditApiService(
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
         val isBearer = isBearerAuth()
         var currentAuthHeader = getAuthHeader()
-        val cleanUser = username.trim().removePrefix("u/").removePrefix("/u/")
+        val storedUser = tokenStorage.getUsername()?.trim()?.removePrefix("u/")?.removePrefix("/u/")
+        val cleanUser = if (username.isNotBlank() && username != "me") {
+            username.trim().removePrefix("u/").removePrefix("/u/")
+        } else {
+            storedUser ?: "me"
+        }
         val urlsToTry = mutableListOf<String>()
         if (isBearer) {
             urlsToTry.add("https://oauth.reddit.com/user/me/saved")
@@ -297,8 +305,8 @@ class RedditApiService(
             }
         }
         if (cleanUser.isNotEmpty() && cleanUser != "me") {
-            urlsToTry.add("https://api.reddit.com/user/$cleanUser/saved.json")
             urlsToTry.add("https://old.reddit.com/user/$cleanUser/saved.json")
+            urlsToTry.add("https://api.reddit.com/user/$cleanUser/saved.json")
             urlsToTry.add("https://www.reddit.com/user/$cleanUser/saved.json")
         }
         urlsToTry.add("https://api.reddit.com/user/me/saved.json")
