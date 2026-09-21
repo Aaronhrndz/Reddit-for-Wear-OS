@@ -32,9 +32,11 @@ jobs:
         with:
           name: reddit-for-wear-watch-apk
           path: wear/build/outputs/apk/debug/wear-debug.apk
+          retention-days: 1
 
       - name: Upload Mobile Companion APK
         uses: actions/upload-artifact@v4
         with:
           name: reddit-for-wear-companion-mobile-apk
           path: mobile/build/outputs/apk/debug/mobile-debug.apk
+          retention-days: 1
