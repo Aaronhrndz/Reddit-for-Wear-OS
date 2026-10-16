@@ -3,6 +3,7 @@ package com.reddit.wearos.auth
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
 import com.reddit.wearos.data.model.OAuthTokenResponse
 import com.reddit.wearos.data.model.RedditUser
 import io.ktor.client.HttpClient
@@ -10,9 +11,11 @@ import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Parameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.security.MessageDigest
 import java.security.SecureRandom
 
@@ -25,19 +28,14 @@ class RedditAuthManager(
     private var currentCodeVerifier: String? = null
     private var currentState: String? = null
 
-    // Reddit OAuth constants
     companion object {
-        const val DEFAULT_CLIENT_ID = "pA-pE4qfVj5W_A" // Open source client ID
+        const val TAG = "RedditAuthManager"
+        const val DEFAULT_CLIENT_ID = "pA-pE4qfVj5W_A"
         const val REDIRECT_URI = "http://localhost:8080"
         const val AUTH_URL = "https://www.reddit.com/api/v1/authorize"
         const val TOKEN_URL = "https://www.reddit.com/api/v1/access_token"
         const val SCOPES = "identity read mysubreddits vote save history"
-    }
-
-    init {
-        if (tokenStorage.getClientId().isEmpty()) {
-            tokenStorage.setClientId(DEFAULT_CLIENT_ID)
-        }
+        const val BROWSER_UA = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
     }
 
     private fun generateRandomString(length: Int = 32): String {
@@ -111,63 +109,142 @@ class RedditAuthManager(
     }
 
     suspend fun refreshTokenIfNeeded(): String? = withContext(Dispatchers.IO) {
-        val currentToken = tokenStorage.getAccessToken() ?: return@withContext null
-        if (!tokenStorage.isTokenExpired()) {
+        val currentToken = tokenStorage.getAccessToken()
+        if (currentToken != null && !tokenStorage.isTokenExpired()) {
             return@withContext currentToken
         }
-
-        val refreshToken = tokenStorage.getRefreshToken() ?: return@withContext null
-        val clientId = tokenStorage.getClientId().ifEmpty { DEFAULT_CLIENT_ID }
-        val credentials = Base64.encodeToString("$clientId:".toByteArray(), Base64.NO_WRAP)
-
-        try {
-            val response: OAuthTokenResponse = httpClient.submitForm(
-                url = TOKEN_URL,
-                formParameters = Parameters.build {
-                    append("grant_type", "refresh_token")
-                    append("refresh_token", refreshToken)
-                }
-            ) {
-                header("Authorization", "Basic $credentials")
-                header("User-Agent", "android:com.reddit.wearos:v1.0.0 (by /u/wear_reddit_user)")
-            }.body()
-
-            tokenStorage.saveTokens(
-                accessToken = response.accessToken,
-                refreshToken = response.refreshToken ?: refreshToken,
-                expiresInSeconds = response.expiresIn
-            )
-            return@withContext response.accessToken
-        } catch (e: Exception) {
-            return@withContext null
-        }
+        return@withContext forceRefreshToken() ?: tokenStorage.getSessionCookie() ?: currentToken
     }
 
     suspend fun forceRefreshToken(): String? = withContext(Dispatchers.IO) {
-        val refreshToken = tokenStorage.getRefreshToken() ?: return@withContext null
-        val clientId = tokenStorage.getClientId().ifEmpty { DEFAULT_CLIENT_ID }
-        val credentials = Base64.encodeToString("$clientId:".toByteArray(), Base64.NO_WRAP)
+        val sessionCookie = tokenStorage.getSessionCookie()
+        val refreshToken = tokenStorage.getRefreshToken()
 
-        try {
-            val response: OAuthTokenResponse = httpClient.submitForm(
-                url = TOKEN_URL,
-                formParameters = Parameters.build {
-                    append("grant_type", "refresh_token")
-                    append("refresh_token", refreshToken)
+        // 1. Si tenemos un refresh_token OAuth real (que no sea cookie de sesión)
+        if (!refreshToken.isNullOrEmpty() && !refreshToken.contains("reddit_session=")) {
+            val clientId = tokenStorage.getClientId().takeIf { it.isNotEmpty() && it != "cookie_session" } ?: DEFAULT_CLIENT_ID
+            val credentials = Base64.encodeToString("$clientId:".toByteArray(), Base64.NO_WRAP)
+            try {
+                val response: OAuthTokenResponse = httpClient.submitForm(
+                    url = TOKEN_URL,
+                    formParameters = Parameters.build {
+                        append("grant_type", "refresh_token")
+                        append("refresh_token", refreshToken)
+                    }
+                ) {
+                    header("Authorization", "Basic $credentials")
+                    header("User-Agent", "android:com.reddit.wearos:v1.4.0 (by /u/wear_reddit_user)")
+                }.body()
+
+                if (response.accessToken.isNotEmpty()) {
+                    tokenStorage.saveTokens(
+                        accessToken = response.accessToken,
+                        refreshToken = response.refreshToken ?: refreshToken,
+                        expiresInSeconds = response.expiresIn
+                    )
+                    return@withContext response.accessToken
                 }
-            ) {
-                header("Authorization", "Basic $credentials")
-                header("User-Agent", "android:com.reddit.wearos:v1.0.0 (by /u/wear_reddit_user)")
-            }.body()
+            } catch (e: Exception) {
+                Log.w(TAG, "Fallo al refrescar OAuth token: ${e.message}")
+            }
+        }
 
-            tokenStorage.saveTokens(
-                accessToken = response.accessToken,
-                refreshToken = response.refreshToken ?: refreshToken,
-                expiresInSeconds = response.expiresIn
-            )
-            return@withContext response.accessToken
+        // 2. Si tenemos cookie persistente reddit_session (dura 1 año), renovamos autónomamente en el reloj
+        if (!sessionCookie.isNullOrEmpty()) {
+            return@withContext refreshFromSessionCookie(sessionCookie)
+        }
+
+        return@withContext null
+    }
+
+    private suspend fun refreshFromSessionCookie(sessionCookie: String): String = withContext(Dispatchers.IO) {
+        var latestSessionCookie = sessionCookie
+        var newTokenV2: String? = null
+
+        // A. Actualizar modhash y usuario desde old.reddit.com/api/me.json y revisar Set-Cookie
+        try {
+            val meResp = httpClient.get("https://old.reddit.com/api/me.json") {
+                header("Cookie", latestSessionCookie)
+                header("User-Agent", BROWSER_UA)
+            }
+            val setCookies = meResp.headers.getAll("Set-Cookie") ?: emptyList()
+            for (sc in setCookies) {
+                Regex("""reddit_session=([^;\s]+)""").find(sc)?.let {
+                    val v = it.groupValues[1].trim()
+                    if (v.isNotEmpty() && v != "deleted") {
+                        latestSessionCookie = "reddit_session=$v"
+                    }
+                }
+                Regex("""token_v2=([^;\s]+)""").find(sc)?.let {
+                    val v = it.groupValues[1].trim()
+                    if (v.length > 50) newTokenV2 = v
+                }
+            }
+
+            if (meResp.status.value == 200) {
+                val bodyStr = meResp.bodyAsText()
+                if (bodyStr.trim().startsWith("{")) {
+                    val dataObj = JSONObject(bodyStr).optJSONObject("data")
+                    if (dataObj != null) {
+                        val uh = dataObj.optString("modhash", "")
+                        if (uh.isNotEmpty()) {
+                            tokenStorage.setModhash(uh)
+                        }
+                        val name = dataObj.optString("name", "")
+                        if (name.isNotEmpty()) {
+                            tokenStorage.setUsername(name)
+                        }
+                    }
+                }
+            }
         } catch (e: Exception) {
-            return@withContext null
+            Log.w(TAG, "Error consultando old.reddit.com/api/me.json: ${e.message}")
+        }
+
+        // B. Intentar obtener un nuevo token_v2 desde www.reddit.com enviando reddit_session
+        if (newTokenV2 == null) {
+            try {
+                val webResp = httpClient.get("https://www.reddit.com/") {
+                    header("Cookie", latestSessionCookie)
+                    header("User-Agent", BROWSER_UA)
+                }
+                val setCookies = webResp.headers.getAll("Set-Cookie") ?: emptyList()
+                for (sc in setCookies) {
+                    Regex("""reddit_session=([^;\s]+)""").find(sc)?.let {
+                        val v = it.groupValues[1].trim()
+                        if (v.isNotEmpty() && v != "deleted") {
+                            latestSessionCookie = "reddit_session=$v"
+                        }
+                    }
+                    Regex("""token_v2=([^;\s]+)""").find(sc)?.let {
+                        val v = it.groupValues[1].trim()
+                        if (v.length > 50) newTokenV2 = v
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Error renovando token_v2 en www.reddit.com: ${e.message}")
+            }
+        }
+
+        tokenStorage.setSessionCookie(latestSessionCookie)
+
+        if (!newTokenV2.isNullOrEmpty()) {
+            Log.d(TAG, "✅ token_v2 renovado autónomamente desde reddit_session en el reloj")
+            tokenStorage.saveTokens(
+                accessToken = newTokenV2!!,
+                refreshToken = latestSessionCookie,
+                expiresInSeconds = 3600L
+            )
+            return@withContext newTokenV2!!
+        } else {
+            Log.d(TAG, "✅ Usando reddit_session persistente directamente (válida 1 año)")
+            tokenStorage.saveTokens(
+                accessToken = latestSessionCookie,
+                refreshToken = latestSessionCookie,
+                expiresInSeconds = 31536000L
+            )
+            return@withContext latestSessionCookie
         }
     }
 }
+

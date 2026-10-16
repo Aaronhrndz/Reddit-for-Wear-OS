@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,6 +35,12 @@ fun SavedScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollState = rememberScalingLazyListState()
+
+    LaunchedEffect(Unit) {
+        if (uiState is SavedUiState.Error) {
+            viewModel.loadSavedPosts(forceRefresh = true)
+        }
+    }
 
     Scaffold(
         vignette = { Vignette(vignettePosition = VignettePosition.TopAndBottom) },

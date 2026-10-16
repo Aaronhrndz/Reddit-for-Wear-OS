@@ -2,6 +2,7 @@ package com.reddit.wearos.ui.saved
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reddit.wearos.auth.TokenStorage
 import com.reddit.wearos.data.RedditRepository
 import com.reddit.wearos.data.model.RedditPost
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ sealed class SavedUiState {
 
 class SavedViewModel(
     private val repository: RedditRepository,
-    private val username: String = "me"
+    private val tokenStorage: TokenStorage? = null,
+    private val fallbackUsername: String = "me"
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SavedUiState>(SavedUiState.Loading)
@@ -28,14 +30,20 @@ class SavedViewModel(
     private val currentPosts = mutableListOf<RedditPost>()
 
     init {
-        loadSavedPosts()
+        loadSavedPosts(forceRefresh = true)
     }
 
-    fun loadSavedPosts() {
+    private fun resolveUsername(): String {
+        return tokenStorage?.getUsername()?.takeIf { it.isNotBlank() } ?: fallbackUsername
+    }
+
+    fun loadSavedPosts(forceRefresh: Boolean = false) {
+        if (!forceRefresh && _uiState.value is SavedUiState.Success && currentPosts.isNotEmpty()) return
         viewModelScope.launch {
             _uiState.value = SavedUiState.Loading
             try {
-                val (posts, nextAfter) = repository.getSavedPosts(username)
+                val user = resolveUsername()
+                val (posts, nextAfter) = repository.getSavedPosts(user)
                 currentPosts.clear()
                 currentPosts.addAll(posts)
                 after = nextAfter
@@ -51,7 +59,8 @@ class SavedViewModel(
         isLoadingMore = true
         viewModelScope.launch {
             try {
-                val (posts, nextAfter) = repository.getSavedPosts(username, after)
+                val user = resolveUsername()
+                val (posts, nextAfter) = repository.getSavedPosts(user, after)
                 currentPosts.addAll(posts)
                 after = nextAfter
                 _uiState.value = SavedUiState.Success(currentPosts.toList(), after != null)

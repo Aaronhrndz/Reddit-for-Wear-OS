@@ -93,8 +93,19 @@ class CompanionMainActivity : ComponentActivity() {
         val prefs = getSharedPreferences("companion_prefs", Context.MODE_PRIVATE)
         redditUsername = prefs.getString("saved_username", "Aaronhrnndz") ?: "Aaronhrnndz"
         clientIdInput = prefs.getString("saved_client_id", DEFAULT_CLIENT_ID) ?: DEFAULT_CLIENT_ID
+        val savedSession = prefs.getString("saved_session_data", "") ?: ""
 
-        checkConnectedWatches()
+        // Recuperar automáticamente cookies activas del WebView (incluyendo reddit_session de 1 año)
+        val webViewCookies = extractAllRedditCookies()
+        if (webViewCookies.contains("reddit_session=")) {
+            tokenOrCookieInput = webViewCookies
+            prefs.edit().putString("saved_session_data", webViewCookies).apply()
+            loginStatus = "✅ Sesión persistente (reddit_session) activa en el móvil"
+        } else if (savedSession.isNotEmpty()) {
+            tokenOrCookieInput = savedSession
+        }
+
+        checkConnectedWatches(autoSyncIfReady = tokenOrCookieInput.contains("reddit_session="))
         handleAuthRedirect(intent)
 
         setContent {
@@ -114,9 +125,14 @@ class CompanionMainActivity : ComponentActivity() {
                             username = redditUsername,
                             onSessionCaptured = { sessionToken, user ->
                                 isWebLoginOpen = false
+                                if (user.isNotBlank()) {
+                                    redditUsername = user
+                                    prefs.edit().putString("saved_username", user).apply()
+                                }
                                 tokenOrCookieInput = sessionToken
+                                prefs.edit().putString("saved_session_data", sessionToken).apply()
                                 copyToClipboard(sessionToken)
-                                syncSessionToWatch(sessionToken, user)
+                                syncSessionToWatch(sessionToken, redditUsername)
                             },
                             onCancel = { isWebLoginOpen = false }
                         )
@@ -147,15 +163,23 @@ class CompanionMainActivity : ComponentActivity() {
                                 }
                             },
                             onSyncManualToken = {
-                                if (tokenOrCookieInput.isNotBlank()) {
-                                    copyToClipboard(tokenOrCookieInput.trim())
-                                    syncSessionToWatch(tokenOrCookieInput.trim(), redditUsername)
+                                val currentCookies = extractAllRedditCookies()
+                                val effectiveToken = if (currentCookies.contains("reddit_session=")) {
+                                    currentCookies
                                 } else {
-                                    Toast.makeText(this@CompanionMainActivity, "Introduce un token o sesión", Toast.LENGTH_SHORT).show()
+                                    tokenOrCookieInput.trim()
+                                }
+                                if (effectiveToken.isNotBlank()) {
+                                    tokenOrCookieInput = effectiveToken
+                                    prefs.edit().putString("saved_session_data", effectiveToken).apply()
+                                    copyToClipboard(effectiveToken)
+                                    syncSessionToWatch(effectiveToken, redditUsername)
+                                } else {
+                                    Toast.makeText(this@CompanionMainActivity, "Introduce un token o inicia sesión primero", Toast.LENGTH_SHORT).show()
                                 }
                             },
                             onLogout = { performLogout() },
-                            onRefreshWatches = { checkConnectedWatches() }
+                            onRefreshWatches = { checkConnectedWatches(autoSyncIfReady = false) }
                         )
                     }
                 }
@@ -320,6 +344,8 @@ class CompanionMainActivity : ComponentActivity() {
         cm.removeAllCookies {
             cm.flush()
         }
+        getSharedPreferences("companion_prefs", Context.MODE_PRIVATE)
+            .edit().remove("saved_session_data").apply()
         tokenOrCookieInput = ""
         loginStatus = "Sesión cerrada en el móvil"
         Toast.makeText(this, "Sesión cerrada y cookies eliminadas", Toast.LENGTH_SHORT).show()
@@ -334,23 +360,39 @@ class CompanionMainActivity : ComponentActivity() {
         } catch (_: Exception) {}
     }
 
-    private fun checkConnectedWatches() {
+    private fun checkConnectedWatches(autoSyncIfReady: Boolean = false) {
         lifecycleScope.launch {
             val nodes = syncManager.getConnectedWatches()
             connectedWatchesCount = nodes.size
+            if (autoSyncIfReady && nodes.isNotEmpty() && tokenOrCookieInput.isNotBlank()) {
+                syncSessionToWatch(tokenOrCookieInput, redditUsername)
+            }
         }
     }
 
     private fun syncSessionToWatch(sessionData: String, username: String) {
         isSyncing = true
-        loginStatus = "Sincronizando sesión de u/$username con Galaxy Watch..."
+        loginStatus = "Sincronizando sesión persistente de u/$username con Galaxy Watch..."
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                // Asegurar que siempre incluimos reddit_session de CookieManager si existe
+                val webCookies = extractAllRedditCookies()
+                val combined = if (webCookies.isNotEmpty()) "$sessionData; $webCookies" else sessionData
+                val sessionMatch = Regex("""reddit_session=([^;\s]+)""").find(combined)
+                val tokenV2Match = Regex("""token_v2=([^;\s]+)""").find(combined)
+
+                val permanentCookie = sessionMatch?.let { "reddit_session=${it.groupValues[1].trim()}" }
+                val effectiveAccess = when {
+                    permanentCookie != null -> permanentCookie
+                    tokenV2Match != null -> tokenV2Match.groupValues[1].trim()
+                    else -> sessionData.trim()
+                }
+
                 val payload = AuthSyncPayload(
                     clientId = "cookie_session",
-                    accessToken = sessionData,
-                    refreshToken = null,
+                    accessToken = effectiveAccess,
+                    refreshToken = permanentCookie,
                     expiresInSeconds = 31536000L,
                     username = username
                 )
@@ -359,10 +401,11 @@ class CompanionMainActivity : ComponentActivity() {
                 withContext(Dispatchers.Main) {
                     isSyncing = false
                     if (syncSuccess) {
-                        loginStatus = "u/$username sincronizado con éxito en tu Galaxy Watch"
-                        Toast.makeText(this@CompanionMainActivity, "u/$username conectado en el reloj", Toast.LENGTH_LONG).show()
+                        val modeLabel = if (permanentCookie != null) "persistente (1 año)" else "activa"
+                        loginStatus = "✅ u/$username sincronizado con sesión $modeLabel en tu Galaxy Watch"
+                        Toast.makeText(this@CompanionMainActivity, "u/$username conectado en el reloj (Sesión Persistente)", Toast.LENGTH_LONG).show()
                     } else {
-                        loginStatus = "Sesión obtenida. Conecta tu reloj por Bluetooth para sincronizar."
+                        loginStatus = "Sesión persistente guardada. Conecta tu reloj por Bluetooth y pulsa Reenviar."
                     }
                 }
             } catch (e: Exception) {
@@ -375,14 +418,8 @@ class CompanionMainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("SetJavaScriptEnabled")
-@Composable
-fun RedditWebLoginView(
-    username: String,
-    onSessionCaptured: (String, String) -> Unit,
-    onCancel: () -> Unit
-) {
-    fun extractSessionToken(): String {
+fun extractAllRedditCookies(): String {
+    return try {
         val cm = CookieManager.getInstance()
         val c1 = cm.getCookie("https://www.reddit.com") ?: ""
         val c2 = cm.getCookie("https://old.reddit.com") ?: ""
@@ -390,17 +427,34 @@ fun RedditWebLoginView(
         val c4 = cm.getCookie("https://accounts.reddit.com") ?: ""
         val combined = listOf(c1, c2, c3, c4).filter { it.isNotEmpty() }.joinToString("; ")
 
-        val tokenV2Match = Regex("""token_v2=([^;]+)""").find(combined)
-        if (tokenV2Match != null) {
-            val token = tokenV2Match.groupValues[1].trim()
-            if (token.length > 50) return token
+        val parts = mutableListOf<String>()
+        Regex("""reddit_session=([^;\s]+)""").find(combined)?.let {
+            val v = it.groupValues[1].trim()
+            if (v.isNotEmpty() && v != "deleted") parts.add("reddit_session=$v")
         }
-        val sessionMatch = Regex("""reddit_session=([^;]+)""").find(combined)
-        if (sessionMatch != null) {
-            return "reddit_session=${sessionMatch.groupValues[1].trim()}"
+        Regex("""token_v2=([^;\s]+)""").find(combined)?.let {
+            val v = it.groupValues[1].trim()
+            if (v.length > 50) parts.add("token_v2=$v")
         }
-        return combined
+        Regex("""loid=([^;\s]+)""").find(combined)?.let {
+            val v = it.groupValues[1].trim()
+            if (v.isNotEmpty()) parts.add("loid=$v")
+        }
+        if (parts.isNotEmpty()) parts.joinToString("; ") else combined
+    } catch (_: Exception) {
+        ""
     }
+}
+
+@SuppressLint("SetJavaScriptEnabled")
+@Composable
+fun RedditWebLoginView(
+    username: String,
+    onSessionCaptured: (String, String) -> Unit,
+    onCancel: () -> Unit
+) {
+    var detectedUser by remember { mutableStateOf(username) }
+    var hasPersistentCookie by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -421,12 +475,20 @@ fun RedditWebLoginView(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Login Reddit u/$username", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
+                    Column {
+                        Text("Login Reddit u/$detectedUser", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
+                        Text(
+                            text = if (hasPersistentCookie) "✅ Cookie reddit_session (1 año) lista" else "Inicia sesión abajo (Remember Me activo)",
+                            fontSize = 11.sp,
+                            color = if (hasPersistentCookie) Color(0xFF4CAF50) else Color(0xFFAAAAAA)
+                        )
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
                             onClick = {
                                 val cm = CookieManager.getInstance()
                                 cm.removeAllCookies { cm.flush() }
+                                hasPersistentCookie = false
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF442222)),
                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
@@ -464,10 +526,20 @@ fun RedditWebLoginView(
                         webViewClient = object : WebViewClient() {
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
+                                CookieManager.getInstance().flush()
+                                val cookies = extractAllRedditCookies()
+                                hasPersistentCookie = cookies.contains("reddit_session=")
+
                                 view?.evaluateJavascript(
                                     """
                                     (function() {
                                         try {
+                                            // 1. Marcar siempre "remember me" (rem) para que reddit_session dure 1 año
+                                            var rems = document.querySelectorAll('input[name="rem"], #rem-login-main, input[type="checkbox"]');
+                                            for (var k = 0; k < rems.length; k++) {
+                                                rems[k].checked = true;
+                                            }
+                                            // 2. Cerrar banners de cookies
                                             var btns = document.querySelectorAll('button, a');
                                             for (var i = 0; i < btns.length; i++) {
                                                 var text = (btns[i].innerText || '').toLowerCase();
@@ -482,11 +554,21 @@ fun RedditWebLoginView(
                                                     overlays[j].style.pointerEvents = 'none';
                                                 }
                                             }
+                                            // 3. Detectar usuario logueado en old.reddit.com
+                                            var userLink = document.querySelector('.user a');
+                                            if (userLink && userLink.innerText && !userLink.innerText.toLowerCase().includes('want to join')) {
+                                                return userLink.innerText.trim();
+                                            }
                                         } catch(e) {}
+                                        return "";
                                     })();
-                                    """.trimIndent(),
-                                    null
-                                )
+                                    """.trimIndent()
+                                ) { result ->
+                                    val cleanName = result?.trim()?.removeSurrounding("\"") ?: ""
+                                    if (cleanName.isNotEmpty() && cleanName != "null" && !cleanName.contains(" ")) {
+                                        detectedUser = cleanName
+                                    }
+                                }
                             }
                         }
                         settings.apply {
@@ -511,19 +593,26 @@ fun RedditWebLoginView(
             ) {
                 Button(
                     onClick = {
-                        val token = extractSessionToken()
-                        onSessionCaptured(token, username)
+                        CookieManager.getInstance().flush()
+                        val token = extractAllRedditCookies()
+                        onSessionCaptured(token, detectedUser)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(14.dp)
                         .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (hasPersistentCookie) Color(0xFF2E7D32) else Color(0xFFFF4500)
+                    ),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Copiar y Sincronizar con el Reloj", fontWeight = FontWeight.Bold)
+                    Text(
+                        text = if (hasPersistentCookie) "✅ Sincronizar Sesión Persistente con el Reloj" else "Copiar y Sincronizar con el Reloj",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
         }
@@ -569,7 +658,7 @@ fun CompanionScreen(
             color = Color.White
         )
         Text(
-            text = "Sincronizador Oficial de Cuenta",
+            text = "Sincronizador de Sesión Persistente",
             fontSize = 14.sp,
             color = Color(0xFFAAAAAA)
         )
@@ -614,83 +703,23 @@ fun CompanionScreen(
             }
         }
 
-        // SECCIÓN 1: LOGIN OFICIAL PERMANENTE (OAUTH 2.0 CON REFRESH TOKEN)
+        // SECCIÓN PRINCIPAL: LOGIN WEB PERSISTENTE (1 AÑO, AUTO-RENOVABLE EN EL RELOJ)
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1B281E))
         ) {
             Column(modifier = Modifier.padding(14.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.VpnKey,
-                        contentDescription = null,
-                        tint = Color(0xFF81C784),
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Conexión Permanente (OAuth 2.0)", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 15.sp)
-                }
+                Text(
+                    text = "Inicio de Sesión Persistente (Recomendado)",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    fontSize = 15.sp
+                )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Obtiene un Refresh Token oficial que no caduca. El reloj auto-renueva el acceso en segundo plano.",
+                    text = "Captura la cookie maestra reddit_session (válida 1 año con 'Recordarme' activo). El reloj renueva sus tokens por sí solo sin necesitar el móvil.",
                     fontSize = 11.sp,
                     color = Color(0xFFB0BEC5)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Text("Client ID de Reddit (Opcional / Personal)", fontSize = 12.sp, color = Color(0xFFCCCCCC), fontWeight = FontWeight.SemiBold)
-                Spacer(modifier = Modifier.height(4.dp))
-                OutlinedTextField(
-                    value = clientId,
-                    onValueChange = onClientIdChange,
-                    singleLine = true,
-                    placeholder = { Text("pA-pE4qfVj5W_A", fontSize = 12.sp, color = Color.Gray) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFF4CAF50),
-                        unfocusedBorderColor = Color(0xFF388E3C)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Button(
-                    onClick = onStartOAuthLogin,
-                    enabled = !isSyncing,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.VpnKey,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Iniciar Sesión Permanente (OAuth)",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-        }
-
-        // SECCIÓN 2: MÉTODO ALTERNATIVO (LOGIN WEB / COOKIES)
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
-        ) {
-            Column(modifier = Modifier.padding(14.dp)) {
-                Text("Método Alternativo / Pruebas (Cookies Web)", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Inicio mediante navegador in-app (caduca a las 24h). Úsalo si no deseas usar OAuth.",
-                    fontSize = 11.sp,
-                    color = Color(0xFFAAAAAA)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Row(
@@ -701,8 +730,8 @@ fun CompanionScreen(
                         onClick = onStartLogin,
                         enabled = !isSyncing,
                         modifier = Modifier
-                            .weight(1f)
-                            .height(44.dp),
+                            .weight(1.4f)
+                            .height(48.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
                         shape = RoundedCornerShape(10.dp)
                     ) {
@@ -710,12 +739,12 @@ fun CompanionScreen(
                             imageVector = Icons.Default.Language,
                             contentDescription = null,
                             tint = Color.White,
-                            modifier = Modifier.size(15.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Login Web",
-                            fontSize = 12.sp,
+                            text = "Iniciar Sesión Web",
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -726,7 +755,7 @@ fun CompanionScreen(
                         enabled = !isSyncing,
                         modifier = Modifier
                             .weight(1f)
-                            .height(44.dp),
+                            .height(48.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF372727)),
                         shape = RoundedCornerShape(10.dp)
                     ) {
@@ -738,7 +767,7 @@ fun CompanionScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Cerrar Sesión",
+                            text = "Limpiar",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFFFF8A80)

@@ -34,24 +34,27 @@ class RedditApiService(
         const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
     }
 
-    private suspend fun isBearerAuth(): Boolean {
-        val refreshToken = tokenStorage.getRefreshToken()
-        if (!refreshToken.isNullOrEmpty()) return true
-        val clientId = tokenStorage.getClientId()
-        if (clientId.isNotEmpty() && clientId != "cookie_session") return true
-        val token = tokenStorage.getAccessToken() ?: return false
-        return token.startsWith("Bearer ") || (!token.contains("=") && !token.contains(";"))
+    private suspend fun getAuthHeader(): Pair<String, String>? {
+        val token = authManager.refreshTokenIfNeeded() ?: tokenStorage.getAccessToken() ?: tokenStorage.getSessionCookie() ?: return null
+        val clean = token.trim()
+        return if (clean.contains("reddit_session=") || clean.contains("=")) {
+            Pair("Cookie", clean)
+        } else if (clean.startsWith("Bearer ")) {
+            Pair("Authorization", clean)
+        } else {
+            Pair("Authorization", "Bearer $clean")
+        }
     }
 
-    private suspend fun getAuthHeader(): Pair<String, String>? {
-        val isBearer = isBearerAuth()
-        val token = authManager.refreshTokenIfNeeded() ?: tokenStorage.getAccessToken() ?: return null
-        return if (isBearer) {
-            Pair("Authorization", if (token.startsWith("Bearer ")) token else "Bearer $token")
-        } else {
-            val cookieVal = if (!token.contains("=")) "reddit_session=$token" else token
-            Pair("Cookie", cookieVal)
-        }
+    private suspend fun isBearerAuth(): Boolean {
+        val header = getAuthHeader() ?: return false
+        return header.first == "Authorization"
+    }
+
+    private suspend fun ensureModhash(): String? {
+        tokenStorage.getModhash()?.takeIf { it.isNotEmpty() }?.let { return it }
+        getMe()
+        return tokenStorage.getModhash()
     }
 
     var lastDiagnostic: String = "Iniciando consulta..."
@@ -62,8 +65,9 @@ class RedditApiService(
         after: String? = null,
         limit: Int = 25
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
+        val sessionCookie = tokenStorage.getSessionCookie()
         val sub = subreddit?.trim()
         val isHome = sub.isNullOrEmpty() || sub.equals("home", ignoreCase = true) || sub.equals("principal", ignoreCase = true) || sub.equals("frontpage", ignoreCase = true)
 
@@ -80,13 +84,15 @@ class RedditApiService(
             }
         }
         if (isHome) {
-            if (authHeader != null) {
+            if (authHeader != null || !sessionCookie.isNullOrEmpty()) {
+                urlsToTry.add("https://old.reddit.com/$sortPath.json")
                 urlsToTry.add("https://api.reddit.com/$sortPath.json")
             }
             urlsToTry.add("https://api.reddit.com/r/popular/$sortPath.json")
             urlsToTry.add("https://api.reddit.com/r/all/$sortPath.json")
             urlsToTry.add("https://api.reddit.com/$sortPath.json")
         } else {
+            urlsToTry.add("https://old.reddit.com/r/$sub/$sortPath.json")
             urlsToTry.add("https://api.reddit.com/r/$sub/$sortPath.json")
             urlsToTry.add("https://api.reddit.com/r/$sub.json")
         }
@@ -95,12 +101,14 @@ class RedditApiService(
 
         for (url in urlsToTry) {
             try {
-                Log.d(TAG, "Intentando feed: url=$url, sort=$sortPath, authHeader=${currentAuthHeader?.first} -> ${currentAuthHeader?.second?.take(15)}...")
+                Log.d(TAG, "Intentando feed: url=$url, sort=$sortPath, authHeader=${currentAuthHeader?.first}")
                 var response = httpClient.get(url) {
-                    if (url.contains("oauth.reddit.com") && isBearer) {
-                        currentAuthHeader?.let { (k, v) -> header(k, v) }
+                    if (url.contains("oauth.reddit.com") && currentAuthHeader?.first == "Authorization") {
+                        header("Authorization", currentAuthHeader!!.second)
                     } else if (currentAuthHeader?.first == "Cookie") {
-                        header("Cookie", currentAuthHeader.second)
+                        header("Cookie", currentAuthHeader!!.second)
+                    } else if (!sessionCookie.isNullOrEmpty()) {
+                        header("Cookie", sessionCookie)
                     }
                     header("User-Agent", USER_AGENT)
                     header("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -113,16 +121,14 @@ class RedditApiService(
                 var status = response.status.value
                 var responseText = response.bodyAsText()
                 lastDiagnostic = "HTTP $status (${url.substringAfter("://").take(30)}): ${responseText.take(60).replace("\n", " ")}"
-                Log.d(TAG, "Respuesta de $url: status=$status, len=${responseText.length}, preview=${responseText.take(120).replace("\n", " ")}")
 
-                // Si recibimos 401 en oauth.reddit.com, intentamos refrescar el token de forma forzada
-                if (status == 401 && url.contains("oauth.reddit.com")) {
-                    Log.w(TAG, "401 recibido en OAuth. Intentando forceRefreshToken...")
+                if ((status == 401 || status == 403) && url.contains("oauth.reddit.com")) {
+                    Log.w(TAG, "$status recibido en OAuth. Intentando forceRefreshToken...")
                     val newToken = authManager.forceRefreshToken()
-                    if (!newToken.isNullOrEmpty()) {
+                    if (!newToken.isNullOrEmpty() && !newToken.contains("reddit_session=")) {
                         currentAuthHeader = Pair("Authorization", if (newToken.startsWith("Bearer ")) newToken else "Bearer $newToken")
                         response = httpClient.get(url) {
-                            header("Authorization", currentAuthHeader.second)
+                            header("Authorization", currentAuthHeader!!.second)
                             header("User-Agent", USER_AGENT)
                             header("Cache-Control", "no-cache, no-store, must-revalidate")
                             header("Pragma", "no-cache")
@@ -132,7 +138,8 @@ class RedditApiService(
                         }
                         status = response.status.value
                         responseText = response.bodyAsText()
-                        lastDiagnostic = "Reintento $status: ${responseText.take(60).replace("\n", " ")}"
+                    } else if (!newToken.isNullOrEmpty()) {
+                        currentAuthHeader = Pair("Cookie", newToken)
                     }
                 }
 
@@ -145,10 +152,8 @@ class RedditApiService(
                     }
                 }
 
-                // Si la sesión dio 403 o no trajo posts, intentamos inmediatamente en modo público
-                if ((status == 403 || status == 401) && currentAuthHeader != null) {
+                if ((status == 403 || status == 401) && currentAuthHeader != null && !url.contains("oauth.reddit.com")) {
                     val publicUrl = if (url.endsWith(".json")) url else "$url.json"
-                    Log.d(TAG, "Reintentando $publicUrl de forma pública...")
                     val publicResp = httpClient.get(publicUrl) {
                         header("User-Agent", USER_AGENT)
                         header("Cache-Control", "no-cache, no-store, must-revalidate")
@@ -162,7 +167,6 @@ class RedditApiService(
                         if (!pubText.trim().startsWith("<") && pubText.isNotBlank()) {
                             val listing = NetworkClient.json.decodeFromString<RedditListing<RedditPost>>(pubText)
                             if (listing.data.children.isNotEmpty()) {
-                                Log.d(TAG, "✅ Feed público cargado: ${listing.data.children.size} posts de $publicUrl")
                                 lastDiagnostic = "OK Público (${listing.data.children.size} posts)"
                                 return@withContext listing
                             }
@@ -175,7 +179,6 @@ class RedditApiService(
             }
         }
 
-        Log.w(TAG, "Ninguna URL devolvió posts válidos. Devolviendo lista vacía.")
         RedditListing(kind = "Listing", data = ListingData(children = emptyList(), after = null))
     }
 
@@ -185,8 +188,9 @@ class RedditApiService(
         sort: String = "confidence",
         limit: Int = 30
     ): Pair<RedditPost?, List<RedditComment>> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
+        val sessionCookie = tokenStorage.getSessionCookie()
         val sub = if (subreddit.isEmpty() || subreddit == "home") "popular" else subreddit
 
         val urlsToTry = if (isBearer) {
@@ -208,6 +212,8 @@ class RedditApiService(
                         authHeader?.let { (k, v) -> header(k, v) }
                     } else if (authHeader?.first == "Cookie") {
                         header("Cookie", authHeader.second)
+                    } else if (!sessionCookie.isNullOrEmpty()) {
+                        header("Cookie", sessionCookie)
                     }
                     header("User-Agent", USER_AGENT)
                     parameter("sort", sort)
@@ -240,15 +246,17 @@ class RedditApiService(
     }
 
     suspend fun vote(postFullName: String, dir: Int): Boolean = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
         val url = if (isBearer) "https://oauth.reddit.com/api/vote" else "https://old.reddit.com/api/vote"
+        val uh = if (!isBearer) ensureModhash() else null
         try {
             httpClient.submitForm(
                 url = url,
                 formParameters = Parameters.build {
                     append("id", postFullName)
                     append("dir", dir.toString())
+                    if (!uh.isNullOrEmpty()) append("uh", uh)
                 }
             ) {
                 authHeader?.let { (k, v) -> header(k, v) }
@@ -261,18 +269,20 @@ class RedditApiService(
     }
 
     suspend fun savePost(postFullName: String, save: Boolean): Boolean = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
         val endpoint = if (isBearer) {
             if (save) "https://oauth.reddit.com/api/save" else "https://oauth.reddit.com/api/unsave"
         } else {
             if (save) "https://old.reddit.com/api/save" else "https://old.reddit.com/api/unsave"
         }
+        val uh = if (!isBearer) ensureModhash() else null
         try {
             httpClient.submitForm(
                 url = endpoint,
                 formParameters = Parameters.build {
                     append("id", postFullName)
+                    if (!uh.isNullOrEmpty()) append("uh", uh)
                 }
             ) {
                 authHeader?.let { (k, v) -> header(k, v) }
@@ -289,8 +299,9 @@ class RedditApiService(
         after: String? = null,
         limit: Int = 25
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         var currentAuthHeader = getAuthHeader()
+        val isBearer = currentAuthHeader?.first == "Authorization"
+        val sessionCookie = tokenStorage.getSessionCookie()
         val storedUser = tokenStorage.getUsername()?.trim()?.removePrefix("u/")?.removePrefix("/u/")
         val cleanUser = if (username.isNotBlank() && username != "me") {
             username.trim().removePrefix("u/").removePrefix("/u/")
@@ -309,23 +320,19 @@ class RedditApiService(
             urlsToTry.add("https://api.reddit.com/user/$cleanUser/saved.json")
             urlsToTry.add("https://www.reddit.com/user/$cleanUser/saved.json")
         }
-        urlsToTry.add("https://api.reddit.com/user/me/saved.json")
-        urlsToTry.add("https://old.reddit.com/user/me/saved.json")
-        urlsToTry.add("https://www.reddit.com/user/me/saved.json")
-        urlsToTry.add("https://api.reddit.com/saved.json")
         urlsToTry.add("https://old.reddit.com/saved.json")
-        urlsToTry.add("https://www.reddit.com/saved.json")
+        urlsToTry.add("https://api.reddit.com/saved.json")
 
         for (url in urlsToTry) {
             try {
                 Log.d(TAG, "Consultando guardados: url=$url, auth=${currentAuthHeader?.first}")
                 var response = httpClient.get(url) {
-                    if (url.contains("oauth.reddit.com") && isBearer) {
-                        currentAuthHeader?.let { (k, v) -> header(k, v) }
+                    if (url.contains("oauth.reddit.com") && currentAuthHeader?.first == "Authorization") {
+                        header("Authorization", currentAuthHeader!!.second)
                     } else if (currentAuthHeader?.first == "Cookie") {
-                        header("Cookie", currentAuthHeader.second)
-                    } else if (currentAuthHeader != null) {
-                        header(currentAuthHeader.first, currentAuthHeader.second)
+                        header("Cookie", currentAuthHeader!!.second)
+                    } else if (!sessionCookie.isNullOrEmpty()) {
+                        header("Cookie", sessionCookie)
                     }
                     header("User-Agent", USER_AGENT)
                     parameter("limit", limit)
@@ -336,13 +343,13 @@ class RedditApiService(
                 var status = response.status.value
                 var responseText = response.bodyAsText()
 
-                if (status == 401 && url.contains("oauth.reddit.com")) {
-                    Log.w(TAG, "401 en guardados. Intentando refrescar token...")
+                if ((status == 401 || status == 403) && url.contains("oauth.reddit.com")) {
+                    Log.w(TAG, "$status en guardados. Intentando refrescar token...")
                     val newToken = authManager.forceRefreshToken()
-                    if (!newToken.isNullOrEmpty()) {
+                    if (!newToken.isNullOrEmpty() && !newToken.contains("reddit_session=")) {
                         currentAuthHeader = Pair("Authorization", if (newToken.startsWith("Bearer ")) newToken else "Bearer $newToken")
                         response = httpClient.get(url) {
-                            header("Authorization", currentAuthHeader.second)
+                            header("Authorization", currentAuthHeader!!.second)
                             header("User-Agent", USER_AGENT)
                             parameter("limit", limit)
                             after?.let { parameter("after", it) }
@@ -350,6 +357,8 @@ class RedditApiService(
                         }
                         status = response.status.value
                         responseText = response.bodyAsText()
+                    } else if (!newToken.isNullOrEmpty()) {
+                        currentAuthHeader = Pair("Cookie", newToken)
                     }
                 }
 
@@ -408,53 +417,86 @@ class RedditApiService(
     }
 
     suspend fun getUserSubreddits(): List<RedditSubreddit> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/subreddits/mine/subscriber" else "https://old.reddit.com/subreddits/mine/subscriber.json"
-        try {
-            val responseText = httpClient.get(url) {
-                authHeader?.let { (k, v) -> header(k, v) }
-                header("User-Agent", USER_AGENT)
-                parameter("limit", 50)
-                parameter("raw_json", 1)
-            }.bodyAsText()
-
-            if (responseText.trim().startsWith("<")) {
-                return@withContext emptyList()
-            }
-
-            val response: RedditListing<RedditSubreddit> = NetworkClient.json.decodeFromString(responseText)
-            response.data.children.map { it.data }
-        } catch (e: Exception) {
-            emptyList()
+        val isBearer = authHeader?.first == "Authorization"
+        val sessionCookie = tokenStorage.getSessionCookie()
+        val urls = if (isBearer) {
+            listOf("https://oauth.reddit.com/subreddits/mine/subscriber", "https://old.reddit.com/subreddits/mine/subscriber.json")
+        } else {
+            listOf("https://old.reddit.com/subreddits/mine/subscriber.json")
         }
+        for (url in urls) {
+            try {
+                val responseText = httpClient.get(url) {
+                    if (url.contains("oauth.reddit.com") && isBearer) {
+                        authHeader?.let { (k, v) -> header(k, v) }
+                    } else if (authHeader?.first == "Cookie") {
+                        header("Cookie", authHeader.second)
+                    } else if (!sessionCookie.isNullOrEmpty()) {
+                        header("Cookie", sessionCookie)
+                    }
+                    header("User-Agent", USER_AGENT)
+                    parameter("limit", 50)
+                    parameter("raw_json", 1)
+                }.bodyAsText()
+
+                if (!responseText.trim().startsWith("<") && responseText.isNotBlank()) {
+                    val response: RedditListing<RedditSubreddit> = NetworkClient.json.decodeFromString(responseText)
+                    if (response.data.children.isNotEmpty()) {
+                        return@withContext response.data.children.map { it.data }
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        emptyList()
     }
 
     suspend fun getMe(): RedditUser? = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/api/v1/me" else "https://old.reddit.com/api/v1/me.json"
-        try {
-            val responseText = httpClient.get(url) {
-                authHeader?.let { (k, v) -> header(k, v) }
-                header("User-Agent", USER_AGENT)
-                parameter("raw_json", 1)
-            }.bodyAsText()
-
-            if (responseText.trim().startsWith("<")) {
-                return@withContext null
-            }
-            NetworkClient.json.decodeFromString<RedditUser>(responseText)
-        } catch (e: Exception) {
-            null
+        val isBearer = authHeader?.first == "Authorization"
+        val sessionCookie = tokenStorage.getSessionCookie()
+        val urls = if (isBearer) {
+            listOf("https://oauth.reddit.com/api/v1/me", "https://old.reddit.com/api/me.json")
+        } else {
+            listOf("https://old.reddit.com/api/me.json")
         }
+        for (url in urls) {
+            try {
+                val responseText = httpClient.get(url) {
+                    if (url.contains("oauth.reddit.com") && isBearer) {
+                        authHeader?.let { (k, v) -> header(k, v) }
+                    } else if (authHeader?.first == "Cookie") {
+                        header("Cookie", authHeader.second)
+                    } else if (!sessionCookie.isNullOrEmpty()) {
+                        header("Cookie", sessionCookie)
+                    }
+                    header("User-Agent", USER_AGENT)
+                    parameter("raw_json", 1)
+                }.bodyAsText()
+
+                if (!responseText.trim().startsWith("<") && responseText.isNotBlank()) {
+                    val root = NetworkClient.json.parseToJsonElement(responseText).jsonObject
+                    val targetObj = root["data"]?.jsonObject ?: root
+                    targetObj["modhash"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotEmpty() }?.let {
+                        tokenStorage.setModhash(it)
+                    }
+                    val user = NetworkClient.json.decodeFromJsonElement<RedditUser>(targetObj)
+                    if (user.name.isNotEmpty()) {
+                        tokenStorage.setUsername(user.name)
+                        return@withContext user
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        null
     }
 
     suspend fun addComment(thingId: String, text: String): Boolean = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
         val url = if (isBearer) "https://oauth.reddit.com/api/comment" else "https://old.reddit.com/api/comment"
         val formattedThingId = if (thingId.startsWith("t1_") || thingId.startsWith("t3_")) thingId else if (thingId.length <= 8) "t3_$thingId" else thingId
+        val uh = if (!isBearer) ensureModhash() else null
         try {
             val response = httpClient.submitForm(
                 url = url,
@@ -462,6 +504,7 @@ class RedditApiService(
                     append("api_type", "json")
                     append("thing_id", formattedThingId)
                     append("text", text)
+                    if (!uh.isNullOrEmpty()) append("uh", uh)
                 }
             ) {
                 authHeader?.let { (k, v) -> header(k, v) }
@@ -477,27 +520,38 @@ class RedditApiService(
     }
 
     suspend fun getInbox(limit: Int = 25): List<RedditMessage> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/message/inbox" else "https://api.reddit.com/message/inbox"
-        try {
-            val responseText = httpClient.get(url) {
-                authHeader?.let { (k, v) -> header(k, v) }
-                header("User-Agent", USER_AGENT)
-                parameter("limit", limit)
-                parameter("raw_json", 1)
-            }.bodyAsText()
-
-            if (responseText.trim().startsWith("<") || responseText.isBlank()) {
-                return@withContext emptyList()
-            }
-
-            val response: RedditListing<RedditMessage> = NetworkClient.json.decodeFromString(responseText)
-            response.data.children.map { it.data }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error loading inbox: ${e.message}")
-            emptyList()
+        val isBearer = authHeader?.first == "Authorization"
+        val sessionCookie = tokenStorage.getSessionCookie()
+        val urls = if (isBearer) {
+            listOf("https://oauth.reddit.com/message/inbox", "https://old.reddit.com/message/inbox.json")
+        } else {
+            listOf("https://old.reddit.com/message/inbox.json", "https://api.reddit.com/message/inbox.json")
         }
+        for (url in urls) {
+            try {
+                val responseText = httpClient.get(url) {
+                    if (url.contains("oauth.reddit.com") && isBearer) {
+                        authHeader?.let { (k, v) -> header(k, v) }
+                    } else if (authHeader?.first == "Cookie") {
+                        header("Cookie", authHeader.second)
+                    } else if (!sessionCookie.isNullOrEmpty()) {
+                        header("Cookie", sessionCookie)
+                    }
+                    header("User-Agent", USER_AGENT)
+                    parameter("limit", limit)
+                    parameter("raw_json", 1)
+                }.bodyAsText()
+
+                if (!responseText.trim().startsWith("<") && responseText.isNotBlank()) {
+                    val response: RedditListing<RedditMessage> = NetworkClient.json.decodeFromString(responseText)
+                    return@withContext response.data.children.map { it.data }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading inbox from $url: ${e.message}")
+            }
+        }
+        emptyList()
     }
 
     suspend fun getUserSubmitted(
