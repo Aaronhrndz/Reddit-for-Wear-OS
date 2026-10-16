@@ -130,8 +130,14 @@ fun PostDetailScreen(
                                 .padding(horizontal = 14.dp, vertical = 4.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            val timeAgo = com.reddit.wearos.data.model.formatRelativeTime(post.createdUtc)
+                            val metaText = if (timeAgo.isNotEmpty()) {
+                                "${post.subredditPrefixed} • $timeAgo • u/${post.author}"
+                            } else {
+                                "${post.subredditPrefixed} • u/${post.author}"
+                            }
                             Text(
-                                text = "${post.subredditPrefixed} • u/${post.author}",
+                                text = metaText,
                                 fontSize = 9.sp,
                                 color = RedditOrange,
                                 fontWeight = FontWeight.Bold,
@@ -455,13 +461,23 @@ fun InlineCommentCard(
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera: u/author en naranja sin icono
-                Text(
-                    text = "u/${comment.author}",
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = RedditOrange
-                )
+                // Cabecera: u/author en naranja + tiempo relativo
+                val commentTimeAgo = com.reddit.wearos.data.model.formatRelativeTime(comment.createdUtc)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "u/${comment.author}",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RedditOrange
+                    )
+                    if (commentTimeAgo.isNotEmpty()) {
+                        Text(
+                            text = " • $commentTimeAgo",
+                            fontSize = 8.sp,
+                            color = TextSecondary
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 

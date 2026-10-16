@@ -94,12 +94,16 @@ fun PostCard(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     val subText = if (post.subredditPrefixed.isNotEmpty()) post.subredditPrefixed else "r/${post.subreddit}"
+                    val timeAgo = com.reddit.wearos.data.model.formatRelativeTime(post.createdUtc)
                     Text(
                         text = buildAnnotatedString {
                             withStyle(SpanStyle(color = RedditOrange, fontWeight = FontWeight.Bold)) {
                                 append(subText)
                             }
                             withStyle(SpanStyle(color = TextSecondary)) {
+                                if (timeAgo.isNotEmpty()) {
+                                    append(" • $timeAgo")
+                                }
                                 append(" • u/${post.author}")
                             }
                         },

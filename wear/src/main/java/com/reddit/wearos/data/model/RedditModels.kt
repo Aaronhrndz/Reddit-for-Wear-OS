@@ -255,3 +255,19 @@ data class RedditMessage(
     val parentId: String? = null,
     val context: String = ""
 )
+
+fun formatRelativeTime(createdUtc: Double): String {
+    if (createdUtc <= 0.0) return ""
+    val nowSec = System.currentTimeMillis() / 1000L
+    val diffSec = (nowSec - createdUtc.toLong()).coerceAtLeast(0L)
+    return when {
+        diffSec < 60L -> "ahora"
+        diffSec < 3600L -> "hace ${diffSec / 60L}m"
+        diffSec < 86400L -> "hace ${diffSec / 3600L}h"
+        diffSec < 604800L -> "hace ${diffSec / 86400L}d"
+        diffSec < 2592000L -> "hace ${diffSec / 604800L}sem"
+        diffSec < 31536000L -> "hace ${diffSec / 2592000L}mes"
+        else -> "hace ${diffSec / 31536000L}a"
+    }
+}
+

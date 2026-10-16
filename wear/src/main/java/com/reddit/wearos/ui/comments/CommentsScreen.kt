@@ -164,13 +164,23 @@ fun CommentCard(
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera: u/author en naranja sin icono
-                Text(
-                    text = "u/${comment.author}",
-                    fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = RedditOrange
-                )
+                // Cabecera: u/author en naranja + tiempo relativo
+                val commentTimeAgo = com.reddit.wearos.data.model.formatRelativeTime(comment.createdUtc)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "u/${comment.author}",
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RedditOrange
+                    )
+                    if (commentTimeAgo.isNotEmpty()) {
+                        Text(
+                            text = " • $commentTimeAgo",
+                            fontSize = 8.sp,
+                            color = TextSecondary
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 

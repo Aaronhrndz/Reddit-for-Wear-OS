@@ -12,13 +12,15 @@ Diseñado desde cero con **Jetpack Compose for Wear OS**, soporte para **bisel r
 * **📱 Lectura Continua en Always On Display (AOD)**:
   * Al bajar la muñeca, **se mantiene en pantalla exactamente el post, noticia o feed que estabas leyendo** (sin pantallazos intermediarios ni blur de Samsung).
   * **Modo Monocromo GPU Puro**: Toda la interfaz pasa instantáneamente a escala de grises de alto contraste sobre fondo negro puro (`#000000`) para ahorrar batería en paneles LTPO/Super AMOLED a 1 Hz.
-* **▶️ Reproductor de Vídeos Integrado (`WearVideoPlayer`)**:
-  * Reproducción fluida de vídeos de Reddit (`v.redd.it`, MP4, GIFV) directamente en la muñeca.
-  * Soporte para tap-to-pause, bucle infinito y botón de activación/silenciado de audio (Mute/Unmute).
+* **▶️ Reproductor de Vídeos Integrado con Audio HLS (`WearVideoPlayer`)**:
+  * Reproducción fluida con ExoPlayer (Media3) priorizando streams oficiales **HLS (`HLSPlaylist.m3u8`)** con audio muxed CMAF, con fallback automático a MP4 progresivo.
+  * Soporte para tap-to-pause, bucle infinito y control de audio (Mute/Unmute).
+* **🕒 Subtítulos con Tiempo Relativo (`formatRelativeTime`)**:
+  * Todas las tarjetas de publicaciones (`FeedScreen`, `SavedScreen`, `SearchScreen`), vista de detalle (`PostDetailScreen`) y árbol de comentarios muestran hace cuánto se publicó (`ahora`, `hace 15m`, `hace 4h`, `hace 3d`, etc.) junto al subreddit y autor (`r/subreddit • hace 3h • u/autor`).
 * **🔄 Botón de Refresco Rápido**:
   * Acceso directo con icono `🔄` en la cabecera para actualizar el feed sin recargar la app ni perder la posición.
-* **👑 Feed Personal 100% Funcional**:
-  * Carga todas tus suscripciones, subreddits favoritos y ordenación por Popular / All / Home.
+* **👑 Feed Personal y Guardados 100% Funcionales**:
+  * Carga todas tus suscripciones, subreddits favoritos, posts guardados (con resolución automática de usuario y reintento inteligente) y ordenación por Popular / All / Home.
 * **🎨 Tarjetas Elevadas de Alto Contraste**:
   * Diseño AMOLED (`#232326`) con borde sutil (`#38383E`) y pastillas independientes para votación y recuento de comentarios.
 * **🔖 Marcapáginas Vectorial**:
@@ -28,17 +30,19 @@ Diseñado desde cero con **Jetpack Compose for Wear OS**, soporte para **bisel r
 * **💬 Árbol de Comentarios con Profundidad de Color**:
   * Comentarios anidados formateados para lectura ultra-rápida en pantallas circulares.
 
-### 📱 En el Teléfono (Mobile Companion)
-* **🚀 Sincronización Automática con el Reloj**:
-  * Inicio de sesión web seguro en 1 toque que transfiere la sesión automáticamente a tu reloj vía Bluetooth (`Wearable Data Layer API`).
-* **📋 Copiar y Pegar de Tokens**:
-  * Botón directo **`📋 Copiar Todo`** y campo multilínea expandido para inspeccionar o pegar sesiones y Bearer tokens manualmente.
+### 📱 En el Teléfono (Mobile Companion) & Persistencia de Sesión
+* **🔐 Sesión Persistente de Larga Duración (`reddit_session` — 6 a 12 meses)**:
+  * **Extracción Inteligente de Cookies**: Al iniciar sesión en `old.reddit.com/login`, la app companion fuerza automáticamente la casilla *"Remember Me"* (`rem = true`) y prioriza la cookie firmada de largo plazo `reddit_session` (válida de 6 a 12 meses) en lugar del JWT efímero `token_v2` (que caduca a las 24 horas).
+  * **Renovación Autónoma en el Reloj (0 dependencia del móvil)**: El reloj almacena `reddit_session` y su fecha real de expiración (`exp` decodificado del JWT) en `TokenStorage`, y refresca por sí mismo el `modhash` (`uh`) y los datos de sesión contra `https://old.reddit.com/api/me.json` sin necesitar conexión con el teléfono en los días o meses siguientes.
+  * **Auto-Recuperación y Sincronización Bluetooth**: Al abrir la app del móvil, recupera automáticamente la cookie activa del `CookieManager` del sistema y la sincroniza al reloj conectado vía `Wearable Data Layer API` (`/reddit/auth_sync`).
+* **📋 Copiar y Pegar de Tokens / Cookies**:
+  * Botón directo **`📋 Copiar Todo`** y campo multilínea expandido para inspeccionar o pegar sesiones manualmente.
 * **🎨 Nuevo Icono Oficial**:
   * Icono minimalista con la emblemática **`R` en blanco puro sobre fondo naranja Reddit (`#FF4500`)** de alta definición vectorial.
 
 ---
 
-## 📲 Instalación Rápida (Vía Wireless ADB)
+## 📲 Instalación Rápida (Vía USB / Wireless ADB)
 
 ### 1. Activar Depuración Inalámbrica en tus dispositivos
 1. En tu **Galaxy Watch** y en tu **teléfono**, entra en **Ajustes** -> **Opciones de desarrollador**.
@@ -48,13 +52,12 @@ Diseñado desde cero con **Jetpack Compose for Wear OS**, soporte para **bisel r
 ### 2. Instalar en Teléfono y Reloj
 
 ```powershell
-# En el Teléfono Android
-.\adb-cmd.ps1 connect 192.168.1.222:<PUERTO_MOVIL>
-.\adb-cmd.ps1 -s 192.168.1.222:<PUERTO_MOVIL> install -r mobile\build\outputs\apk\debug\mobile-debug.apk
+# En el Teléfono Android (por USB o Wi-Fi)
+adb -s <SERIAL_O_IP_MOVIL> install -r mobile\build\outputs\apk\debug\mobile-debug.apk
 
-# En el Galaxy Watch Ultra
-.\adb-cmd.ps1 connect 192.168.1.176:<PUERTO_RELOJ>
-.\adb-cmd.ps1 -s 192.168.1.176:<PUERTO_RELOJ> install -r wear\build\outputs\apk\debug\wear-debug.apk
+# En el Galaxy Watch (Ultra / 6 / 5 / 4)
+adb connect 192.168.1.173:<PUERTO_RELOJ>
+adb -s 192.168.1.173:<PUERTO_RELOJ> install -r wear\build\outputs\apk\debug\wear-debug.apk
 ```
 
 ---
@@ -73,12 +76,13 @@ El proyecto incluye un entorno de compilación totalmente portátil y automatiza
 ## 🏗️ Arquitectura Técnica
 
 * **Lenguaje**: Kotlin 2.0
-* **UI Toolkit**: Jetpack Compose for Wear OS + Wear Material 3 + Horologist 0.6.x + Compose Material 3 (Mobile)
-* **Networking**: Ktor HTTP Client (CIO engine) + OkHttp + Kotlinx Serialization
-* **Video & Media**: Android Native `VideoView` / `MediaPlayer` SurfaceView + Coil Compose
+* **UI Toolkit**: Jetpack Compose for Wear OS + Wear Material + Horologist 0.6.x + Compose Material 3 (Mobile)
+* **Networking**: Ktor HTTP Client (CIO engine) + OkHttp + Kotlinx Serialization (`old.reddit.com` / `oauth.reddit.com` dual-mode)
+* **Autenticación Persistente**: Cookie firmada `reddit_session` + `modhash` (`uh`) CSRF + soporte dual OAuth2 `Bearer`
+* **Video & Media**: Media3 ExoPlayer (`HlsMediaSource` + `ProgressiveMediaSource`) + Coil Compose
 * **Display Engine**: BlendMode GPU Grayscale Shader + AmbientModeSupport
-* **Almacenamiento Seguro**: EncryptedSharedPreferences (AES-256-GCM)
-* **Inter-device Sync**: Google Play Services Wearable API (`MessageClient` + `DataClient`)
+* **Almacenamiento Seguro**: `TokenStorage` (`SharedPreferences` con decodificación de expiración JWT `exp`)
+* **Inter-device Sync**: Google Play Services Wearable API (`MessageClient` + `DataClient` + `CapabilityClient`)
 
 ---
 
