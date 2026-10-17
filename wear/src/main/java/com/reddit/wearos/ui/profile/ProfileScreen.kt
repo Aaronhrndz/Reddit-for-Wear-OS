@@ -60,7 +60,7 @@ fun ProfileScreen(
             try {
                 val me = repository.getMe()
                 user = me
-                val username = me?.name ?: "aaronhrndz"
+                val username = me?.name ?: "me"
                 val (posts, _) = repository.getUserSubmitted(username)
                 userPosts = posts
                 userComments = repository.getUserComments(username)
@@ -120,7 +120,7 @@ fun ProfileScreen(
 
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "u/${user?.name ?: "aaronhrndz"}",
+                        text = "u/${user?.name ?: "me"}",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White

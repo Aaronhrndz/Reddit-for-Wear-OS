@@ -2,6 +2,9 @@ name: Build Reddit for Wear & Companion
 
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -40,3 +43,13 @@ jobs:
           name: reddit-for-wear-companion-mobile-apk
           path: mobile/build/outputs/apk/debug/mobile-debug.apk
           retention-days: 1
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            wear/build/outputs/apk/debug/wear-debug.apk
+            mobile/build/outputs/apk/debug/mobile-debug.apk
