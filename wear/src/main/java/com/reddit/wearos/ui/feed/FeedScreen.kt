@@ -27,7 +27,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.reddit.wearos.R
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.itemsIndexed
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -67,7 +69,7 @@ fun FeedScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             CircularProgressIndicator(indicatorColor = RedditOrange)
                             Spacer(modifier = Modifier.height(6.dp))
-                            Text("Cargando feed…", fontSize = 10.sp, color = TextSecondary)
+                            Text(stringResource(R.string.loading_feed), fontSize = 10.sp, color = TextSecondary)
                         }
                     }
                 }
@@ -89,7 +91,7 @@ fun FeedScreen(
                             Spacer(modifier = Modifier.height(6.dp))
                             Chip(
                                 onClick = { viewModel.loadFeed(refresh = true) },
-                                label = { Text("Reintentar") },
+                                label = { Text(stringResource(R.string.retry)) },
                                 colors = ChipDefaults.primaryChipColors(backgroundColor = RedditOrange)
                             )
                         }
@@ -118,14 +120,14 @@ fun FeedScreen(
                             },
                             label = {
                                 Text(
-                                    text = "Buscar en Reddit...",
+                                    text = stringResource(R.string.search_reddit_hint),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = Color.White
                                 )
                             },
                             secondaryLabel = {
-                                Text("Feeds y posts", fontSize = 8.sp, color = TextSecondary)
+                                Text(stringResource(R.string.search_sub_hint), fontSize = 8.sp, color = TextSecondary)
                             },
                             colors = ChipDefaults.secondaryChipColors(),
                             modifier = Modifier

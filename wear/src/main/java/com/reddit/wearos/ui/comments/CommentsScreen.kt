@@ -18,8 +18,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reddit.wearos.R
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults
 import androidx.wear.compose.foundation.lazy.items
@@ -100,7 +102,7 @@ fun CommentsScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(indicatorColor = RedditOrange)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text("Cargando comentarios…", fontSize = 10.sp, color = TextSecondary)
+                        Text(stringResource(R.string.loading_comments), fontSize = 10.sp, color = TextSecondary)
                     }
                 }
             }
@@ -112,7 +114,7 @@ fun CommentsScreen(
             is CommentsUiState.Success -> {
                 if (state.comments.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(text = "Sin comentarios", color = TextSecondary, fontSize = 12.sp)
+                        Text(text = stringResource(R.string.comments_empty), color = TextSecondary, fontSize = 12.sp)
                     }
                 } else {
                     ScalingLazyColumn(
@@ -259,7 +261,7 @@ fun CommentCard(
                             ) {
                                 if (confirmDelete) {
                                     Text(
-                                        text = "¿Borrar?",
+                                        text = stringResource(R.string.delete_confirm_title),
                                         fontSize = 7.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White
@@ -267,7 +269,7 @@ fun CommentCard(
                                 } else {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
-                                        contentDescription = "Borrar",
+                                        contentDescription = stringResource(R.string.delete_comment),
                                         tint = Color(0xFFFF8A80),
                                         modifier = Modifier.size(10.dp)
                                     )

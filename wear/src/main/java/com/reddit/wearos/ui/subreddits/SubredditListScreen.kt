@@ -14,9 +14,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reddit.wearos.R
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -190,8 +192,8 @@ fun SubredditListScreen(
                             modifier = Modifier.size(16.dp)
                         )
                     },
-                    label = { Text("Feed Personal", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
-                    secondaryLabel = { Text("Tus suscripciones", fontSize = 9.sp, color = TextSecondary) },
+                    label = { Text(stringResource(R.string.feed_personal), fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    secondaryLabel = { Text(stringResource(R.string.feed_personal_sub), fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.primaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -212,7 +214,7 @@ fun SubredditListScreen(
                         )
                     },
                     label = { Text("r/popular", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
-                    secondaryLabel = { Text("Tendencias globales", fontSize = 9.sp, color = TextSecondary) },
+                    secondaryLabel = { Text(stringResource(R.string.feed_popular_sub), fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.secondaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -233,7 +235,7 @@ fun SubredditListScreen(
                         )
                     },
                     label = { Text("r/all", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
-                    secondaryLabel = { Text("Todo Reddit", fontSize = 9.sp, color = TextSecondary) },
+                    secondaryLabel = { Text(stringResource(R.string.feed_all_sub), fontSize = 9.sp, color = TextSecondary) },
                     colors = ChipDefaults.secondaryChipColors(),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -287,7 +289,7 @@ fun SubredditListScreen(
                                 indicatorColor = RedditOrange
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Cargando subs…", fontSize = 9.sp, color = TextSecondary)
+                            Text(stringResource(R.string.loading_subreddits), fontSize = 9.sp, color = TextSecondary)
                         }
                     }
                 }

@@ -20,6 +20,8 @@ import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.rotaryinput.rotaryWithScroll
+import androidx.compose.ui.res.stringResource
+import com.reddit.wearos.R
 import com.reddit.wearos.data.model.RedditPost
 import com.reddit.wearos.ui.feed.PostCard
 import com.reddit.wearos.ui.theme.RedditOrange
@@ -52,7 +54,7 @@ fun SavedScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(indicatorColor = RedditOrange)
                         Spacer(modifier = Modifier.height(6.dp))
-                        Text("Cargando posts guardados…", fontSize = 10.sp, color = TextSecondary)
+                        Text(stringResource(R.string.loading_saved), fontSize = 10.sp, color = TextSecondary)
                     }
                 }
             }
@@ -66,7 +68,7 @@ fun SavedScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         CompactChip(
                             onClick = { viewModel.loadSavedPosts() },
-                            label = { Text("Reintentar") }
+                            label = { Text(stringResource(R.string.retry)) }
                         )
                     }
                 }
@@ -82,7 +84,7 @@ fun SavedScreen(
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(text = "No tienes nada guardado", color = TextSecondary, fontSize = 11.sp)
+                            Text(text = stringResource(R.string.no_saved_posts), color = TextSecondary, fontSize = 11.sp)
                         }
                     }
                 } else {
@@ -108,7 +110,7 @@ fun SavedScreen(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "Guardados",
+                                    text = stringResource(R.string.settings_saved),
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = RedditOrange
@@ -135,7 +137,7 @@ fun SavedScreen(
                             item {
                                 CompactChip(
                                     onClick = { viewModel.loadMore() },
-                                    label = { Text("Cargar más", fontSize = 10.sp) },
+                                    label = { Text(stringResource(R.string.load_more), fontSize = 10.sp) },
                                     colors = ChipDefaults.secondaryChipColors(),
                                     modifier = Modifier.padding(vertical = 4.dp)
                                 )

@@ -17,8 +17,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reddit.wearos.R
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -162,7 +164,7 @@ fun ProfileScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
-                            Text("Posts", fontSize = 8.sp, color = TextSecondary)
+                            Text(stringResource(R.string.section_posts), fontSize = 8.sp, color = TextSecondary)
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
@@ -171,7 +173,7 @@ fun ProfileScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
-                            Text("Comentarios", fontSize = 8.sp, color = TextSecondary)
+                            Text(stringResource(R.string.section_comments), fontSize = 8.sp, color = TextSecondary)
                         }
                     }
                 }
@@ -197,7 +199,7 @@ fun ProfileScreen(
                         },
                         label = {
                             Text(
-                                "Mis Posts (${userPosts.size})",
+                                "${stringResource(R.string.tab_posts)} (${userPosts.size})",
                                 fontSize = 9.sp,
                                 fontWeight = if (selectedTab == ProfileTab.POSTS) FontWeight.Bold else FontWeight.Normal
                             )
@@ -221,7 +223,7 @@ fun ProfileScreen(
                         },
                         label = {
                             Text(
-                                "Comentarios (${userComments.size})",
+                                "${stringResource(R.string.tab_comments)} (${userComments.size})",
                                 fontSize = 9.sp,
                                 fontWeight = if (selectedTab == ProfileTab.COMMENTS) FontWeight.Bold else FontWeight.Normal
                             )
@@ -250,7 +252,7 @@ fun ProfileScreen(
                                 indicatorColor = RedditOrange
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Cargando perfil…", fontSize = 9.sp, color = TextSecondary)
+                            Text(stringResource(R.string.loading_profile), fontSize = 9.sp, color = TextSecondary)
                         }
                     }
                 }

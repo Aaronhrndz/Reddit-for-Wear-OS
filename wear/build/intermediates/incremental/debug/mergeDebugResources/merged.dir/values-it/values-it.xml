@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string-array name="exo_controls_playback_speeds">
+    <item>0,25x</item>
+    <item>0,5x</item>
+    <item>0,75x</item>
+    <item>Normale</item>
+    <item>1,25x</item>
+    <item>1,5x</item>
+    <item>2x</item>
+  </string-array>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+    <item quantity="one">Avanti di %d secondo</item>
+    <item quantity="other">Avanti di %d secondi</item>
+  </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+    <item quantity="one">Indietro di %d secondo</item>
+    <item quantity="other">Indietro di %d secondi</item>
+  </plurals>
+    <plurals name="horologist_time_picker_hours_content_description">
+    <item quantity="one">%d ora</item>
+    <item quantity="other">%d ore</item>
+  </plurals>
+    <plurals name="horologist_time_picker_minutes_content_description">
+    <item quantity="one">%d minuto</item>
+    <item quantity="other">%d minuti</item>
+  </plurals>
+    <plurals name="horologist_time_picker_seconds_content_description">
+    <item quantity="one">%d secondo</item>
+    <item quantity="other">%d secondi</item>
+  </plurals>
+    <plurals formatted="false" msgid="7688673698789346225" name="wear_m3c_time_picker_hours_content_description">
+      <item quantity="many">%d di ore</item>
+      <item quantity="other">%d ore</item>
+      <item quantity="one">%d ora</item>
+    </plurals>
+    <plurals formatted="false" msgid="8268405448590438607" name="wear_m3c_time_picker_minutes_content_description">
+      <item quantity="many">%d di minuti</item>
+      <item quantity="other">%d minuti</item>
+      <item quantity="one">%d minuto</item>
+    </plurals>
+    <plurals formatted="false" msgid="1073969431850983434" name="wear_m3c_time_picker_seconds_content_description">
+      <item quantity="many">%d di secondi</item>
+      <item quantity="other">%d secondi</item>
+      <item quantity="one">%d secondo</item>
+    </plurals>
+    <string name="app_name">Wrist for Reddit</string>
+    <string name="bookmark_save">Salva</string>
+    <string name="bookmark_saved">Salvato</string>
+    <string msgid="881409763997275156" name="call_notification_answer_action">"Rispondi"</string>
+    <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Video"</string>
+    <string msgid="3229508546291798546" name="call_notification_decline_action">"Rifiuta"</string>
+    <string msgid="2659457946726154263" name="call_notification_hang_up_action">"Riaggancia"</string>
+    <string msgid="6107532579223922871" name="call_notification_incoming_text">"Chiamata in arrivo"</string>
+    <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Chiamata in corso"</string>
+    <string msgid="59049573811482460" name="call_notification_screening_text">"Applicazione filtro a chiamata in arrivo"</string>
+    <string name="cancel">Annulla</string>
+    <string name="client_id_label">Client ID Reddit</string>
+    <string msgid="406453423630273620" name="close_drawer">"Chiudi il menu di navigazione"</string>
+    <string msgid="7573152094250666567" name="close_sheet">"Chiudi il foglio"</string>
+    <string name="comments_empty">Nessun commento su questo post</string>
+    <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Attiva</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">%1$s non funzionerà se non attivi Google Play Services.</string>
+    <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Attiva Google Play Services</string>
+    <string msgid="7153882981874058840" name="common_google_play_services_install_button">Installa</string>
+    <string name="common_google_play_services_install_text">L\'app %1$s non funzionerà senza Google Play Services, non presente sul tuo dispositivo.</string>
+    <string msgid="7215213145546190223" name="common_google_play_services_install_title">Installa Google Play Services</string>
+    <string name="common_google_play_services_notification_channel_name">Disponibilità di Google Play Services</string>
+    <string name="common_google_play_services_notification_ticker">Errore Google Play Services</string>
+    <string name="common_google_play_services_unknown_issue">%1$s sta riscontrando problemi con Google Play Services. Riprova.</string>
+    <string name="common_google_play_services_unsupported_text">%1$s non funzionerà senza Google Play Services, non supportati dal tuo dispositivo.</string>
+    <string msgid="6556509956452265614" name="common_google_play_services_update_button">Aggiorna</string>
+    <string msgid="9053896323427875356" name="common_google_play_services_update_text">%1$s non funzionerà se non aggiorni Google Play Services.</string>
+    <string msgid="6006316683626838685" name="common_google_play_services_update_title">Aggiorna Google Play Services</string>
+    <string name="common_google_play_services_updating_text">%1$s non funzionerà senza Google Play Services, attualmente in fase di aggiornamento.</string>
+    <string name="common_google_play_services_wear_update_text">È richiesta una nuova versione di Google Play Services. L\'aggiornamento automatico verrà eseguito a breve.</string>
+    <string name="common_open_on_phone">Apri sul telefono</string>
+    <string name="common_signin_button_text">Accedi</string>
+    <string name="common_signin_button_text_long">Accedi con Google</string>
+    <string name="confirm">Elimina</string>
+    <string msgid="6412144553299494336" name="confirmation_overlay_a11y_description_fail">"Errore"</string>
+    <string msgid="8809042819843332546" name="confirmation_overlay_a11y_description_phone">"Elemento aperto sul telefono"</string>
+    <string msgid="2936753235333429892" name="confirmation_overlay_a11y_description_success">"Operazione riuscita"</string>
+    <string msgid="8038256446254964252" name="default_error_message">"Valore non valido"</string>
+    <string msgid="6312721426453364202" name="default_popup_window_title">"Finestra popup"</string>
+    <string name="delete_comment">Elimina</string>
+    <string name="delete_confirm_title">Eliminare commento?</string>
+    <string msgid="1890207353314751437" name="dropdown_menu">"Menu a discesa"</string>
+    <string name="edit_comment">Modifica commento</string>
+    <string name="exo_controls_cc_disabled_description">Attiva i sottotitoli</string>
+    <string name="exo_controls_cc_enabled_description">Disattiva i sottotitoli</string>
+    <string name="exo_controls_fastforward_description">Avanti veloce</string>
+    <string name="exo_controls_fullscreen_enter_description">Attiva schermo intero</string>
+    <string name="exo_controls_fullscreen_exit_description">Esci da schermo intero</string>
+    <string name="exo_controls_hide">Nascondi i controlli del player</string>
+    <string name="exo_controls_next_description">Avanti</string>
+    <string name="exo_controls_overflow_hide_description">Nascondi impostazioni aggiuntive</string>
+    <string name="exo_controls_overflow_show_description">Mostra impostazioni aggiuntive</string>
+    <string name="exo_controls_pause_description">Pausa</string>
+    <string name="exo_controls_play_description">Riproduci</string>
+    <string name="exo_controls_playback_speed">Velocità</string>
+    <string name="exo_controls_previous_description">Indietro</string>
+    <string name="exo_controls_repeat_all_description">Modalità attuale: Ripeti tutto. Cambia modalità di ripetizione.</string>
+    <string name="exo_controls_repeat_off_description">Modalità attuale: Non ripetere nulla. Cambia modalità di ripetizione.</string>
+    <string name="exo_controls_repeat_one_description">Modalità attuale: Ripeti uno. Cambia modalità di ripetizione.</string>
+    <string name="exo_controls_rewind_description">Riavvolgi</string>
+    <string name="exo_controls_seek_bar_description">Avanzamento della riproduzione</string>
+    <string name="exo_controls_settings_description">Impostazioni</string>
+    <string name="exo_controls_show">Mostra i controlli del player</string>
+    <string name="exo_controls_shuffle_off_description">Attiva la riproduzione casuale</string>
+    <string name="exo_controls_shuffle_on_description">Disattiva la riproduzione casuale</string>
+    <string name="exo_controls_stop_description">Interrompi</string>
+    <string name="exo_controls_vr_description">Modalità VR</string>
+    <string name="exo_download_completed">Download completato</string>
+    <string name="exo_download_description">Scarica</string>
+    <string name="exo_download_downloading">Download in corso…</string>
+    <string name="exo_download_failed">Download non riuscito</string>
+    <string name="exo_download_notification_channel_name">Download</string>
+    <string name="exo_download_paused">Download in pausa</string>
+    <string name="exo_download_paused_for_network">Download in attesa di rete</string>
+    <string name="exo_download_paused_for_wifi">Download in attesa di Wi-Fi</string>
+    <string name="exo_download_removing">Rimozione dei download…</string>
+    <string name="exo_item_list">%1$s, %2$s</string>
+    <string name="exo_track_bitrate">%1$.2f Mbps</string>
+    <string name="exo_track_mono">Mono</string>
+    <string name="exo_track_resolution">%1$d × %2$d</string>
+    <string name="exo_track_role_alternate">Versione alternativa</string>
+    <string name="exo_track_role_closed_captions">Sottotitoli</string>
+    <string name="exo_track_role_commentary">Commenti</string>
+    <string name="exo_track_role_supplementary">Contenuti supplementari</string>
+    <string name="exo_track_selection_auto">Auto</string>
+    <string name="exo_track_selection_none">Nessuno</string>
+    <string name="exo_track_selection_title_audio">Audio</string>
+    <string name="exo_track_stereo">Stereo</string>
+    <string name="exo_track_surround">Audio surround</string>
+    <string name="exo_track_surround_5_point_1">Audio surround 5.1</string>
+    <string name="exo_track_surround_7_point_1">Audio surround 7.1</string>
+    <string name="exo_track_unknown">Sconosciuta</string>
+    <string name="exo_track_unknown_name">Sconosciute (%1$s)</string>
+    <string name="feed_all_sub">Tutto Reddit</string>
+    <string name="feed_empty">Nessun post disponibile</string>
+    <string name="feed_personal">Feed Personale</string>
+    <string name="feed_personal_sub">Le tue iscrizioni</string>
+    <string name="feed_popular_sub">Tendenze globali</string>
+    <string name="horologist_picker_confirm_button_content_description">Conferma</string>
+    <string name="horologist_picker_day">Giorno</string>
+    <string name="horologist_picker_month">Mese</string>
+    <string name="horologist_picker_next_button_content_description">Avanti</string>
+    <string name="horologist_picker_year">Anno</string>
+    <string name="horologist_placeholderchip_content_description">Caricamento in corso…</string>
+    <string name="horologist_split_toggle_chip_off_state_description">Off</string>
+    <string name="horologist_split_toggle_chip_on_state_description">On</string>
+    <string name="horologist_stepper_decrease_content_description">Riduci</string>
+    <string name="horologist_stepper_increase_content_description">Aumenta</string>
+    <string name="horologist_time_picker_hour">Ora</string>
+    <string name="horologist_time_picker_min">Min</string>
+    <string name="horologist_time_picker_minute">Minuto</string>
+    <string name="horologist_time_picker_period">Periodo</string>
+    <string name="horologist_time_picker_second">Secondo</string>
+    <string name="horologist_toggle_button_off_state_description">Off</string>
+    <string name="horologist_toggle_button_on_state_description">On</string>
+    <string name="horologist_toggle_chip_off_state_description">Off</string>
+    <string name="horologist_toggle_chip_on_state_description">On</string>
+    <string msgid="6827826412747255547" name="in_progress">"In corso"</string>
+    <string msgid="7933458017204019916" name="indeterminate">"Elemento parzialmente selezionato"</string>
+    <string name="load_more">Carica altri</string>
+    <string name="loading_comments">Caricamento commenti…</string>
+    <string name="loading_feed">Caricamento feed…</string>
+    <string name="loading_profile">Caricamento profilo…</string>
+    <string name="loading_saved">Caricamento salvati…</string>
+    <string name="loading_subreddits">Caricamento subreddit…</string>
+    <string name="login_button_phone">Apri su telefono</string>
+    <string name="login_desc">Usa il telefono o inserisci il tuo Client ID personale</string>
+    <string name="login_guest">Continua come ospite</string>
+    <string name="login_title">Collega Reddit</string>
+    <string name="logout">Disconnetti</string>
+    <string msgid="542007171693138492" name="navigation_menu">"Menu di navigazione"</string>
+    <string name="news_tile_name">Flash Notizie</string>
+    <string name="no_saved_posts">Nessun post salvato</string>
+    <string msgid="6610465462668679431" name="not_selected">"Opzione non selezionata"</string>
+    <string name="open_on_phone">Apri su telefono</string>
+    <string msgid="5941395253238309765" name="range_end">"Fine intervallo"</string>
+    <string msgid="7097486360902471446" name="range_start">"Inizio intervallo"</string>
+    <string name="reply_to_post">Rispondi al post</string>
+    <string name="reply_to_user">Rispondi a u/%1$s</string>
+    <string name="retry">Riprova</string>
+    <string name="saved_tile_name">I Miei Salvati</string>
+    <string name="search_reddit_hint">Cerca su Reddit...</string>
+    <string name="search_searching">Ricerca in corso…</string>
+    <string name="search_sub_hint">Feed e post</string>
+    <string name="section_comments">Commenti</string>
+    <string name="section_karma">Karma</string>
+    <string name="section_posts">Post</string>
+    <string name="section_total">Totale</string>
+    <string msgid="6043586758067023" name="selected">"Elemento selezionato"</string>
+    <string name="settings_inbox">Posta in arrivo</string>
+    <string name="settings_messages">Messaggi</string>
+    <string name="settings_open_mobile">Accedi su smartphone</string>
+    <string name="settings_saved">Salvati</string>
+    <string name="settings_saved_sub">Post e commenti</string>
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_version_title">Wrist for Reddit</string>
+    <string msgid="2792228137354697160" name="snackbar_pane_title">"Avviso"</string>
+    <string msgid="4139871816613051306" name="state_empty">"Vuoto"</string>
+    <string msgid="5834637030682409883" name="state_off">"Off"</string>
+    <string msgid="1490883874751719580" name="state_on">"On"</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="2561197295334830845" name="switch_role">"Opzione"</string>
+    <string msgid="1672349317127674378" name="tab">"Scheda"</string>
+    <string name="tab_comments">Commenti</string>
+    <string name="tab_posts">Post</string>
+    <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g> percento."</string>
+    <string name="tile_name">Feed Personale</string>
+    <string msgid="3765533235322692011" name="tooltip_description">"Descrizione comando"</string>
+    <string msgid="3124740595719787496" name="tooltip_label">"Mostra descrizione comando"</string>
+    <string msgid="8440144719909288057" name="wear_m3c_picker_confirm_button_content_description">"Conferma"</string>
+    <string msgid="5670838450714030035" name="wear_m3c_time_picker_hour">"Ora"</string>
+    <string msgid="2847700380677127030" name="wear_m3c_time_picker_minute">"Minuto"</string>
+    <string msgid="5567285614451063120" name="wear_m3c_time_picker_period">"Periodo"</string>
+    <string msgid="5551916170669814925" name="wear_m3c_time_picker_second">"Secondo"</string>
+    <string name="write_reply_hint">Scrivi la tua risposta...</string>
+    <string msgid="8863821639144537553" name="ws_action_drawer_content_description">"Riquadro a scomparsa delle azioni"</string>
+    <string msgid="777117228299084604" name="ws_navigation_drawer_content_description">"Riquadro di navigazione a scomparsa"</string>
+</resources>

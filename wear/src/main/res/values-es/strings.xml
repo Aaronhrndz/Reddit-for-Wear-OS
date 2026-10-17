@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wrist for Reddit</string>
+    <string name="tile_name">Feed Personal Reddit</string>
+    <string name="news_tile_name">Titulares Flash Reddit</string>
+    <string name="saved_tile_name">Mis Guardados Reddit</string>
+    <string name="login_title">Conectar Reddit</string>
+    <string name="login_desc">Usa tu teléfono o ingresa tu Client ID personal para iniciar sesión</string>
+    <string name="login_button_phone">Abrir en teléfono</string>
+    <string name="login_guest">Continuar como invitado</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="client_id_label">Reddit Client ID</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="feed_empty">No hay publicaciones disponibles</string>
+    <string name="comments_empty">No hay comentarios en este post</string>
+
+    <!-- General UI -->
+    <string name="loading_feed">Cargando feed…</string>
+    <string name="loading_comments">Cargando comentarios…</string>
+    <string name="loading_profile">Cargando perfil…</string>
+    <string name="loading_saved">Cargando posts guardados…</string>
+    <string name="loading_subreddits">Cargando subs…</string>
+    <string name="retry">Reintentar</string>
+    <string name="search_reddit_hint">Buscar en Reddit...</string>
+    <string name="search_sub_hint">Feeds y posts</string>
+    <string name="search_searching">Buscando…</string>
+    <string name="no_saved_posts">No tienes nada guardado</string>
+    <string name="load_more">Cargar más</string>
+    <string name="open_on_phone">Abrir en el móvil</string>
+    <string name="reply_to_post">Responder al post</string>
+    <string name="reply_to_user">Responder a u/%1$s</string>
+    <string name="edit_comment">Editar comentario</string>
+    <string name="write_reply_hint">Escribe tu respuesta...</string>
+    <string name="delete_comment">Borrar</string>
+    <string name="delete_confirm_title">¿Borrar comentario?</string>
+    <string name="confirm">Borrar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="bookmark_save">Guardar</string>
+    <string name="bookmark_saved">Guardado</string>
+    <string name="feed_personal">Feed Personal</string>
+    <string name="feed_personal_sub">Tus suscripciones</string>
+    <string name="feed_popular_sub">Tendencias globales</string>
+    <string name="feed_all_sub">Todo Reddit</string>
+    <string name="section_karma">Karma</string>
+    <string name="section_total">Total</string>
+    <string name="section_posts">Posts</string>
+    <string name="section_comments">Comentarios</string>
+    <string name="tab_posts">Posts</string>
+    <string name="tab_comments">Comentarios</string>
+    <string name="settings_messages">Mensajes</string>
+    <string name="settings_inbox">Bandeja de entrada</string>
+    <string name="settings_saved">Guardados</string>
+    <string name="settings_saved_sub">Posts y comentarios</string>
+    <string name="settings_open_mobile">Abrir Login en Móvil</string>
+    <string name="settings_version_title">Wrist for Reddit</string>
+</resources>

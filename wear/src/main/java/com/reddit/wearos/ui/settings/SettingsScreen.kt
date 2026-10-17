@@ -12,9 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reddit.wearos.R
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.*
@@ -176,8 +177,8 @@ fun SettingsScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text("Mensajes", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
-                        secondaryLabel = { Text("Bandeja de entrada", fontSize = 9.sp) },
+                        label = { Text(stringResource(R.string.settings_messages), fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                        secondaryLabel = { Text(stringResource(R.string.settings_inbox), fontSize = 9.sp) },
                         colors = ChipDefaults.secondaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -194,8 +195,8 @@ fun SettingsScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text("Guardados", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
-                        secondaryLabel = { Text("Posts y comentarios", fontSize = 9.sp) },
+                        label = { Text(stringResource(R.string.settings_saved), fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+                        secondaryLabel = { Text(stringResource(R.string.settings_saved_sub), fontSize = 9.sp) },
                         colors = ChipDefaults.secondaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -218,7 +219,7 @@ fun SettingsScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text("Cerrar Sesión", fontSize = 11.sp) },
+                        label = { Text(stringResource(R.string.logout), fontSize = 11.sp) },
                         colors = ChipDefaults.secondaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -236,7 +237,7 @@ fun SettingsScreen(
                                 modifier = Modifier.size(16.dp)
                             )
                         },
-                        label = { Text("Abrir Login en Móvil", fontSize = 11.sp) },
+                        label = { Text(stringResource(R.string.settings_open_mobile), fontSize = 11.sp) },
                         colors = ChipDefaults.primaryChipColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -247,10 +248,10 @@ fun SettingsScreen(
             item {
                 val deviceName = "${android.os.Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${android.os.Build.MODEL}"
                 Text(
-                    text = "Reddit for Wear OS v1.1.0\n$deviceName",
+                    text = "${stringResource(R.string.settings_version_title)} v1.5.0\n$deviceName",
                     fontSize = 9.sp,
                     color = TextSecondary,
-                    textAlign = TextAlign.Center,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     modifier = Modifier.padding(top = 6.dp)
                 )
             }

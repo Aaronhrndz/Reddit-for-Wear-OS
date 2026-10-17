@@ -27,7 +27,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import com.reddit.wearos.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -97,7 +99,7 @@ fun ReplyDialog(
             ) {
                 item {
                     Text(
-                        text = dialogTitle ?: "Responder a u/$author",
+                        text = dialogTitle ?: stringResource(R.string.reply_to_user, author),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = RedditOrange,
@@ -117,7 +119,7 @@ fun ReplyDialog(
                     ) {
                         if (text.isEmpty()) {
                             Text(
-                                text = "Escribe tu respuesta...",
+                                text = stringResource(R.string.write_reply_hint),
                                 fontSize = 11.sp,
                                 color = TextSecondary
                             )

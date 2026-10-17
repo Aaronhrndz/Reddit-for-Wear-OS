@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Wrist for Reddit Companion</string>
+    <string name="btn_login">Iniciar sesión en Reddit</string>
+    <string name="btn_sync">Sincronizar con Reloj</string>
     <string msgid="881409763997275156" name="call_notification_answer_action">"Responder"</string>
     <string msgid="8793775615905189152" name="call_notification_answer_video_action">"Vídeo"</string>
     <string msgid="3229508546291798546" name="call_notification_decline_action">"Rechazar"</string>
@@ -7,6 +10,7 @@
     <string msgid="6107532579223922871" name="call_notification_incoming_text">"Llamada entrante"</string>
     <string msgid="8623827134497363134" name="call_notification_ongoing_text">"Llamada en curso"</string>
     <string msgid="59049573811482460" name="call_notification_screening_text">"Filtrando una llamada entrante"</string>
+    <string name="client_id_hint">Introduce tu Client ID de Reddit</string>
     <string msgid="406453423630273620" name="close_drawer">"Cerrar menú de navegación"</string>
     <string msgid="7573152094250666567" name="close_sheet">"Cerrar hoja"</string>
     <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Habilitar</string>
@@ -96,9 +100,12 @@
     <string msgid="7097486360902471446" name="range_start">"Inicio del intervalo"</string>
     <string msgid="6043586758067023" name="selected">"Seleccionado"</string>
     <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string name="status_connected">Conectado con reloj</string>
+    <string name="status_disconnected">Buscando reloj...</string>
     <string msgid="2561197295334830845" name="switch_role">"Interruptor"</string>
     <string msgid="1672349317127674378" name="tab">"Pestaña"</string>
     <string msgid="5946805113151406391" name="template_percent">"<ns1:g id="PERCENTAGE">%1$d</ns1:g> por cien."</string>
+    <string name="title_setup">Wrist for Reddit - Configuración</string>
     <string msgid="3765533235322692011" name="tooltip_description">"descripción emergente"</string>
     <string msgid="3124740595719787496" name="tooltip_label">"mostrar descripción emergente"</string>
 </resources>

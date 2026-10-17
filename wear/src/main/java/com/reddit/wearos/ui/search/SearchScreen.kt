@@ -22,10 +22,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reddit.wearos.R
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -327,7 +329,7 @@ fun SearchScreen(
                                 indicatorColor = RedditOrange
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text("Buscando…", fontSize = 9.sp, color = TextSecondary)
+                            Text(stringResource(R.string.search_searching), fontSize = 9.sp, color = TextSecondary)
                         }
                     }
                 }

@@ -323,14 +323,63 @@ fun formatRelativeTime(createdUtc: Double): String {
     if (createdUtc <= 0.0) return ""
     val nowSec = System.currentTimeMillis() / 1000L
     val diffSec = (nowSec - createdUtc.toLong()).coerceAtLeast(0L)
-    return when {
-        diffSec < 60L -> "ahora"
-        diffSec < 3600L -> "hace ${diffSec / 60L}m"
-        diffSec < 86400L -> "hace ${diffSec / 3600L}h"
-        diffSec < 604800L -> "hace ${diffSec / 86400L}d"
-        diffSec < 2592000L -> "hace ${diffSec / 604800L}sem"
-        diffSec < 31536000L -> "hace ${diffSec / 2592000L}mes"
-        else -> "hace ${diffSec / 31536000L}a"
+    val lang = java.util.Locale.getDefault().language.lowercase()
+
+    return when (lang) {
+        "es" -> when {
+            diffSec < 60L -> "ahora"
+            diffSec < 3600L -> "hace ${diffSec / 60L}m"
+            diffSec < 86400L -> "hace ${diffSec / 3600L}h"
+            diffSec < 604800L -> "hace ${diffSec / 86400L}d"
+            diffSec < 2592000L -> "hace ${diffSec / 604800L}sem"
+            diffSec < 31536000L -> "hace ${diffSec / 2592000L}mes"
+            else -> "hace ${diffSec / 31536000L}a"
+        }
+        "fr" -> when {
+            diffSec < 60L -> "maintenant"
+            diffSec < 3600L -> "il y a ${diffSec / 60L}m"
+            diffSec < 86400L -> "il y a ${diffSec / 3600L}h"
+            diffSec < 604800L -> "il y a ${diffSec / 86400L}j"
+            diffSec < 2592000L -> "il y a ${diffSec / 604800L}sem"
+            diffSec < 31536000L -> "il y a ${diffSec / 2592000L}m"
+            else -> "il y a ${diffSec / 31536000L}a"
+        }
+        "de" -> when {
+            diffSec < 60L -> "jetzt"
+            diffSec < 3600L -> "vor ${diffSec / 60L}m"
+            diffSec < 86400L -> "vor ${diffSec / 3600L}h"
+            diffSec < 604800L -> "vor ${diffSec / 86400L}t"
+            diffSec < 2592000L -> "vor ${diffSec / 604800L}w"
+            diffSec < 31536000L -> "vor ${diffSec / 2592000L}m"
+            else -> "vor ${diffSec / 31536000L}j"
+        }
+        "pt" -> when {
+            diffSec < 60L -> "agora"
+            diffSec < 3600L -> "há ${diffSec / 60L}m"
+            diffSec < 86400L -> "há ${diffSec / 3600L}h"
+            diffSec < 604800L -> "há ${diffSec / 86400L}d"
+            diffSec < 2592000L -> "há ${diffSec / 604800L}sem"
+            diffSec < 31536000L -> "há ${diffSec / 2592000L}m"
+            else -> "há ${diffSec / 31536000L}a"
+        }
+        "it" -> when {
+            diffSec < 60L -> "adesso"
+            diffSec < 3600L -> "${diffSec / 60L}m fa"
+            diffSec < 86400L -> "${diffSec / 3600L}h fa"
+            diffSec < 604800L -> "${diffSec / 86400L}g fa"
+            diffSec < 2592000L -> "${diffSec / 604800L}sett fa"
+            diffSec < 31536000L -> "${diffSec / 2592000L}m fa"
+            else -> "${diffSec / 31536000L}a fa"
+        }
+        else -> when {
+            diffSec < 60L -> "just now"
+            diffSec < 3600L -> "${diffSec / 60L}m ago"
+            diffSec < 86400L -> "${diffSec / 3600L}h ago"
+            diffSec < 604800L -> "${diffSec / 86400L}d ago"
+            diffSec < 2592000L -> "${diffSec / 604800L}w ago"
+            diffSec < 31536000L -> "${diffSec / 2592000L}mo ago"
+            else -> "${diffSec / 31536000L}y ago"
+        }
     }
 }
 

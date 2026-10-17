@@ -1,6 +1,8 @@
-# ⌚ Reddit for Wear OS & Mobile Companion
+# ⌚ Wrist for Reddit (Wear OS & Mobile Companion)
 
-Cliente moderno, fluido y nativo de Reddit para smartwatches con **Wear OS 4 / 5** (optimizado para **Galaxy Watch Ultra 2 / 7 / 6 / 5 / 4**) y app complementaria para smartphones Android.
+> **Disclaimer**: *Wrist for Reddit is an unofficial, community-driven open-source client. It is not affiliated with, endorsed, sponsored, or associated with Reddit Inc. in any way.*
+
+Cliente moderno, fluido y nativo para smartwatches con **Wear OS 4 / 5** (optimizado para **Galaxy Watch Ultra 2 / 7 / 6 / 5 / 4**, Pixel Watch y TicWatch) y app complementaria para smartphones Android.
 
 Diseñado desde cero con **Jetpack Compose for Wear OS**, soporte para **bisel rotatorio/corona**, reproductor de vídeo nativo, modo de lectura continuo en **Always On Display monocromo** y sincronización en 1 toque.
 
@@ -96,4 +98,4 @@ El proyecto incluye un entorno de compilación totalmente portátil y automatiza
 
 ## 📄 Licencia
 
-Desarrollado bajo licencia libre para uso personal y comunitario.
+Este proyecto está bajo la Licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.

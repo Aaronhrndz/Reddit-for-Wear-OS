@@ -27,8 +27,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reddit.wearos.R
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumnDefaults
 import androidx.wear.compose.foundation.lazy.items
@@ -286,7 +288,7 @@ fun PostDetailScreen(
                                 },
                                 label = {
                                     Text(
-                                        text = if (post.saved) "Guardado" else "Guardar",
+                                        text = if (post.saved) stringResource(R.string.bookmark_saved) else stringResource(R.string.bookmark_save),
                                         fontSize = 10.sp
                                     )
                                 },
@@ -312,7 +314,7 @@ fun PostDetailScreen(
                             },
                             label = {
                                 Text(
-                                    text = "Responder al post",
+                                    text = stringResource(R.string.reply_to_post),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -340,7 +342,7 @@ fun PostDetailScreen(
                             },
                             label = {
                                 Text(
-                                    text = "Abrir en el móvil",
+                                    text = stringResource(R.string.open_on_phone),
                                     fontSize = 10.sp,
                                     color = TextSecondary
                                 )
@@ -367,7 +369,7 @@ fun PostDetailScreen(
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
-                                    Text("Cargando comentarios…", fontSize = 9.sp, color = TextSecondary)
+                                    Text(stringResource(R.string.loading_comments), fontSize = 9.sp, color = TextSecondary)
                                 }
                             }
                         }
@@ -636,7 +638,7 @@ fun InlineCommentCard(
                             ) {
                                 if (confirmDelete) {
                                     Text(
-                                        text = "¿Borrar?",
+                                        text = stringResource(R.string.delete_confirm_title),
                                         fontSize = 7.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White
@@ -644,7 +646,7 @@ fun InlineCommentCard(
                                 } else {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
-                                        contentDescription = "Borrar",
+                                        contentDescription = stringResource(R.string.delete_comment),
                                         tint = Color(0xFFFF8A80),
                                         modifier = Modifier.size(10.dp)
                                     )
