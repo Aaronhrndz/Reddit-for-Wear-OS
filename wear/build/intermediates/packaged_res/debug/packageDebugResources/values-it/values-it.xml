@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wrist for Reddit</string>
+    <string name="app_name">Red for Reddit</string>
     <string name="bookmark_save">Salva</string>
     <string name="bookmark_saved">Salvato</string>
     <string name="cancel">Annulla</string>
@@ -46,7 +46,7 @@
     <string name="settings_saved">Salvati</string>
     <string name="settings_saved_sub">Post e commenti</string>
     <string name="settings_title">Impostazioni</string>
-    <string name="settings_version_title">Wrist for Reddit</string>
+    <string name="settings_version_title">Red for Reddit</string>
     <string name="tab_comments">Commenti</string>
     <string name="tab_posts">Post</string>
     <string name="tile_name">Feed Personale</string>

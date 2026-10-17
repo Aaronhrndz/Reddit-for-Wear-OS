@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wrist for Reddit Companion</string>
-    <string name="title_setup">Wrist for Reddit - Configuración</string>
+    <string name="app_name">Red for Reddit Companion</string>
+    <string name="title_setup">Red for Reddit - Configuración</string>
     <string name="client_id_hint">Introduce tu Client ID de Reddit</string>
     <string name="btn_login">Iniciar sesión en Reddit</string>
     <string name="btn_sync">Sincronizar con Reloj</string>

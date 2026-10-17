@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wrist for Reddit</string>
+    <string name="app_name">Red for Reddit</string>
     <string name="bookmark_save">Enregistrer</string>
     <string name="bookmark_saved">Enregistré</string>
     <string name="cancel">Annuler</string>
@@ -46,7 +46,7 @@
     <string name="settings_saved">Enregistrements</string>
     <string name="settings_saved_sub">Publications et commentaires</string>
     <string name="settings_title">Paramètres</string>
-    <string name="settings_version_title">Wrist for Reddit</string>
+    <string name="settings_version_title">Red for Reddit</string>
     <string name="tab_comments">Commentaires</string>
     <string name="tab_posts">Publications</string>
     <string name="tile_name">Fil Personnel</string>

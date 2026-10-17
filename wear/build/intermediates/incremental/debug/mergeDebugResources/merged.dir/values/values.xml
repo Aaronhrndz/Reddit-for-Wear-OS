@@ -457,7 +457,7 @@
         <item quantity="other">%d Seconds</item>
     </plurals>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
-    <string name="app_name">Wrist for Reddit</string>
+    <string name="app_name">Red for Reddit</string>
     <string name="bookmark_save">Save</string>
     <string name="bookmark_saved">Saved</string>
     <string name="call_notification_answer_action">Answer</string>
@@ -614,7 +614,7 @@
     <string name="settings_saved">Saved</string>
     <string name="settings_saved_sub">Posts and comments</string>
     <string name="settings_title">Settings</string>
-    <string name="settings_version_title">Wrist for Reddit</string>
+    <string name="settings_version_title">Red for Reddit</string>
     <string name="snackbar_pane_title">Alert</string>
     <string name="state_empty">Empty</string>
     <string name="state_off">Off</string>

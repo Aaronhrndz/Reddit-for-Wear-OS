@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wrist for Reddit Companion</string>
+    <string name="app_name">Red for Reddit Companion</string>
     <string name="btn_login">Sign in to Reddit</string>
     <string name="btn_sync">Sync with Watch</string>
     <string name="client_id_hint">Enter your Reddit Client ID</string>
     <string name="status_connected">Connected to watch</string>
     <string name="status_disconnected">Looking for watch...</string>
-    <string name="title_setup">Wrist for Reddit - Setup</string>
+    <string name="title_setup">Red for Reddit - Setup</string>
 </resources>

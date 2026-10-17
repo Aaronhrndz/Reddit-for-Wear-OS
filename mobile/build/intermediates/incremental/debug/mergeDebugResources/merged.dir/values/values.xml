@@ -106,7 +106,7 @@
     <integer name="google_play_services_version">12451000</integer>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
-    <string name="app_name">Wrist for Reddit Companion</string>
+    <string name="app_name">Red for Reddit Companion</string>
     <string name="btn_login">Sign in to Reddit</string>
     <string name="btn_sync">Sync with Watch</string>
     <string name="call_notification_answer_action">Answer</string>
@@ -215,7 +215,7 @@
     <string name="switch_role">Switch</string>
     <string name="tab">Tab</string>
     <string name="template_percent"><ns1:g id="percentage">%1$d</ns1:g> percent.</string>
-    <string name="title_setup">Wrist for Reddit - Setup</string>
+    <string name="title_setup">Red for Reddit - Setup</string>
     <string name="tooltip_description">tooltip</string>
     <string name="tooltip_label">show tooltip</string>
     <style name="DialogWindowTheme">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wrist for Reddit</string>
+    <string name="app_name">Red for Reddit</string>
     <string name="tile_name">Fil Personnel</string>
     <string name="news_tile_name">Flash Actualités</string>
     <string name="saved_tile_name">Mes Enregistrements</string>
@@ -50,5 +50,5 @@
     <string name="settings_saved">Enregistrements</string>
     <string name="settings_saved_sub">Publications et commentaires</string>
     <string name="settings_open_mobile">Connexion sur mobile</string>
-    <string name="settings_version_title">Wrist for Reddit</string>
+    <string name="settings_version_title">Red for Reddit</string>
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wrist for Reddit</string>
+    <string name="app_name">Red for Reddit</string>
     <string name="tile_name">Feed Personal Reddit</string>
     <string name="news_tile_name">Titulares Flash Reddit</string>
     <string name="saved_tile_name">Mis Guardados Reddit</string>
@@ -52,5 +52,5 @@
     <string name="settings_saved">Guardados</string>
     <string name="settings_saved_sub">Posts y comentarios</string>
     <string name="settings_open_mobile">Abrir Login en Móvil</string>
-    <string name="settings_version_title">Wrist for Reddit</string>
+    <string name="settings_version_title">Red for Reddit</string>
 </resources>

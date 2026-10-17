@@ -1,6 +1,6 @@
-# ⌚ Wrist for Reddit (Wear OS & Mobile Companion)
+# ⌚ Red for Reddit (Wear OS & Mobile Companion)
 
-> **Disclaimer**: *Wrist for Reddit is an unofficial, community-driven open-source client. It is not affiliated with, endorsed, sponsored, or associated with Reddit Inc. in any way.*
+> **Disclaimer**: *Red for Reddit is an unofficial, community-driven open-source client. It is not affiliated with, endorsed, sponsored, or associated with Reddit Inc. in any way.*
 
 Cliente moderno, fluido y nativo para smartwatches con **Wear OS 4 / 5** (optimizado para **Galaxy Watch Ultra 2 / 7 / 6 / 5 / 4**, Pixel Watch y TicWatch) y app complementaria para smartphones Android.
 

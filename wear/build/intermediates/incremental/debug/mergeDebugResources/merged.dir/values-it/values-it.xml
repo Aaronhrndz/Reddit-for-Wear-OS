@@ -44,7 +44,7 @@
       <item quantity="other">%d secondi</item>
       <item quantity="one">%d secondo</item>
     </plurals>
-    <string name="app_name">Wrist for Reddit</string>
+    <string name="app_name">Red for Reddit</string>
     <string name="bookmark_save">Salva</string>
     <string name="bookmark_saved">Salvato</string>
     <string msgid="881409763997275156" name="call_notification_answer_action">"Rispondi"</string>
@@ -199,7 +199,7 @@
     <string name="settings_saved">Salvati</string>
     <string name="settings_saved_sub">Post e commenti</string>
     <string name="settings_title">Impostazioni</string>
-    <string name="settings_version_title">Wrist for Reddit</string>
+    <string name="settings_version_title">Red for Reddit</string>
     <string msgid="2792228137354697160" name="snackbar_pane_title">"Avviso"</string>
     <string msgid="4139871816613051306" name="state_empty">"Vuoto"</string>
     <string msgid="5834637030682409883" name="state_off">"Off"</string>
