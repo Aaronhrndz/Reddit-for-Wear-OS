@@ -33,7 +33,11 @@ import androidx.media3.ui.PlayerView
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
+import com.reddit.wearos.LocalIsAmbient
 import com.reddit.wearos.ui.theme.RedditOrange
 import kotlinx.coroutines.delay
 
@@ -58,10 +62,37 @@ fun WearVideoPlayer(
     var retryTrigger by remember { mutableIntStateOf(0) }
     var urlIndex by remember { mutableIntStateOf(0) }
 
+    val isAmbient = LocalIsAmbient.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     val candidates = remember(videoUrl, fallbackUrl) {
         listOf(videoUrl.replace("&amp;", "&"), fallbackUrl?.replace("&amp;", "&"))
             .filterNotNull()
             .distinct()
+    }
+
+    // Pausar vídeo inmediatamente al entrar en Always-On Display (AOD) para no drenar batería
+    LaunchedEffect(isAmbient) {
+        if (isAmbient) {
+            try {
+                playerRef?.playWhenReady = false
+            } catch (_: Exception) {}
+        }
+    }
+
+    // Pausar vídeo cuando la actividad pasa a segundo plano (ON_PAUSE / ON_STOP)
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+                try {
+                    playerRef?.playWhenReady = false
+                } catch (_: Exception) {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     // Limpieza al desmontar o al reintentar / cambiar de URL candidata
@@ -79,9 +110,9 @@ fun WearVideoPlayer(
         playerRef?.volume = if (isMuted) 0f else 1f
     }
 
-    // Ticker para progreso de reproducción
-    LaunchedEffect(isPlaying, hasStartedPlayback, hasError) {
-        while (hasStartedPlayback && isPlaying && !hasError) {
+    // Ticker para progreso de reproducción (se detiene en AOD o pausa)
+    LaunchedEffect(isPlaying, hasStartedPlayback, hasError, isAmbient) {
+        while (hasStartedPlayback && isPlaying && !hasError && !isAmbient) {
             try {
                 playerRef?.let { p ->
                     currentPositionMs = p.currentPosition.coerceAtLeast(0)
@@ -191,6 +222,7 @@ fun WearVideoPlayer(
                     },
                     update = { view ->
                         view.player?.volume = if (isMuted) 0f else 1f
+                        view.keepScreenOn = isPlaying && !isAmbient
                     },
                     modifier = Modifier
                         .fillMaxSize()

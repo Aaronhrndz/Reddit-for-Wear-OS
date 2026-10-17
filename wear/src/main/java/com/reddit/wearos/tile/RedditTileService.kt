@@ -47,9 +47,14 @@ class RedditTileService : TileService() {
             TileBuilders.Tile.Builder()
                 .setResourcesVersion("1")
                 .setTileTimeline(timeline)
-                .setFreshnessIntervalMillis(10 * 60 * 1000L)
+                .setFreshnessIntervalMillis(60 * 60 * 1000L)
                 .build()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.coroutineContext[kotlinx.coroutines.Job]?.cancel()
     }
 
     override fun onTileResourcesRequest(requestParams: RequestBuilders.ResourcesRequest): ListenableFuture<ResourceBuilders.Resources> {

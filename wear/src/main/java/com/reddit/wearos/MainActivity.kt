@@ -54,7 +54,6 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         super.onCreate(savedInstanceState)
 
         app = application as RedditWearApp
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         ambientController = AmbientModeSupport.attach(this)
 
         handleAuthIntent(intent)

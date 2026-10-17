@@ -38,7 +38,7 @@ object NetworkClient {
                 socketTimeoutMillis = 15000
             }
             install(Logging) {
-                level = LogLevel.INFO
+                level = LogLevel.NONE
             }
         }
     }
