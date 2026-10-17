@@ -98,4 +98,4 @@ El proyecto incluye un entorno de compilación totalmente portátil y automatiza
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia **MIT**. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está protegido bajo la Licencia **GNU General Public License v3.0 (GPLv3)**. Consulta el archivo [LICENSE](LICENSE) para más detalles. Todo derivado o modificación de este software debe mantenerse de código abierto y bajo esta misma licencia.
