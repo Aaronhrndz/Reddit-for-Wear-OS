@@ -519,6 +519,60 @@ class RedditApiService(
         }
     }
 
+    suspend fun editComment(thingId: String, text: String): Boolean = withContext(Dispatchers.IO) {
+        val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
+        val url = if (isBearer) "https://oauth.reddit.com/api/editusertext" else "https://old.reddit.com/api/editusertext"
+        val formattedThingId = if (thingId.startsWith("t1_") || thingId.startsWith("t3_")) thingId else "t1_$thingId"
+        val uh = if (!isBearer) ensureModhash() else null
+        try {
+            val response = httpClient.submitForm(
+                url = url,
+                formParameters = Parameters.build {
+                    append("api_type", "json")
+                    append("thing_id", formattedThingId)
+                    append("text", text)
+                    if (!uh.isNullOrEmpty()) append("uh", uh)
+                }
+            ) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+            }
+            val resText = response.bodyAsText()
+            Log.d(TAG, "editComment result for $formattedThingId: status=${response.status.value}")
+            !resText.contains("NO_USER") && !resText.contains("USER_REQUIRED") && response.status.value in 200..299
+        } catch (e: Exception) {
+            Log.e(TAG, "Error editing comment: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun deleteComment(thingId: String): Boolean = withContext(Dispatchers.IO) {
+        val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
+        val url = if (isBearer) "https://oauth.reddit.com/api/del" else "https://old.reddit.com/api/del"
+        val formattedThingId = if (thingId.startsWith("t1_") || thingId.startsWith("t3_")) thingId else "t1_$thingId"
+        val uh = if (!isBearer) ensureModhash() else null
+        try {
+            val response = httpClient.submitForm(
+                url = url,
+                formParameters = Parameters.build {
+                    append("id", formattedThingId)
+                    if (!uh.isNullOrEmpty()) append("uh", uh)
+                }
+            ) {
+                authHeader?.let { (k, v) -> header(k, v) }
+                header("User-Agent", USER_AGENT)
+            }
+            val resText = response.bodyAsText()
+            Log.d(TAG, "deleteComment result for $formattedThingId: status=${response.status.value}")
+            !resText.contains("NO_USER") && !resText.contains("USER_REQUIRED") && response.status.value in 200..299
+        } catch (e: Exception) {
+            Log.e(TAG, "Error deleting comment: ${e.message}")
+            false
+        }
+    }
+
     suspend fun getInbox(limit: Int = 25): List<RedditMessage> = withContext(Dispatchers.IO) {
         val authHeader = getAuthHeader()
         val isBearer = authHeader?.first == "Authorization"
@@ -559,9 +613,9 @@ class RedditApiService(
         after: String? = null,
         limit: Int = 25
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/user/$username/submitted" else "https://api.reddit.com/user/$username/submitted"
+        val isBearer = authHeader?.first == "Authorization"
+        val url = if (isBearer) "https://oauth.reddit.com/user/$username/submitted" else "https://old.reddit.com/user/$username/submitted.json"
         try {
             val responseText = httpClient.get(url) {
                 authHeader?.let { (k, v) -> header(k, v) }
@@ -586,9 +640,9 @@ class RedditApiService(
         after: String? = null,
         limit: Int = 25
     ): List<RedditComment> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/user/$username/comments" else "https://api.reddit.com/user/$username/comments"
+        val isBearer = authHeader?.first == "Authorization"
+        val url = if (isBearer) "https://oauth.reddit.com/user/$username/comments" else "https://old.reddit.com/user/$username/comments.json"
         try {
             val responseText = httpClient.get(url) {
                 authHeader?.let { (k, v) -> header(k, v) }
@@ -613,15 +667,16 @@ class RedditApiService(
         query: String,
         subreddit: String? = null,
         sort: String = "relevance",
+        timeRange: String = "all",
         after: String? = null,
         limit: Int = 25
     ): RedditListing<RedditPost> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
+        val isBearer = authHeader?.first == "Authorization"
         val url = if (isBearer) {
             if (!subreddit.isNullOrEmpty() && subreddit != "home") "https://oauth.reddit.com/r/$subreddit/search" else "https://oauth.reddit.com/search"
         } else {
-            if (!subreddit.isNullOrEmpty() && subreddit != "home") "https://api.reddit.com/r/$subreddit/search" else "https://api.reddit.com/search"
+            if (!subreddit.isNullOrEmpty() && subreddit != "home") "https://old.reddit.com/r/$subreddit/search.json" else "https://old.reddit.com/search.json"
         }
         try {
             val responseText = httpClient.get(url) {
@@ -629,6 +684,7 @@ class RedditApiService(
                 header("User-Agent", USER_AGENT)
                 parameter("q", query)
                 parameter("sort", sort)
+                parameter("t", timeRange)
                 parameter("limit", limit)
                 parameter("raw_json", 1)
                 after?.let { parameter("after", it) }
@@ -648,9 +704,9 @@ class RedditApiService(
     }
 
     suspend fun searchSubreddits(query: String, limit: Int = 20): List<RedditSubreddit> = withContext(Dispatchers.IO) {
-        val isBearer = isBearerAuth()
         val authHeader = getAuthHeader()
-        val url = if (isBearer) "https://oauth.reddit.com/subreddits/search" else "https://api.reddit.com/subreddits/search"
+        val isBearer = authHeader?.first == "Authorization"
+        val url = if (isBearer) "https://oauth.reddit.com/subreddits/search" else "https://old.reddit.com/subreddits/search.json"
         try {
             val responseText = httpClient.get(url) {
                 authHeader?.let { (k, v) -> header(k, v) }

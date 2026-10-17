@@ -151,6 +151,7 @@ fun PostCard(
             )
 
             val previewUrl = post.getThumbnailUrl()
+            val galleryUrls = post.getGalleryImageUrls()
             if (!previewUrl.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Box(
@@ -178,6 +179,22 @@ fun PostCard(
                                 contentDescription = null,
                                 tint = Color.White,
                                 modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    } else if (galleryUrls.size > 1) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(4.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xBB000000))
+                                .padding(horizontal = 5.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "1/${galleryUrls.size}",
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
                             )
                         }
                     }

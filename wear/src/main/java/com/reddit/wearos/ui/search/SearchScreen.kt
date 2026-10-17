@@ -59,6 +59,23 @@ fun SearchScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     var currentQuery by remember { mutableStateOf(initialQuery) }
     var selectedTab by remember { mutableStateOf(SearchTab.FEEDS) }
+    var selectedSort by remember { mutableStateOf("relevance") }
+    var selectedTimeRange by remember { mutableStateOf("all") }
+
+    val sortOptions = listOf(
+        "relevance" to "Relevancia",
+        "new" to "Nuevos",
+        "hot" to "Destacados",
+        "top" to "Top",
+        "comments" to "Comentarios"
+    )
+    val timeOptions = listOf(
+        "all" to "Siempre",
+        "year" to "Año",
+        "month" to "Mes",
+        "week" to "Semana",
+        "day" to "Hoy"
+    )
 
     var isLoading by remember { mutableStateOf(false) }
     var subredditsResult by remember { mutableStateOf<List<RedditSubreddit>>(emptyList()) }
@@ -72,7 +89,11 @@ fun SearchScreen(
                 if (selectedTab == SearchTab.FEEDS) {
                     subredditsResult = repository.searchSubreddits(query.trim())
                 } else {
-                    val (posts, _) = repository.searchPosts(query = query.trim())
+                    val (posts, _) = repository.searchPosts(
+                        query = query.trim(),
+                        sort = selectedSort,
+                        timeRange = selectedTimeRange
+                    )
                     postsResult = posts
                 }
             } catch (_: Exception) {
@@ -82,7 +103,7 @@ fun SearchScreen(
         }
     }
 
-    LaunchedEffect(selectedTab) {
+    LaunchedEffect(selectedTab, selectedSort, selectedTimeRange) {
         if (currentQuery.isNotBlank()) {
             performSearch(currentQuery)
         }
@@ -228,6 +249,66 @@ fun SearchScreen(
                             ChipDefaults.secondaryChipColors(),
                         modifier = Modifier.weight(1f)
                     )
+                }
+            }
+
+            // 2.5 FILTROS DE ORDENACIÓN Y TIEMPO (Solo en pestaña POSTS)
+            if (selectedTab == SearchTab.POSTS) {
+                item {
+                    val currentSortLabel = sortOptions.find { it.first == selectedSort }?.second ?: "Relevancia"
+                    val currentTimeLabel = timeOptions.find { it.first == selectedTimeRange }?.second ?: "Siempre"
+                    val showTimeFilter = selectedSort == "top" || selectedSort == "relevance" || selectedSort == "comments"
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFF23232A))
+                                .clickable {
+                                    val idx = sortOptions.indexOfFirst { it.first == selectedSort }
+                                    selectedSort = sortOptions[(idx + 1) % sortOptions.size].first
+                                }
+                                .padding(horizontal = 6.dp, vertical = 5.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Orden: $currentSortLabel",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = RedditOrange,
+                                maxLines = 1
+                            )
+                        }
+
+                        if (showTimeFilter) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(0xFF23232A))
+                                    .clickable {
+                                        val idx = timeOptions.indexOfFirst { it.first == selectedTimeRange }
+                                        selectedTimeRange = timeOptions[(idx + 1) % timeOptions.size].first
+                                    }
+                                    .padding(horizontal = 6.dp, vertical = 5.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Tiempo: $currentTimeLabel",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White,
+                                    maxLines = 1
+                                )
+                            }
+                        }
+                    }
                 }
             }
 

@@ -638,245 +638,231 @@ fun CompanionScreen(
     onRefreshWatches: () -> Unit
 ) {
     val scrollState = rememberScrollState()
+    var showAdvanced by remember { mutableStateOf(false) }
+    val hasActiveSession = tokenInput.contains("reddit_session=") || tokenInput.length > 40
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 10.dp)
+            .padding(horizontal = 20.dp, vertical = 14.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
+        // Cabecera limpia
         Text(
             text = "Reddit for Wear OS",
-            fontSize = 24.sp,
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
         Text(
-            text = "Sincronizador de Sesión Persistente",
-            fontSize = 14.sp,
-            color = Color(0xFFAAAAAA)
+            text = "Sincronización automática con tu Galaxy Watch",
+            fontSize = 13.sp,
+            color = Color(0xFF9E9E9E)
         )
 
-        // Estado del Reloj
+        // 1. Tarjeta de Estado del Reloj + Sesión
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1E))
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(14.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(18.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Column {
-                    Text("Galaxy Watch", fontWeight = FontWeight.Bold, color = Color.White)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = if (connectedWatches > 0) Icons.Default.CheckCircle else Icons.Default.Watch,
-                            contentDescription = null,
-                            tint = if (connectedWatches > 0) Color(0xFF4CAF50) else Color(0xFFFF9800),
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = if (connectedWatches > 0) "$connectedWatches reloj conectado" else "Buscando reloj vía Bluetooth...",
-                            fontSize = 12.sp,
-                            color = if (connectedWatches > 0) Color(0xFF4CAF50) else Color(0xFFFF9800)
-                        )
-                    }
-                }
-                IconButton(onClick = onRefreshWatches) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Refrescar",
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-            }
-        }
-
-        // SECCIÓN PRINCIPAL: LOGIN WEB PERSISTENTE (1 AÑO, AUTO-RENOVABLE EN EL RELOJ)
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1B281E))
-        ) {
-            Column(modifier = Modifier.padding(14.dp)) {
-                Text(
-                    text = "Inicio de Sesión Persistente (Recomendado)",
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    fontSize = 15.sp
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Captura la cookie maestra reddit_session (válida 1 año con 'Recordarme' activo). El reloj renueva sus tokens por sí solo sin necesitar el móvil.",
-                    fontSize = 11.sp,
-                    color = Color(0xFFB0BEC5)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = onStartLogin,
-                        enabled = !isSyncing,
-                        modifier = Modifier
-                            .weight(1.4f)
-                            .height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Language,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Iniciar Sesión Web",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-
-                    Button(
-                        onClick = onLogout,
-                        enabled = !isSyncing,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF372727)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = null,
-                            tint = Color(0xFFFF8A80),
-                            modifier = Modifier.size(15.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Limpiar",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFF8A80)
-                        )
-                    }
-                }
-            }
-        }
-
-        // Campo de Usuario
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
-        ) {
-            Column(modifier = Modifier.padding(14.dp)) {
-                Text("Usuario de Reddit", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
-                Spacer(modifier = Modifier.height(6.dp))
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = onUsernameChange,
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFFFF4500),
-                        unfocusedBorderColor = Color(0xFF444444)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
-        // Estado de Sesión
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
-        ) {
-            Column(modifier = Modifier.padding(14.dp)) {
-                Text("Estado de la Sincronización", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 13.sp)
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = loginStatus,
-                    fontSize = 13.sp,
-                    color = if (loginStatus.contains("éxito") || loginStatus.contains("sincronizado") || loginStatus.contains("vinculada")) Color(0xFF4CAF50) else Color(0xFFCCCCCC)
-                )
-            }
-        }
-
-        // Tarjeta Token con visualización completa y botón copiar
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
-        ) {
-            Column(modifier = Modifier.padding(14.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Token / Sesión Capturada", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.White)
-                    if (tokenInput.isNotEmpty()) {
-                        Button(
-                            onClick = onCopyToClipboard,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
-                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (connectedWatches > 0) Icons.Default.CheckCircle else Icons.Default.Watch,
+                            contentDescription = null,
+                            tint = if (connectedWatches > 0) Color(0xFF4CAF50) else Color(0xFFFF9800),
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
+                            Text(
+                                text = if (connectedWatches > 0) "Galaxy Watch conectado" else "Buscando reloj Bluetooth…",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = Color.White
+                            )
+                            Text(
+                                text = if (hasActiveSession) "Cuenta activa: u/$username" else "Sin sesión iniciada",
+                                fontSize = 12.sp,
+                                color = if (hasActiveSession) Color(0xFF4CAF50) else Color(0xFFAAAAAA)
+                            )
+                        }
+                    }
+                    IconButton(onClick = onRefreshWatches) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Refrescar relojes",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+                HorizontalDivider(color = Color(0xFF2C2C34))
+
+                Text(
+                    text = loginStatus,
+                    fontSize = 13.sp,
+                    color = if (loginStatus.contains("✅")) Color(0xFF81C784) else Color(0xFFCCCCCC)
+                )
+            }
+        }
+
+        // 2. Acciones Principales (1 Toque)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1E))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Button(
+                    onClick = onSyncManualToken,
+                    enabled = !isSyncing && hasActiveSession,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (isSyncing) "Sincronizando con el reloj…" else "Sincronizar con el Reloj Ahora",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onStartLogin,
+                        enabled = !isSyncing,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(46.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.Language, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = if (hasActiveSession) "Cambiar Cuenta" else "Iniciar Sesión",
+                            fontSize = 13.sp,
+                            color = Color.White
+                        )
+                    }
+
+                    if (hasActiveSession) {
+                        OutlinedButton(
+                            onClick = onLogout,
+                            enabled = !isSyncing,
+                            modifier = Modifier.height(46.dp),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.ContentCopy,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(12.dp)
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Cerrar sesión",
+                                tint = Color(0xFFFF8A80),
+                                modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Copiar Todo", fontSize = 11.sp, color = Color.White)
+                            Text("Salir", fontSize = 13.sp, color = Color(0xFFFF8A80))
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(6.dp))
-                OutlinedTextField(
-                    value = tokenInput,
-                    onValueChange = onTokenInputChange,
-                    minLines = 3,
-                    maxLines = 6,
-                    placeholder = { Text("Pega tu Bearer token o sesión aquí...", fontSize = 11.sp, color = Color.Gray) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFFFF4500),
-                        unfocusedBorderColor = Color(0xFF444444)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = onSyncManualToken,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500))
+            }
+        }
+
+        // 3. Sección Avanzada Plegable (Oculta por defecto para no recargar la UI)
+        TextButton(onClick = { showAdvanced = !showAdvanced }) {
+            Text(
+                text = if (showAdvanced) "▲ Ocultar opciones avanzadas" else "▼ Opciones avanzadas (Token / Usuario)",
+                fontSize = 12.sp,
+                color = Color(0xFF888888)
+            )
+        }
+
+        if (showAdvanced) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF16161A))
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Sync,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
+                    Text("Usuario de Reddit", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 12.sp)
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = onUsernameChange,
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFFFF4500),
+                            unfocusedBorderColor = Color(0xFF444444)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("Reenviar Este Token al Reloj", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Cookie / Token de Sesión", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.White)
+                        if (tokenInput.isNotEmpty()) {
+                            TextButton(onClick = onCopyToClipboard) {
+                                Icon(Icons.Default.ContentCopy, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Copiar", fontSize = 11.sp, color = Color.White)
+                            }
+                        }
+                    }
+
+                    OutlinedTextField(
+                        value = tokenInput,
+                        onValueChange = onTokenInputChange,
+                        minLines = 2,
+                        maxLines = 4,
+                        placeholder = { Text("reddit_session=...", fontSize = 11.sp, color = Color.Gray) },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFFFF4500),
+                            unfocusedBorderColor = Color(0xFF444444)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
     }
 }
+
 

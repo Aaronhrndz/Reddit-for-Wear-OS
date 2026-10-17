@@ -70,6 +70,44 @@ class PostDetailViewModel(
         }
     }
 
+    fun editComment(commentId: String, newText: String) {
+        val state = _uiState.value
+        if (state is PostDetailUiState.Success) {
+            // Actualización optimista inmediata
+            val cleanId = commentId.removePrefix("t1_")
+            val optimistic = state.comments.map { flat ->
+                if (flat.comment.id == cleanId) {
+                    flat.copy(comment = flat.comment.copy(body = newText))
+                } else flat
+            }
+            _uiState.value = state.copy(comments = optimistic)
+            viewModelScope.launch {
+                val success = repository.editComment("t1_$cleanId", newText)
+                if (success) {
+                    try {
+                        val (_, comments) = repository.getComments(state.post.subreddit, state.post.id)
+                        val current = _uiState.value
+                        if (current is PostDetailUiState.Success) {
+                            _uiState.value = current.copy(comments = flattenCommentTree(comments))
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
+        }
+    }
+
+    fun deleteComment(commentId: String) {
+        val state = _uiState.value
+        if (state is PostDetailUiState.Success) {
+            val cleanId = commentId.removePrefix("t1_")
+            val optimistic = state.comments.filterNot { it.comment.id == cleanId }
+            _uiState.value = state.copy(comments = optimistic)
+            viewModelScope.launch {
+                repository.deleteComment("t1_$cleanId")
+            }
+        }
+    }
+
     fun voteComment(comment: RedditComment, direction: Int) {
         viewModelScope.launch {
             val postEquivalent = RedditPost(

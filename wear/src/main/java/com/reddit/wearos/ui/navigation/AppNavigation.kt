@@ -150,11 +150,13 @@ fun AppNavigation(
         composable(Screen.PostDetail.route) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
             val subreddit = backStackEntry.arguments?.getString("subreddit") ?: ""
-            val detailViewModel = PostDetailViewModel(repository)
-            detailViewModel.loadPost(postId, subreddit)
+            val detailViewModel = remember(postId, subreddit) {
+                PostDetailViewModel(repository).also { it.loadPost(postId, subreddit) }
+            }
 
             PostDetailScreen(
                 viewModel = detailViewModel,
+                currentUsername = tokenStorage.getUsername(),
                 onViewComments = { sub, id ->
                     navController.navigate(Screen.Comments.createRoute(id, sub))
                 },
@@ -167,13 +169,15 @@ fun AppNavigation(
         composable(Screen.Comments.route) { backStackEntry ->
             val postId = backStackEntry.arguments?.getString("postId") ?: ""
             val subreddit = backStackEntry.arguments?.getString("subreddit") ?: ""
-            val commentsViewModel = CommentsViewModel(repository)
-            commentsViewModel.loadComments(postId, subreddit)
+            val commentsViewModel = remember(postId, subreddit) {
+                CommentsViewModel(repository).also { it.loadComments(postId, subreddit) }
+            }
 
             CommentsScreen(
                 viewModel = commentsViewModel,
                 postId = postId,
                 subreddit = subreddit,
+                currentUsername = tokenStorage.getUsername(),
                 onBack = {
                     navController.popBackStack()
                 }

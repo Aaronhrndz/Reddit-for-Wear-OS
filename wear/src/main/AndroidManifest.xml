@@ -69,6 +69,20 @@
                 android:resource="@drawable/tile_preview" />
         </service>
 
+        <!-- Mis Guardados Reddit Tile -->
+        <service
+            android:name=".tile.SavedTileService"
+            android:exported="true"
+            android:label="@string/saved_tile_name"
+            android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
+            <intent-filter>
+                <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
+            </intent-filter>
+            <meta-data
+                android:name="androidx.wear.tiles.PREVIEW"
+                android:resource="@drawable/tile_preview" />
+        </service>
+
         <!-- Service receptor de autenticación enviada desde el móvil Companion -->
         <service
             android:name=".service.AuthWearableListenerService"

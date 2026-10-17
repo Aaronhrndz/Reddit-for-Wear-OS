@@ -5,11 +5,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
@@ -48,6 +53,7 @@ import com.reddit.wearos.util.RemotePhoneHelper
 @Composable
 fun PostDetailScreen(
     viewModel: PostDetailViewModel,
+    currentUsername: String? = null,
     onViewComments: (String, String) -> Unit,
     onBack: () -> Unit
 ) {
@@ -60,26 +66,44 @@ fun PostDetailScreen(
 
     var replyingToThingId by remember { mutableStateOf<String?>(null) }
     var replyingToAuthor by remember { mutableStateOf<String?>(null) }
+    var editingCommentId by remember { mutableStateOf<String?>(null) }
+    var editingInitialText by remember { mutableStateOf("") }
     var showReplyDialog by remember { mutableStateOf(false) }
 
     fun launchReply(thingId: String, author: String) {
+        editingCommentId = null
+        editingInitialText = ""
         replyingToThingId = thingId
         replyingToAuthor = author
         showReplyDialog = true
     }
 
-    // Modal de Entrada de Texto con Teclado
+    fun launchEdit(commentId: String, currentBody: String) {
+        replyingToThingId = null
+        editingCommentId = commentId
+        editingInitialText = currentBody
+        showReplyDialog = true
+    }
+
+    // Modal de Entrada de Texto con Teclado (Responder o Editar)
     ReplyDialog(
         show = showReplyDialog,
         author = replyingToAuthor ?: "usuario",
+        initialText = editingInitialText,
+        dialogTitle = if (editingCommentId != null) "Editar comentario" else null,
         onDismiss = {
             showReplyDialog = false
             replyingToThingId = null
             replyingToAuthor = null
+            editingCommentId = null
+            editingInitialText = ""
         },
         onSend = { text ->
+            val editId = editingCommentId
             val targetId = replyingToThingId
-            if (!targetId.isNullOrEmpty()) {
+            if (!editId.isNullOrEmpty()) {
+                viewModel.editComment(editId, text)
+            } else if (!targetId.isNullOrEmpty()) {
                 viewModel.submitComment(targetId, text)
             }
         }
@@ -157,7 +181,7 @@ fun PostDetailScreen(
                         }
                     }
 
-                    // REPRODUCTOR DE VIDEO O IMAGEN
+                    // REPRODUCTOR DE VIDEO O CARRUSEL DE IMÁGENES
                     if (!videoUrl.isNullOrEmpty()) {
                         item {
                             WearVideoPlayer(
@@ -172,20 +196,10 @@ fun PostDetailScreen(
                             )
                         }
                     } else {
-                        val imgUrl = post.getImageUrl()
-                        if (!imgUrl.isNullOrEmpty()) {
+                        val galleryUrls = post.getGalleryImageUrls()
+                        if (galleryUrls.isNotEmpty()) {
                             item {
-                                AsyncImage(
-                                    model = imgUrl,
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Fit,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(135.dp)
-                                        .padding(vertical = 4.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(Color.Black)
-                                )
+                                PostImageCarousel(imageUrls = galleryUrls)
                             }
                         }
                     }
@@ -407,8 +421,11 @@ fun PostDetailScreen(
                             }
                         }
                         items(state.comments) { flatComment ->
+                            val isOwnComment = !currentUsername.isNullOrBlank() &&
+                                flatComment.comment.author.equals(currentUsername, ignoreCase = true)
                             InlineCommentCard(
                                 flatComment = flatComment,
+                                isOwnComment = isOwnComment,
                                 onUpvote = {
                                     val newDir = if (flatComment.comment.likes == true) 0 else 1
                                     viewModel.voteComment(flatComment.comment, newDir)
@@ -420,6 +437,12 @@ fun PostDetailScreen(
                                 onReply = {
                                     val targetId = if (flatComment.comment.id.startsWith("t1_")) flatComment.comment.id else "t1_${flatComment.comment.id}"
                                     launchReply(targetId, flatComment.comment.author)
+                                },
+                                onEdit = {
+                                    launchEdit(flatComment.comment.id, flatComment.comment.body)
+                                },
+                                onDelete = {
+                                    viewModel.deleteComment(flatComment.comment.id)
                                 }
                             )
                         }
@@ -431,13 +454,109 @@ fun PostDetailScreen(
 }
 
 @Composable
+fun PostImageCarousel(
+    imageUrls: List<String>
+) {
+    var currentIndex by remember(imageUrls) { mutableStateOf(0) }
+    val safeIndex = currentIndex.coerceIn(0, (imageUrls.size - 1).coerceAtLeast(0))
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(145.dp)
+            .padding(vertical = 4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        AsyncImage(
+            model = imageUrls[safeIndex],
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(enabled = imageUrls.size > 1) {
+                    currentIndex = (safeIndex + 1) % imageUrls.size
+                }
+        )
+
+        if (imageUrls.size > 1) {
+            // Botón Anterior (Izquierda)
+            if (safeIndex > 0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 4.dp)
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xAA000000))
+                        .clickable { currentIndex = safeIndex - 1 },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Anterior",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            // Botón Siguiente (Derecha)
+            if (safeIndex < imageUrls.size - 1) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 4.dp)
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xAA000000))
+                        .clickable { currentIndex = safeIndex + 1 },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Siguiente",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            // Indicador de página inferior (ej. 1 / 5)
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xBB000000))
+                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                Text(
+                    text = "${safeIndex + 1} / ${imageUrls.size}",
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun InlineCommentCard(
     flatComment: FlatComment,
+    isOwnComment: Boolean = false,
     onUpvote: () -> Unit,
     onDownvote: () -> Unit,
-    onReply: () -> Unit
+    onReply: () -> Unit,
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {}
 ) {
     val comment = flatComment.comment
+    var confirmDelete by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -461,21 +580,82 @@ fun InlineCommentCard(
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera: u/author en naranja + tiempo relativo
+                // Cabecera: u/author en naranja + tiempo relativo + acciones propias (Editar/Borrar)
                 val commentTimeAgo = com.reddit.wearos.data.model.formatRelativeTime(comment.createdUtc)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "u/${comment.author}",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = RedditOrange
-                    )
-                    if (commentTimeAgo.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f, fill = false)
+                    ) {
                         Text(
-                            text = " • $commentTimeAgo",
-                            fontSize = 8.sp,
-                            color = TextSecondary
+                            text = "u/${comment.author}",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RedditOrange
                         )
+                        if (commentTimeAgo.isNotEmpty()) {
+                            Text(
+                                text = " • $commentTimeAgo",
+                                fontSize = 8.sp,
+                                color = TextSecondary
+                            )
+                        }
+                    }
+
+                    if (isOwnComment) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xFF353542))
+                                    .clickable { onEdit() }
+                                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Editar",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(10.dp)
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(if (confirmDelete) Color(0xFFB71C1C) else Color(0xFF3A2323))
+                                    .clickable {
+                                        if (confirmDelete) {
+                                            confirmDelete = false
+                                            onDelete()
+                                        } else {
+                                            confirmDelete = true
+                                        }
+                                    }
+                                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                            ) {
+                                if (confirmDelete) {
+                                    Text(
+                                        text = "¿Borrar?",
+                                        fontSize = 7.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Borrar",
+                                        tint = Color(0xFFFF8A80),
+                                        modifier = Modifier.size(10.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -555,7 +735,7 @@ fun InlineCommentCard(
                         Box(
                             modifier = Modifier
                                 .clickable { onDownvote() }
-                            .padding(1.dp)
+                                .padding(1.dp)
                         ) {
                             RedditDownvoteIcon(
                                 isVoted = comment.likes == false,
@@ -568,3 +748,4 @@ fun InlineCommentCard(
         }
     }
 }
+

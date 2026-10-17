@@ -48,12 +48,14 @@ import kotlinx.coroutines.delay
 fun ReplyDialog(
     show: Boolean,
     author: String,
+    initialText: String = "",
+    dialogTitle: String? = null,
     onDismiss: () -> Unit,
     onSend: (String) -> Unit
 ) {
     if (!show) return
 
-    var text by remember { mutableStateOf("") }
+    var text by remember(show, initialText) { mutableStateOf(initialText) }
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScalingLazyListState()
@@ -95,7 +97,7 @@ fun ReplyDialog(
             ) {
                 item {
                     Text(
-                        text = "Responder a u/$author",
+                        text = dialogTitle ?: "Responder a u/$author",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = RedditOrange,

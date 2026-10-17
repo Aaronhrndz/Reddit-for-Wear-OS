@@ -88,6 +88,12 @@ data class RedditPost(
     val isSelf: Boolean = true,
     @SerialName("is_video")
     val isVideo: Boolean = false,
+    @SerialName("is_gallery")
+    val isGallery: Boolean = false,
+    @SerialName("gallery_data")
+    val galleryData: JsonElement? = null,
+    @SerialName("media_metadata")
+    val mediaMetadata: JsonElement? = null,
     val media: JsonElement? = null,
     val preview: JsonElement? = null,
     val likes: Boolean? = null,
@@ -97,6 +103,47 @@ data class RedditPost(
 ) {
     fun hasVideo(): Boolean {
         return isVideo || url.endsWith(".mp4") || url.endsWith(".gifv") || url.contains("v.redd.it") || url.contains("redgifs.com") || getVideoUrl() != null
+    }
+
+    fun getGalleryImageUrls(): List<String> {
+        val result = mutableListOf<String>()
+        if (mediaMetadata != null) {
+            try {
+                val metaObj = mediaMetadata.jsonObject
+                val orderedIds = mutableListOf<String>()
+                if (galleryData != null) {
+                    val items = galleryData.jsonObject["items"]?.jsonArray
+                    items?.forEach { item ->
+                        item.jsonObject["media_id"]?.jsonPrimitive?.content?.let { orderedIds.add(it) }
+                    }
+                }
+                val keysToProcess = if (orderedIds.isNotEmpty()) orderedIds else metaObj.keys.toList()
+                for (mediaId in keysToProcess) {
+                    val entry = metaObj[mediaId]?.jsonObject ?: continue
+                    val previews = entry["p"]?.jsonArray
+                    var chosenUrl: String? = null
+                    if (!previews.isNullOrEmpty()) {
+                        val target = previews.find {
+                            val w = it.jsonObject["x"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+                            w in 320..960
+                        } ?: previews.last()
+                        chosenUrl = target.jsonObject["u"]?.jsonPrimitive?.content
+                    }
+                    if (chosenUrl.isNullOrEmpty()) {
+                        val source = entry["s"]?.jsonObject
+                        chosenUrl = source?.get("u")?.jsonPrimitive?.content
+                            ?: source?.get("gif")?.jsonPrimitive?.content
+                    }
+                    if (!chosenUrl.isNullOrEmpty()) {
+                        result.add(chosenUrl.replace("&amp;", "&"))
+                    }
+                }
+            } catch (_: Exception) {}
+        }
+        if (result.isEmpty()) {
+            getImageUrl()?.let { result.add(it) }
+        }
+        return result.distinct()
     }
 
     fun getVideoUrl(): String? = getVideoUrls().firstOrNull()
@@ -160,6 +207,16 @@ data class RedditPost(
                 }
             } catch (_: Exception) {}
         }
+        if (mediaMetadata != null) {
+            try {
+                val metaObj = mediaMetadata.jsonObject
+                val firstEntry = metaObj.values.firstOrNull()?.jsonObject
+                val sourceUrl = firstEntry?.get("s")?.jsonObject?.get("u")?.jsonPrimitive?.content
+                if (!sourceUrl.isNullOrEmpty()) {
+                    return sourceUrl.replace("&amp;", "&")
+                }
+            } catch (_: Exception) {}
+        }
         if (!thumbnail.isNullOrEmpty() && thumbnail.startsWith("http") && !thumbnail.contains("default") && !thumbnail.contains("self")) {
             return thumbnail
         }
@@ -188,6 +245,12 @@ data class RedditPost(
                         return sourceUrl.replace("&amp;", "&")
                     }
                 }
+            } catch (_: Exception) {}
+        }
+        if (mediaMetadata != null) {
+            try {
+                val urls = getGalleryImageUrls()
+                if (urls.isNotEmpty()) return urls.first()
             } catch (_: Exception) {}
         }
         return getImageUrl()

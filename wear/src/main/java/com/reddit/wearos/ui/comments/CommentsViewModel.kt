@@ -52,6 +52,41 @@ class CommentsViewModel(
         }
     }
 
+    fun editComment(postId: String, subreddit: String, commentId: String, newText: String) {
+        val state = _uiState.value
+        val cleanId = commentId.removePrefix("t1_")
+        if (state is CommentsUiState.Success) {
+            val optimistic = state.comments.map { flat ->
+                if (flat.comment.id == cleanId) {
+                    flat.copy(comment = flat.comment.copy(body = newText))
+                } else flat
+            }
+            _uiState.value = CommentsUiState.Success(optimistic)
+        }
+        viewModelScope.launch {
+            val success = repository.editComment("t1_$cleanId", newText)
+            if (success) {
+                try {
+                    val (_, comments) = repository.getComments(subreddit, postId)
+                    rawCommentTree = comments
+                    _uiState.value = CommentsUiState.Success(flattenCommentTree(comments))
+                } catch (_: Exception) {}
+            }
+        }
+    }
+
+    fun deleteComment(commentId: String) {
+        val state = _uiState.value
+        val cleanId = commentId.removePrefix("t1_")
+        if (state is CommentsUiState.Success) {
+            val optimistic = state.comments.filterNot { it.comment.id == cleanId }
+            _uiState.value = CommentsUiState.Success(optimistic)
+        }
+        viewModelScope.launch {
+            repository.deleteComment("t1_$cleanId")
+        }
+    }
+
     fun voteComment(comment: RedditComment, direction: Int) {
         viewModelScope.launch {
             val postEquivalent = RedditPost(

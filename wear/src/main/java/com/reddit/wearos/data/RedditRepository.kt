@@ -78,6 +78,14 @@ class RedditRepository(
         return apiService.addComment(thingId, text)
     }
 
+    suspend fun editComment(thingId: String, text: String): Boolean {
+        return apiService.editComment(thingId, text)
+    }
+
+    suspend fun deleteComment(thingId: String): Boolean {
+        return apiService.deleteComment(thingId)
+    }
+
     suspend fun getSavedPosts(
         username: String = "me",
         after: String? = null
@@ -95,9 +103,10 @@ class RedditRepository(
         query: String,
         subreddit: String? = null,
         sort: String = "relevance",
+        timeRange: String = "all",
         after: String? = null
     ): Pair<List<RedditPost>, String?> {
-        val listing = apiService.searchPosts(query = query, subreddit = subreddit, sort = sort, after = after)
+        val listing = apiService.searchPosts(query = query, subreddit = subreddit, sort = sort, timeRange = timeRange, after = after)
         val posts = listing.data.children.map { it.data }
         return Pair(posts, listing.data.after)
     }

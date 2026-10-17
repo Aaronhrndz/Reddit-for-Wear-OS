@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Reply
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +40,7 @@ fun CommentsScreen(
     viewModel: CommentsViewModel,
     postId: String = "",
     subreddit: String = "",
+    currentUsername: String? = null,
     onBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -45,26 +48,44 @@ fun CommentsScreen(
 
     var replyingToThingId by remember { mutableStateOf<String?>(null) }
     var replyingToAuthor by remember { mutableStateOf<String?>(null) }
+    var editingCommentId by remember { mutableStateOf<String?>(null) }
+    var editingInitialText by remember { mutableStateOf("") }
     var showReplyDialog by remember { mutableStateOf(false) }
 
     fun launchReply(thingId: String, author: String) {
+        editingCommentId = null
+        editingInitialText = ""
         replyingToThingId = thingId
         replyingToAuthor = author
         showReplyDialog = true
     }
 
-    // Modal de Entrada de Texto con Teclado
+    fun launchEdit(commentId: String, currentBody: String) {
+        replyingToThingId = null
+        editingCommentId = commentId
+        editingInitialText = currentBody
+        showReplyDialog = true
+    }
+
+    // Modal de Entrada de Texto con Teclado (Responder o Editar)
     ReplyDialog(
         show = showReplyDialog,
         author = replyingToAuthor ?: "usuario",
+        initialText = editingInitialText,
+        dialogTitle = if (editingCommentId != null) "Editar comentario" else null,
         onDismiss = {
             showReplyDialog = false
             replyingToThingId = null
             replyingToAuthor = null
+            editingCommentId = null
+            editingInitialText = ""
         },
         onSend = { text ->
+            val editId = editingCommentId
             val targetId = replyingToThingId
-            if (!targetId.isNullOrEmpty()) {
+            if (!editId.isNullOrEmpty()) {
+                viewModel.editComment(postId, subreddit, editId, text)
+            } else if (!targetId.isNullOrEmpty()) {
                 viewModel.submitComment(postId, subreddit, targetId, text)
             }
         }
@@ -110,8 +131,11 @@ fun CommentsScreen(
                         verticalArrangement = Arrangement.spacedBy(0.dp)
                     ) {
                         items(state.comments) { flatComment ->
+                            val isOwnComment = !currentUsername.isNullOrBlank() &&
+                                flatComment.comment.author.equals(currentUsername, ignoreCase = true)
                             CommentCard(
                                 flatComment = flatComment,
+                                isOwnComment = isOwnComment,
                                 onUpvote = {
                                     val newDir = if (flatComment.comment.likes == true) 0 else 1
                                     viewModel.voteComment(flatComment.comment, newDir)
@@ -123,6 +147,12 @@ fun CommentsScreen(
                                 onReply = {
                                     val targetId = if (flatComment.comment.id.startsWith("t1_")) flatComment.comment.id else "t1_${flatComment.comment.id}"
                                     launchReply(targetId, flatComment.comment.author)
+                                },
+                                onEdit = {
+                                    launchEdit(flatComment.comment.id, flatComment.comment.body)
+                                },
+                                onDelete = {
+                                    viewModel.deleteComment(flatComment.comment.id)
                                 }
                             )
                         }
@@ -136,11 +166,15 @@ fun CommentsScreen(
 @Composable
 fun CommentCard(
     flatComment: FlatComment,
+    isOwnComment: Boolean = false,
     onUpvote: () -> Unit,
     onDownvote: () -> Unit,
-    onReply: () -> Unit
+    onReply: () -> Unit,
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {}
 ) {
     val comment = flatComment.comment
+    var confirmDelete by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -164,21 +198,82 @@ fun CommentCard(
                 .padding(horizontal = 7.dp, vertical = 5.dp)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Cabecera: u/author en naranja + tiempo relativo
+                // Cabecera: u/author en naranja + tiempo relativo + Editar/Borrar
                 val commentTimeAgo = com.reddit.wearos.data.model.formatRelativeTime(comment.createdUtc)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "u/${comment.author}",
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = RedditOrange
-                    )
-                    if (commentTimeAgo.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f, fill = false)
+                    ) {
                         Text(
-                            text = " • $commentTimeAgo",
-                            fontSize = 8.sp,
-                            color = TextSecondary
+                            text = "u/${comment.author}",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RedditOrange
                         )
+                        if (commentTimeAgo.isNotEmpty()) {
+                            Text(
+                                text = " • $commentTimeAgo",
+                                fontSize = 8.sp,
+                                color = TextSecondary
+                            )
+                        }
+                    }
+
+                    if (isOwnComment) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xFF353542))
+                                    .clickable { onEdit() }
+                                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Editar",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(10.dp)
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(if (confirmDelete) Color(0xFFB71C1C) else Color(0xFF3A2323))
+                                    .clickable {
+                                        if (confirmDelete) {
+                                            confirmDelete = false
+                                            onDelete()
+                                        } else {
+                                            confirmDelete = true
+                                        }
+                                    }
+                                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                            ) {
+                                if (confirmDelete) {
+                                    Text(
+                                        text = "¿Borrar?",
+                                        fontSize = 7.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Borrar",
+                                        tint = Color(0xFFFF8A80),
+                                        modifier = Modifier.size(10.dp)
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
 
