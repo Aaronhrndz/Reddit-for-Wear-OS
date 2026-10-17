@@ -58,6 +58,8 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         ambientController = AmbientModeSupport.attach(this)
 
         handleAuthIntent(intent)
+        val initialPostId = intent?.getStringExtra("post_id")
+        val initialSubreddit = intent?.getStringExtra("subreddit")
 
         setContent {
             RedditWearTheme {
@@ -81,7 +83,9 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
                         AppNavigation(
                             authManager = app.authManager,
                             tokenStorage = app.tokenStorage,
-                            repository = app.repository
+                            repository = app.repository,
+                            initialPostId = initialPostId,
+                            initialSubreddit = initialSubreddit
                         )
                     }
                 }

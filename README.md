@@ -25,10 +25,10 @@ Designed from scratch with **Jetpack Compose for Wear OS**, **rotary bezel/crown
   * Reply to posts or comments using voice input or on-screen keyboard; edit or delete your own comments with 2-tap safety confirmation.
 * **🔎 Search with Sort & Time Filters**:
   * Search communities (`Feeds`) or submissions (`Posts`) with 1-tap filtering by **Sort** (*Relevance, New, Hot, Top, Comments*) and **Time Range** (*All Time, Year, Month, Week, Today*).
-* **⌚ 3 Interactive Wear OS Hero Tiles**:
-  * **🔥 Featured Post (`RedditTileService`)**: Single hero card with thumbnail image, title, subreddit, score badge, and tap-to-open deep link.
-  * **🔖 Saved Post (`SavedTileService`)**: Quick access to your latest saved post directly from your Tile carousel.
-  * **⚡ World News Flash (`NewsTileService`)**: Real-time breaking headlines with inline thumbnail.
+* **⌚ 3 Interactive Wear OS Tiles**:
+  * **🔥 Personal Feed (`RedditTileService`)**: Displays your top 4 feed posts in a curved circular layout with score, subreddit, relative time, 1-tap instant refresh (`↻`), and direct post deep-linking.
+  * **🔖 Saved Posts (`SavedTileService`)**: Quick access to your latest 4 saved posts directly from your Tile carousel.
+  * **⚡ World News Flash (`NewsTileService`)**: Real-time breaking headlines from `r/worldnews`.
 * **🔄 Quick Refresh Button**:
   * Header shortcut to refresh the feed on demand without restarting or losing scroll position.
 * **👑 Fully Functional Personal Feed & Saved Posts**:

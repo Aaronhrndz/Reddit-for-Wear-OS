@@ -24,12 +24,20 @@ import com.reddit.wearos.ui.subreddits.SubredditListScreen
 fun AppNavigation(
     authManager: RedditAuthManager,
     tokenStorage: TokenStorage,
-    repository: RedditRepository
+    repository: RedditRepository,
+    initialPostId: String? = null,
+    initialSubreddit: String? = null
 ) {
     val navController = rememberSwipeDismissableNavController()
     val feedViewModel = remember { FeedViewModel(repository) }
     val savedViewModel = remember { com.reddit.wearos.ui.saved.SavedViewModel(repository, tokenStorage) }
     val startDestination = if (tokenStorage.getAccessToken() != null) Screen.Feed.route else Screen.Login.route
+
+    androidx.compose.runtime.LaunchedEffect(initialPostId, initialSubreddit) {
+        if (!initialPostId.isNullOrEmpty() && !initialSubreddit.isNullOrEmpty()) {
+            navController.navigate(Screen.PostDetail.createRoute(initialPostId, initialSubreddit))
+        }
+    }
 
     SwipeDismissableNavHost(
         navController = navController,
