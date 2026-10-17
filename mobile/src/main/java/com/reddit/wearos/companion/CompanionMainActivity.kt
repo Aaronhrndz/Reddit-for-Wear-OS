@@ -65,12 +65,18 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.longOrNull
 
-class CompanionMainActivity : ComponentActivity() {
+import com.google.android.gms.wearable.MessageClient
+import com.google.android.gms.wearable.MessageEvent
+import com.google.android.gms.wearable.Wearable
+
+class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListener {
 
     private lateinit var syncManager: WatchSyncManager
 
     private var loginStatus by mutableStateOf("Listo para conectar tu cuenta")
     private var connectedWatchesCount by mutableStateOf(0)
+    private var watchInstalledVersion by mutableStateOf<String?>(null)
+    private var watchUpdateStatus by mutableStateOf<String?>(null)
     private var isSyncing by mutableStateOf(false)
     private var isWebLoginOpen by mutableStateOf(false)
     private var redditUsername by mutableStateOf("Aaronhrnndz")
@@ -83,6 +89,30 @@ class CompanionMainActivity : ComponentActivity() {
     companion object {
         const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
         const val DEFAULT_CLIENT_ID = "pA-pE4qfVj5W_A"
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Wearable.getMessageClient(this).addListener(this)
+        lifecycleScope.launch {
+            syncManager.requestWatchVersion()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Wearable.getMessageClient(this).removeListener(this)
+    }
+
+    override fun onMessageReceived(event: MessageEvent) {
+        when (event.path) {
+            "/reddit/version_response" -> {
+                watchInstalledVersion = String(event.data, Charsets.UTF_8).trim()
+            }
+            "/reddit/update_status" -> {
+                watchUpdateStatus = String(event.data, Charsets.UTF_8).trim()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -152,6 +182,8 @@ class CompanionMainActivity : ComponentActivity() {
                             onTokenInputChange = { tokenOrCookieInput = it },
                             loginStatus = loginStatus,
                             connectedWatches = connectedWatchesCount,
+                            watchVersion = watchInstalledVersion,
+                            watchUpdateStatus = watchUpdateStatus,
                             isSyncing = isSyncing,
                             onStartOAuthLogin = { startOAuth2Flow(clientIdInput) },
                             onStartLogin = { isWebLoginOpen = true },
@@ -179,7 +211,19 @@ class CompanionMainActivity : ComponentActivity() {
                                 }
                             },
                             onLogout = { performLogout() },
-                            onRefreshWatches = { checkConnectedWatches(autoSyncIfReady = false) }
+                            onRefreshWatches = {
+                                checkConnectedWatches(autoSyncIfReady = false)
+                                lifecycleScope.launch { syncManager.requestWatchVersion() }
+                            },
+                            onTriggerWatchUpdate = { wearApkUrl ->
+                                lifecycleScope.launch {
+                                    watchUpdateStatus = "Enviando orden de actualización al reloj..."
+                                    val sent = syncManager.triggerWatchUpdate(wearApkUrl)
+                                    if (!sent) {
+                                        watchUpdateStatus = "No se detectó reloj conectado por Bluetooth"
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -629,13 +673,16 @@ fun CompanionScreen(
     onTokenInputChange: (String) -> Unit,
     loginStatus: String,
     connectedWatches: Int,
+    watchVersion: String?,
+    watchUpdateStatus: String?,
     isSyncing: Boolean,
     onStartOAuthLogin: () -> Unit,
     onStartLogin: () -> Unit,
     onCopyToClipboard: () -> Unit,
     onSyncManualToken: () -> Unit,
     onLogout: () -> Unit,
-    onRefreshWatches: () -> Unit
+    onRefreshWatches: () -> Unit,
+    onTriggerWatchUpdate: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
     var showAdvanced by remember { mutableStateOf(false) }
@@ -797,18 +844,19 @@ fun CompanionScreen(
             }
         }
 
-        // 3. Tarjeta de Actualizaciones (GitHub Releases)
+        // 3. Tarjeta de Actualizaciones (Móvil + Reloj)
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val currentVer = remember {
             try {
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.0"
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.1"
             } catch (_: Exception) {
-                "1.6.0"
+                "1.6.1"
             }
         }
         var releaseInfo by remember { mutableStateOf<CompanionReleaseInfo?>(null) }
         var isCheckingUpdate by remember { mutableStateOf(false) }
+        var isInstallingMobile by remember { mutableStateOf(false) }
         var updateLabel by remember { mutableStateOf("Comprobando actualizaciones en GitHub…") }
 
         LaunchedEffect(Unit) {
@@ -817,9 +865,9 @@ fun CompanionScreen(
             isCheckingUpdate = false
             releaseInfo = info
             updateLabel = when {
-                info == null -> "Versión instalada: v$currentVer (Toca para buscar)"
-                info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible en GitHub"
-                else -> "✅ Estás en la última versión (v$currentVer)"
+                info == null -> "Error de red al consultar GitHub"
+                info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible"
+                else -> "✅ Última versión en GitHub: ${info.latestTag}"
             }
         }
 
@@ -841,7 +889,7 @@ fun CompanionScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Actualizaciones de la App",
+                            text = "Actualizaciones (Móvil y Reloj)",
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
                             color = Color.White
@@ -854,6 +902,7 @@ fun CompanionScreen(
                     }
                     IconButton(
                         onClick = {
+                            onRefreshWatches()
                             if (!isCheckingUpdate) {
                                 scope.launch {
                                     isCheckingUpdate = true
@@ -864,7 +913,7 @@ fun CompanionScreen(
                                     updateLabel = when {
                                         info == null -> "Error de red al consultar GitHub"
                                         info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible"
-                                        else -> "✅ Estás al día (v$currentVer)"
+                                        else -> "✅ Última versión en GitHub: ${info.latestTag}"
                                     }
                                 }
                             }
@@ -874,32 +923,95 @@ fun CompanionScreen(
                     }
                 }
 
+                HorizontalDivider(color = Color(0xFF2C2C34))
+
                 val info = releaseInfo
-                if (info != null && info.isUpdateAvailable) {
+                val watchVerLabel = watchVersion?.let { "v$it" } ?: if (connectedWatches > 0) "v$currentVer (conectado)" else "No conectado"
+                val watchHasUpdate = info != null && watchVersion != null &&
+                    CompanionUpdateChecker.isNewerVersion(info.latestVersion, watchVersion.removePrefix("v"))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "📱 Móvil: v$currentVer",
+                        fontSize = 12.sp,
+                        color = Color(0xFFCCCCCC)
+                    )
+                    Text(
+                        text = "⌚ Reloj: $watchVerLabel",
+                        fontSize = 12.sp,
+                        color = if (watchHasUpdate) Color(0xFFFFB74D) else Color(0xFFCCCCCC)
+                    )
+                }
+
+                if (!watchUpdateStatus.isNullOrEmpty()) {
+                    Text(
+                        text = "⌚ $watchUpdateStatus",
+                        fontSize = 12.sp,
+                        color = Color(0xFFFFB74D)
+                    )
+                }
+
+                if (info != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Button(
                             onClick = {
-                                val url = info.mobileApkUrl ?: info.releaseHtmlUrl
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                val url = info.mobileApkUrl
+                                if (!url.isNullOrEmpty() && !isInstallingMobile) {
+                                    scope.launch {
+                                        isInstallingMobile = true
+                                        MobileApkInstaller.downloadAndInstallMobileApk(
+                                            context = context,
+                                            apkUrl = url,
+                                            onStatus = { st -> updateLabel = st }
+                                        )
+                                        isInstallingMobile = false
+                                    }
+                                } else {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.releaseHtmlUrl)))
+                                }
                             },
+                            enabled = !isInstallingMobile,
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (info.isUpdateAvailable) Color(0xFFFF4500) else Color(0xFF2C2C34)
+                            ),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text("APK Móvil (${info.latestTag})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text(
+                                text = if (info.isUpdateAvailable) "Actualizar Móvil" else "Reinstalar Móvil",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
                         }
-                        OutlinedButton(
+
+                        Button(
                             onClick = {
-                                val url = info.wearApkUrl ?: info.releaseHtmlUrl
-                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                val url = info.wearApkUrl
+                                if (!url.isNullOrEmpty()) {
+                                    onTriggerWatchUpdate(url)
+                                } else {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.releaseHtmlUrl)))
+                                }
                             },
                             modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (watchHasUpdate) Color(0xFFFF4500) else Color(0xFF2C2C34)
+                            ),
                             shape = RoundedCornerShape(10.dp)
                         ) {
-                            Text("APK Reloj (${info.latestTag})", fontSize = 12.sp, color = Color.White)
+                            Text(
+                                text = if (watchHasUpdate) "Actualizar Reloj" else "Actualizar Reloj",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
                         }
                     }
                 }

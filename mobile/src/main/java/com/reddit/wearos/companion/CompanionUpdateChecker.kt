@@ -71,7 +71,7 @@ object CompanionUpdateChecker {
         }
     }
 
-    private fun isNewerVersion(remote: String, local: String): Boolean {
+    fun isNewerVersion(remote: String, local: String): Boolean {
         val rParts = remote.split(".").map { it.toIntOrNull() ?: 0 }
         val lParts = local.split(".").map { it.toIntOrNull() ?: 0 }
         val maxLen = maxOf(rParts.size, lParts.size)

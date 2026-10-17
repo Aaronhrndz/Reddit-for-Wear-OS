@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-61:12
-INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-61:12
-INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-61:12
-INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-61:12
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-70:12
+INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-70:12
+INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-70:12
+INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:2:1-70:12
 MERGED from [com.google.android.gms:play-services-wearable:18.2.0] C:\Users\aaron\.gradle\caches\transforms-4\39f3cadbbf406796e605bce9f89b1395\transformed\play-services-wearable-18.2.0\AndroidManifest.xml:2:1-8:12
 MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\aaron\.gradle\caches\transforms-4\4bbd289657756fed496f9a8aeee13fe0\transformed\play-services-base-18.5.0\AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\aaron\.gradle\caches\transforms-4\549bef5895a1973c10a16ef66d4b870b\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:2:1-5:12
@@ -73,9 +73,13 @@ uses-permission#android.permission.WAKE_LOCK
 ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:5:5-68
 	android:name
 		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:5:22-65
+uses-permission#android.permission.REQUEST_INSTALL_PACKAGES
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:6:5-83
+	android:name
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:6:22-80
 application
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:7:5-59:19
-INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:7:5-59:19
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:8:5-68:19
+INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:8:5-68:19
 MERGED from [com.google.android.gms:play-services-wearable:18.2.0] C:\Users\aaron\.gradle\caches\transforms-4\39f3cadbbf406796e605bce9f89b1395\transformed\play-services-wearable-18.2.0\AndroidManifest.xml:6:5-20
 MERGED from [com.google.android.gms:play-services-wearable:18.2.0] C:\Users\aaron\.gradle\caches\transforms-4\39f3cadbbf406796e605bce9f89b1395\transformed\play-services-wearable-18.2.0\AndroidManifest.xml:6:5-20
 MERGED from [com.google.android.gms:play-services-base:18.5.0] C:\Users\aaron\.gradle\caches\transforms-4\4bbd289657756fed496f9a8aeee13fe0\transformed\play-services-base-18.5.0\AndroidManifest.xml:4:5-6:19
@@ -101,67 +105,79 @@ MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\aa
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.0] C:\Users\aaron\.gradle\caches\transforms-4\281cf976570765bbf339cb7f2caaa44a\transformed\core-1.13.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:12:9-35
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:13:9-35
 	android:label
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:10:9-41
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:11:9-41
 	android:roundIcon
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:11:9-54
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:12:9-54
 	android:icon
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:9:9-43
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:10:9-43
 	android:allowBackup
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:8:9-35
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:9:9-35
 	android:theme
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:14:9-72
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:15:9-72
 	android:usesCleartextTraffic
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:13:9-44
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:14:9-44
 activity#com.reddit.wearos.companion.CompanionMainActivity
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:16:9-57:20
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:17:9-58:20
 	android:launchMode
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:20:13-44
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:21:13-44
 	android:windowSoftInputMode
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:19:13-55
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:20:13-55
 	android:exported
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:18:13-36
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:19:13-36
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:17:13-77
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:18:13-77
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:21:13-24:29
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:22:13-25:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:22:17-69
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:23:17-69
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:22:25-66
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:23:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:23:17-77
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:24:17-77
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:23:27-74
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:24:27-74
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:auth+data:scheme:redditwear
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:27:13-34:29
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:28:13-35:29
 action#android.intent.action.VIEW
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:28:17-69
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:29:17-69
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:28:25-66
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:29:25-66
 category#android.intent.category.DEFAULT
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:29:17-76
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:30:17-76
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:29:27-73
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:30:27-73
 category#android.intent.category.BROWSABLE
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:30:17-78
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:31:17-78
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:30:27-75
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:31:27-75
 data
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:31:17-33:51
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:32:17-34:51
 	android:path
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:44:21-41
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:45:21-41
 	android:host
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:32:21-40
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:33:21-40
 	android:port
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:55:21-40
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:56:21-40
 	android:scheme
-		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:33:21-48
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:34:21-48
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:redreader.org+data:path:/auth+data:scheme:https
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:37:13-45:29
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:38:13-46:29
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:localhost+data:port:8080+data:scheme:http
-ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:48:13-56:29
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:49:13-57:29
+receiver#com.reddit.wearos.companion.MobileInstallStatusReceiver
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:60:9-66:20
+	android:exported
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:62:13-37
+	android:name
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:61:13-83
+intent-filter#action:name:com.reddit.wearos.companion.ACTION_INSTALL_COMMIT
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:63:13-65:29
+action#com.reddit.wearos.companion.ACTION_INSTALL_COMMIT
+ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:64:17-92
+	android:name
+		ADDED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml:64:25-89
 uses-sdk
 INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\aaron\reddit-wearos\mobile\src\main\AndroidManifest.xml

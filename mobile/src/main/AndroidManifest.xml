@@ -3,6 +3,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:allowBackup="true"
@@ -55,6 +56,14 @@
                     android:port="8080" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name="com.reddit.wearos.companion.MobileInstallStatusReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.reddit.wearos.companion.ACTION_INSTALL_COMMIT" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

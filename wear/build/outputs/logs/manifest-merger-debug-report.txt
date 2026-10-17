@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-101:12
-INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-101:12
-INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-101:12
-INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-101:12
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-110:12
+INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-110:12
+INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-110:12
+INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:2:1-110:12
 MERGED from [com.google.android.horologist:horologist-composables:0.6.17] C:\Users\aaron\.gradle\caches\transforms-4\78f0ea4175e2ed1d4799828a89a06f7d\transformed\horologist-composables-0.6.17\AndroidManifest.xml:17:1-27:12
 MERGED from [com.google.android.horologist:horologist-compose-material:0.6.17] C:\Users\aaron\.gradle\caches\transforms-4\5658afef48a0aea8d4a99b8f6d369e3c\transformed\horologist-compose-material-0.6.17\AndroidManifest.xml:17:1-27:12
 MERGED from [com.google.android.horologist:horologist-compose-layout:0.6.17] C:\Users\aaron\.gradle\caches\transforms-4\70792040097c5b355796063c2b8d1d81\transformed\horologist-compose-layout-0.6.17\AndroidManifest.xml:17:1-27:12
@@ -146,9 +146,13 @@ uses-permission#android.permission.VIBRATE
 ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:8:5-66
 	android:name
 		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:8:22-63
+uses-permission#android.permission.REQUEST_INSTALL_PACKAGES
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:9:5-83
+	android:name
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:9:22-80
 application
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:10:5-99:19
-INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:10:5-99:19
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:11:5-108:19
+INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:11:5-108:19
 MERGED from [androidx.wear:wear:1.3.0] C:\Users\aaron\.gradle\caches\transforms-4\b9f33ccaf518bc114330b6a312091ef7\transformed\wear-1.3.0\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.wear:wear:1.3.0] C:\Users\aaron\.gradle\caches\transforms-4\b9f33ccaf518bc114330b6a312091ef7\transformed\wear-1.3.0\AndroidManifest.xml:22:5-26:19
 MERGED from [com.google.android.gms:play-services-wearable:18.2.0] C:\Users\aaron\.gradle\caches\transforms-4\39f3cadbbf406796e605bce9f89b1395\transformed\play-services-wearable-18.2.0\AndroidManifest.xml:6:5-20
@@ -182,121 +186,133 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\aaron\.gradle\cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.13.1] C:\Users\aaron\.gradle\caches\transforms-4\0585af89f2ffe701b1d9a44707abccd0\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:16:9-35
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:17:9-35
 	android:label
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:15:9-41
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:16:9-41
 	android:roundIcon
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:14:9-54
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:15:9-54
 	android:icon
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:13:9-43
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:14:9-43
 	android:allowBackup
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:12:9-35
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:13:9-35
 	android:theme
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:17:9-59
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:18:9-59
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:11:9-38
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:12:9-38
 meta-data#com.google.android.wearable.standalone
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:19:9-21:36
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:20:9-22:36
 	android:value
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:21:13-33
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:22:13-33
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:20:13-66
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:21:13-66
 activity#com.reddit.wearos.MainActivity
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:23:9-42:20
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:24:9-43:20
 	android:exported
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:25:13-36
-	android:theme
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:27:13-62
-	android:taskAffinity
 		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:26:13-36
+	android:theme
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:28:13-62
+	android:taskAffinity
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:27:13-36
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:24:13-41
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:25:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:28:13-31:29
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:29:13-32:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:29:17-69
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:30:17-69
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:29:25-66
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:30:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:30:17-77
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:31:17-77
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:30:27-74
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:31:27-74
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:auth+data:scheme:redditwear
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:34:13-41:29
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:35:13-42:29
 action#android.intent.action.VIEW
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:35:17-69
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:36:17-69
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:35:25-66
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:36:25-66
 category#android.intent.category.DEFAULT
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:36:17-76
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:37:17-76
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:36:27-73
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:37:27-73
 category#android.intent.category.BROWSABLE
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:37:17-78
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:38:17-78
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:37:27-75
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:38:27-75
 data
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:38:17-40:51
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:39:17-41:51
 	android:host
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:39:21-40
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:40:21-40
 	android:scheme
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:40:21-48
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:41:21-48
 	android:pathPrefix
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:94:21-49
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:95:21-49
 service#com.reddit.wearos.tile.RedditTileService
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:45:9-56:19
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:46:9-57:19
 	android:label
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:48:13-46
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:49:13-46
 	android:exported
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:47:13-36
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:48:13-36
 	android:permission
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:49:13-91
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:50:13-91
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:46:13-51
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:47:13-51
 intent-filter#action:name:androidx.wear.tiles.action.BIND_TILE_PROVIDER
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:50:13-52:29
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:51:13-53:29
 action#androidx.wear.tiles.action.BIND_TILE_PROVIDER
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:51:17-88
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:52:17-88
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:51:25-85
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:52:25-85
 meta-data#androidx.wear.tiles.PREVIEW
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:53:13-55:61
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:54:13-56:61
 	android:resource
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:55:17-58
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:56:17-58
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:54:17-59
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:55:17-59
 service#com.reddit.wearos.tile.NewsTileService
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:59:9-70:19
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:60:9-71:19
 	android:label
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:62:13-51
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:63:13-51
 	android:exported
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:61:13-36
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:62:13-36
 	android:permission
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:63:13-91
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:64:13-91
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:60:13-49
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:61:13-49
 service#com.reddit.wearos.tile.SavedTileService
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:73:9-84:19
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:74:9-85:19
 	android:label
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:76:13-52
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:77:13-52
 	android:exported
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:75:13-36
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:76:13-36
 	android:permission
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:77:13-91
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:78:13-91
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:74:13-50
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:75:13-50
 service#com.reddit.wearos.service.AuthWearableListenerService
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:87:9-97:19
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:88:9-98:19
 	android:exported
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:89:13-36
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:90:13-36
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:88:13-64
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:89:13-64
 intent-filter#action:name:com.google.android.gms.wearable.MESSAGE_RECEIVED+data:host:*+data:pathPrefix:/reddit+data:scheme:wear
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:90:13-96:29
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:91:13-97:29
 action#com.google.android.gms.wearable.MESSAGE_RECEIVED
-ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:91:17-91
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:92:17-91
 	android:name
-		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:91:25-88
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:92:25-88
+receiver#com.reddit.wearos.util.InstallStatusReceiver
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:100:9-106:20
+	android:exported
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:102:13-37
+	android:name
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:101:13-55
+intent-filter#action:name:com.reddit.wearos.ACTION_INSTALL_COMMIT
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:103:13-105:29
+action#com.reddit.wearos.ACTION_INSTALL_COMMIT
+ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:104:17-82
+	android:name
+		ADDED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml:104:25-79
 uses-sdk
 INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\aaron\reddit-wearos\wear\src\main\AndroidManifest.xml

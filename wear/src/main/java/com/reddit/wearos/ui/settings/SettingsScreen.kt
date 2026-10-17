@@ -276,9 +276,21 @@ fun SettingsScreen(
                 Chip(
                     onClick = {
                         val info = releaseInfo
-                        if (info != null && info.isUpdateAvailable) {
-                            val targetUrl = info.wearApkUrl ?: info.releaseHtmlUrl
-                            RemotePhoneHelper.openUrlOnPhone(context, targetUrl)
+                        if (info != null && info.isUpdateAvailable && !isCheckingUpdate) {
+                            val targetUrl = info.wearApkUrl
+                            if (!targetUrl.isNullOrEmpty()) {
+                                scope.launch {
+                                    isCheckingUpdate = true
+                                    com.reddit.wearos.util.ApkSelfInstaller.downloadAndInstallFromUrl(
+                                        context = context,
+                                        apkUrl = targetUrl,
+                                        onStatus = { status -> updateStatusText = status }
+                                    )
+                                    isCheckingUpdate = false
+                                }
+                            } else {
+                                RemotePhoneHelper.openUrlOnPhone(context, info.releaseHtmlUrl)
+                            }
                         } else if (!isCheckingUpdate) {
                             scope.launch {
                                 isCheckingUpdate = true
@@ -288,7 +300,7 @@ fun SettingsScreen(
                                 releaseInfo = checked
                                 updateStatusText = when {
                                     checked == null -> "Sin conexión a GitHub"
-                                    checked.isUpdateAvailable -> "⚡ Nueva ${checked.latestTag} disponible"
+                                    checked.isUpdateAvailable -> "⚡ Toca para instalar ${checked.latestTag}"
                                     else -> "✅ Estás en la última (v$currentVer)"
                                 }
                             }
@@ -304,7 +316,7 @@ fun SettingsScreen(
                     },
                     label = {
                         Text(
-                            text = if (hasNew) "Descargar ${releaseInfo?.latestTag}" else "Actualizaciones",
+                            text = if (hasNew) "Instalar ${releaseInfo?.latestTag}" else "Actualizaciones",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White

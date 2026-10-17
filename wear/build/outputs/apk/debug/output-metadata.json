@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 2,
-      "versionName": "1.5.0",
+      "versionCode": 4,
+      "versionName": "1.6.1",
       "outputFile": "wear-debug.apk"
     }
   ],
