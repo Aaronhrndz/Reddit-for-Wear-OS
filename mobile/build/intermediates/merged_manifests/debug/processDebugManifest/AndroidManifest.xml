@@ -63,6 +63,19 @@
                     android:path="/auth"
                     android:scheme="https" />
             </intent-filter>
+
+            <!-- Localhost Callback -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="localhost"
+                    android:port="8080"
+                    android:scheme="http" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.google.android.gms.common.api.GoogleApiActivity"

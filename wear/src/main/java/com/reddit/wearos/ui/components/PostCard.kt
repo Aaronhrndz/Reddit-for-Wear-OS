@@ -197,6 +197,26 @@ fun PostCard(
                                 color = Color.White
                             )
                         }
+                        Row(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 4.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color(0x88000000))
+                                .padding(horizontal = 5.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(3.dp)
+                        ) {
+                            val dotsCount = galleryUrls.size.coerceAtMost(7)
+                            repeat(dotsCount) { idx ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(if (idx == 0) 5.dp else 3.5.dp)
+                                        .clip(CircleShape)
+                                        .background(if (idx == 0) RedditOrange else Color(0x99FFFFFF))
+                                )
+                            }
+                        }
                     }
                 }
             }

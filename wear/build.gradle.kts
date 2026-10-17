@@ -88,6 +88,11 @@ dependencies {
     // Coil for Wear Images
     implementation(libs.coil.compose)
 
+    // Media3 / ExoPlayer for HLS CMAF video with muxed audio
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.exoplayer.hls)
+    implementation(libs.media3.ui)
+
     // Tiles
     implementation(libs.androidx.wear.tiles)
     implementation(libs.androidx.wear.tiles.material)

@@ -17,8 +17,9 @@
     <string name="login_title">Conectar Reddit</string>
     <string name="logout">Cerrar sesión</string>
     <string name="news_tile_name">Titulares Flash Reddit</string>
+    <string name="saved_tile_name">Mis Guardados Reddit</string>
     <string name="settings_title">Ajustes</string>
-    <string name="tile_name">Reddit Quick Glance</string>
+    <string name="tile_name">Feed Personal Reddit</string>
     <style name="MainActivityTheme.Starting" parent="@android:style/Theme.DeviceDefault">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowDisablePreview">true</item>

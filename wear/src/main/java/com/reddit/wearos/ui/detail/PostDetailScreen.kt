@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Reply
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
@@ -453,12 +451,12 @@ fun PostDetailScreen(
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun PostImageCarousel(
     imageUrls: List<String>
 ) {
-    var currentIndex by remember(imageUrls) { mutableStateOf(0) }
-    val safeIndex = currentIndex.coerceIn(0, (imageUrls.size - 1).coerceAtLeast(0))
+    val pagerState = androidx.compose.foundation.pager.rememberPagerState(pageCount = { imageUrls.size })
 
     Box(
         modifier = Modifier
@@ -469,77 +467,74 @@ fun PostImageCarousel(
             .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        AsyncImage(
-            model = imageUrls[safeIndex],
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(enabled = imageUrls.size > 1) {
-                    currentIndex = (safeIndex + 1) % imageUrls.size
-                }
-        )
+        androidx.compose.foundation.pager.HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            AsyncImage(
+                model = imageUrls[page],
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
 
         if (imageUrls.size > 1) {
-            // Botón Anterior (Izquierda)
-            if (safeIndex > 0) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 4.dp)
-                        .size(24.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xAA000000))
-                        .clickable { currentIndex = safeIndex - 1 },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "Anterior",
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
-            // Botón Siguiente (Derecha)
-            if (safeIndex < imageUrls.size - 1) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 4.dp)
-                        .size(24.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xAA000000))
-                        .clickable { currentIndex = safeIndex + 1 },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "Siguiente",
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
-            // Indicador de página inferior (ej. 1 / 5)
-            Row(
+            val currentPage = pagerState.currentPage
+            // Contador discreto arriba a la derecha (1/N)
+            Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 4.dp)
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xBB000000))
-                    .padding(horizontal = 6.dp, vertical = 2.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    .background(Color(0x99000000))
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
             ) {
                 Text(
-                    text = "${safeIndex + 1} / ${imageUrls.size}",
+                    text = "${currentPage + 1}/${imageUrls.size}",
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
+            }
+
+            // Indicador de puntos estilo Instagram al pie de la foto
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 6.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0x88000000))
+                    .padding(horizontal = 6.dp, vertical = 3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                val maxVisibleDots = 7
+                val total = imageUrls.size
+                if (total <= maxVisibleDots) {
+                    repeat(total) { idx ->
+                        val isSelected = idx == currentPage
+                        Box(
+                            modifier = Modifier
+                                .size(if (isSelected) 6.dp else 4.dp)
+                                .clip(CircleShape)
+                                .background(if (isSelected) RedditOrange else Color(0x99FFFFFF))
+                        )
+                    }
+                } else {
+                    // Para galerías muy largas, ventana deslizante de puntos
+                    val windowStart = (currentPage - 3).coerceIn(0, total - maxVisibleDots)
+                    val windowEnd = windowStart + maxVisibleDots
+                    for (idx in windowStart until windowEnd) {
+                        val isSelected = idx == currentPage
+                        Box(
+                            modifier = Modifier
+                                .size(if (isSelected) 6.dp else 4.dp)
+                                .clip(CircleShape)
+                                .background(if (isSelected) RedditOrange else Color(0x99FFFFFF))
+                        )
+                    }
+                }
             }
         }
     }
