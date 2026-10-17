@@ -797,7 +797,116 @@ fun CompanionScreen(
             }
         }
 
-        // 3. Sección Avanzada Plegable (Oculta por defecto para no recargar la UI)
+        // 3. Tarjeta de Actualizaciones (GitHub Releases)
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val currentVer = remember {
+            try {
+                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.0"
+            } catch (_: Exception) {
+                "1.6.0"
+            }
+        }
+        var releaseInfo by remember { mutableStateOf<CompanionReleaseInfo?>(null) }
+        var isCheckingUpdate by remember { mutableStateOf(false) }
+        var updateLabel by remember { mutableStateOf("Comprobando actualizaciones en GitHub…") }
+
+        LaunchedEffect(Unit) {
+            isCheckingUpdate = true
+            val info = CompanionUpdateChecker.checkLatestRelease(currentVer)
+            isCheckingUpdate = false
+            releaseInfo = info
+            updateLabel = when {
+                info == null -> "Versión instalada: v$currentVer (Toca para buscar)"
+                info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible en GitHub"
+                else -> "✅ Estás en la última versión (v$currentVer)"
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1E))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Actualizaciones de la App",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = Color.White
+                        )
+                        Text(
+                            text = updateLabel,
+                            fontSize = 12.sp,
+                            color = if (releaseInfo?.isUpdateAvailable == true) Color(0xFFFFB74D) else Color(0xFF81C784)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            if (!isCheckingUpdate) {
+                                scope.launch {
+                                    isCheckingUpdate = true
+                                    updateLabel = "Buscando en GitHub Releases…"
+                                    val info = CompanionUpdateChecker.checkLatestRelease(currentVer)
+                                    isCheckingUpdate = false
+                                    releaseInfo = info
+                                    updateLabel = when {
+                                        info == null -> "Error de red al consultar GitHub"
+                                        info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible"
+                                        else -> "✅ Estás al día (v$currentVer)"
+                                    }
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Comprobar actualizaciones", tint = Color.White)
+                    }
+                }
+
+                val info = releaseInfo
+                if (info != null && info.isUpdateAvailable) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                val url = info.mobileApkUrl ?: info.releaseHtmlUrl
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4500)),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("APK Móvil (${info.latestTag})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                val url = info.wearApkUrl ?: info.releaseHtmlUrl
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text("APK Reloj (${info.latestTag})", fontSize = 12.sp, color = Color.White)
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Sección Avanzada Plegable (Oculta por defecto para no recargar la UI)
         TextButton(onClick = { showAdvanced = !showAdvanced }) {
             Text(
                 text = if (showAdvanced) "▲ Ocultar opciones avanzadas" else "▼ Opciones avanzadas (Token / Usuario)",

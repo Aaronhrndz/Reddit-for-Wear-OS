@@ -35,4 +35,14 @@ object RemotePhoneHelper {
         helper.startRemoteActivity(intent)
         Toast.makeText(context, "Abriendo en tu teléfono...", Toast.LENGTH_SHORT).show()
     }
+
+    fun openUrlOnPhone(context: Context, url: String) {
+        val helper = RemoteActivityHelper(context, Executors.newSingleThreadExecutor())
+        val intent = Intent(Intent.ACTION_VIEW)
+            .addCategory(Intent.CATEGORY_BROWSABLE)
+            .setData(Uri.parse(url))
+
+        helper.startRemoteActivity(intent)
+        Toast.makeText(context, "Abriendo descarga en tu teléfono...", Toast.LENGTH_SHORT).show()
+    }
 }

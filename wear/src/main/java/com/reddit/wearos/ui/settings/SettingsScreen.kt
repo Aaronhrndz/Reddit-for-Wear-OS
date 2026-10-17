@@ -26,7 +26,10 @@ import com.reddit.wearos.data.RedditRepository
 import com.reddit.wearos.ui.theme.RedditOrange
 import com.reddit.wearos.ui.theme.TextPrimary
 import com.reddit.wearos.ui.theme.TextSecondary
+import com.reddit.wearos.util.GitHubReleaseInfo
 import com.reddit.wearos.util.RemotePhoneHelper
+import com.reddit.wearos.util.UpdateChecker
+import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
@@ -53,6 +56,29 @@ fun SettingsScreen(
     val isLoggedIn by tokenStorage.isLoggedIn.collectAsState()
     var username by remember { mutableStateOf(tokenStorage.getUsername()) }
     var userAvatarUrl by remember { mutableStateOf<String?>(null) }
+
+    val currentVer = remember {
+        try {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.0"
+        } catch (_: Exception) {
+            "1.6.0"
+        }
+    }
+    var releaseInfo by remember { mutableStateOf<GitHubReleaseInfo?>(null) }
+    var isCheckingUpdate by remember { mutableStateOf(false) }
+    var updateStatusText by remember { mutableStateOf("Comprobar en GitHub") }
+
+    LaunchedEffect(Unit) {
+        isCheckingUpdate = true
+        val info = UpdateChecker.checkLatestRelease(currentVer)
+        isCheckingUpdate = false
+        releaseInfo = info
+        updateStatusText = when {
+            info == null -> "Toca para comprobar"
+            info.isUpdateAvailable -> "⚡ Nueva ${info.latestTag} disponible"
+            else -> "✅ Al día (v$currentVer)"
+        }
+    }
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
@@ -244,11 +270,67 @@ fun SettingsScreen(
                 }
             }
 
+            // Botón de Actualizaciones OTA (GitHub Releases)
+            item {
+                val hasNew = releaseInfo?.isUpdateAvailable == true
+                Chip(
+                    onClick = {
+                        val info = releaseInfo
+                        if (info != null && info.isUpdateAvailable) {
+                            val targetUrl = info.wearApkUrl ?: info.releaseHtmlUrl
+                            RemotePhoneHelper.openUrlOnPhone(context, targetUrl)
+                        } else if (!isCheckingUpdate) {
+                            scope.launch {
+                                isCheckingUpdate = true
+                                updateStatusText = "Buscando en GitHub…"
+                                val checked = UpdateChecker.checkLatestRelease(currentVer)
+                                isCheckingUpdate = false
+                                releaseInfo = checked
+                                updateStatusText = when {
+                                    checked == null -> "Sin conexión a GitHub"
+                                    checked.isUpdateAvailable -> "⚡ Nueva ${checked.latestTag} disponible"
+                                    else -> "✅ Estás en la última (v$currentVer)"
+                                }
+                            }
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.SystemUpdate,
+                            contentDescription = null,
+                            tint = if (hasNew) Color.White else RedditOrange,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = if (hasNew) "Descargar ${releaseInfo?.latestTag}" else "Actualizaciones",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    },
+                    secondaryLabel = {
+                        Text(
+                            text = updateStatusText,
+                            fontSize = 9.sp,
+                            color = if (hasNew) Color(0xFFFFEE58) else TextSecondary
+                        )
+                    },
+                    colors = if (hasNew) {
+                        ChipDefaults.primaryChipColors(backgroundColor = RedditOrange)
+                    } else {
+                        ChipDefaults.secondaryChipColors()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             // Info de versión
             item {
                 val deviceName = "${android.os.Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${android.os.Build.MODEL}"
                 Text(
-                    text = "${stringResource(R.string.settings_version_title)} v1.5.0\n$deviceName",
+                    text = "${stringResource(R.string.settings_version_title)} v$currentVer\n$deviceName",
                     fontSize = 9.sp,
                     color = TextSecondary,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
