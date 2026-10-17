@@ -2,100 +2,100 @@
 
 > **Disclaimer**: *Red for Reddit is an unofficial, community-driven open-source client. It is not affiliated with, endorsed, sponsored, or associated with Reddit Inc. in any way.*
 
-Cliente moderno, fluido y nativo para smartwatches con **Wear OS 4 / 5** (optimizado para **Galaxy Watch Ultra 2 / 7 / 6 / 5 / 4**, Pixel Watch y TicWatch) y app complementaria para smartphones Android.
+Modern, smooth, and native Reddit client for **Wear OS** smartwatches (optimized for **Galaxy Watch Ultra / 7 / 6 / 5 / 4** and **Pixel Watch**) and its Android mobile companion app.
 
-Diseñado desde cero con **Jetpack Compose for Wear OS**, soporte para **bisel rotatorio/corona**, reproductor de vídeo nativo, modo de lectura continuo en **Always On Display monocromo** y sincronización en 1 toque.
-
----
-
-## ✨ Características Principales
-
-### ⌚ En el Reloj (Wear OS)
-* **📱 Lectura Continua en Always On Display (AOD)**:
-  * Al bajar la muñeca, **se mantiene en pantalla exactamente el post, noticia o feed que estabas leyendo** (sin pantallazos intermediarios ni blur de Samsung).
-  * **Modo Monocromo GPU Puro**: Toda la interfaz pasa instantáneamente a escala de grises de alto contraste sobre fondo negro puro (`#000000`) para ahorrar batería en paneles LTPO/Super AMOLED a 1 Hz.
-* **▶️ Reproductor de Vídeos Integrado con Audio HLS (`WearVideoPlayer`)**:
-  * Reproducción fluida con ExoPlayer (Media3) priorizando streams oficiales **HLS (`HLSPlaylist.m3u8`)** con audio muxed CMAF, con fallback automático a MP4 progresivo.
-  * Soporte para tap-to-pause, bucle infinito y control de audio (Mute/Unmute).
-* **🖼️ Carrusel de Galerías de Fotos (`PostImageCarousel`)**:
-  * Soporte nativo para posts con álbumes múltiples (`gallery_data` + `media_metadata`), con indicador `1 / N` en el feed y visor interactivo con controles de avance/retroceso en el detalle del post.
-* **🕒 Subtítulos con Tiempo Relativo (`formatRelativeTime`)**:
-  * Todas las tarjetas de publicaciones (`FeedScreen`, `SavedScreen`, `SearchScreen`), vista de detalle (`PostDetailScreen`) y árbol de comentarios muestran hace cuánto se publicó (`ahora`, `hace 15m`, `hace 4h`, `hace 3d`, etc.) junto al subreddit y autor (`r/subreddit • hace 3h • u/autor`).
-* **✏️ Gestión Completa de Comentarios (Responder, Editar y Borrar)**:
-  * Responde a publicaciones o comentarios con teclado en pantalla o dictado por voz, y edita o elimina tus propios comentarios con confirmación en 2 toques (`¿Borrar?`).
-* **🔎 Buscador con Filtros de Ordenación y Tiempo**:
-  * Busca comunidades (`Feeds`) o publicaciones (`Posts`) filtrando en 1 toque por **Orden** (*Relevancia, Nuevos, Destacados, Top, Comentarios*) y **Rango de Tiempo** (*Siempre, Año, Mes, Semana, Hoy*).
-* **⌚ 3 Tiles Interactivos para Wear OS (Sin métricas de Karma innecesarias)**:
-  * **🔥 Feed Personal (`RedditTileService`)**: Muestra los 3 posts destacados de tu feed actual con puntuación, subreddit y tiempo relativo.
-  * **🔖 Mis Guardados (`SavedTileService`)**: Acceso rápido a tus últimas 3 publicaciones guardadas directamente desde el carrusel de Tiles.
-  * **⚡ Titulares Flash (`NewsTileService`)**: Últimas noticias globales en tiempo real.
-* **🔄 Botón de Refresco Rápido**:
-  * Acceso directo con icono `🔄` en la cabecera para actualizar el feed sin recargar la app ni perder la posición.
-* **👑 Feed Personal y Guardados 100% Funcionales**:
-  * Carga todas tus suscripciones, subreddits favoritos, posts guardados (con resolución automática de usuario y reintento inteligente) y ordenación por Popular / All / Home.
-* **🎨 Tarjetas Elevadas de Alto Contraste**:
-  * Diseño AMOLED (`#232326`) con borde sutil (`#38383E`) y pastillas independientes para votación y recuento de comentarios.
-* **🔖 Marcapáginas Vectorial**:
-  * Icono de marcapáginas real (`RedditBookmarkIcon`) para guardar posts en tu cuenta de Reddit con feedback visual inmediato.
-* **🌀 Control Total por Bisel Rotatorio & Corona**:
-  * Scroll háptico con aceleración suave mediante Horologist Rotary.
-
-### 📱 En el Teléfono (Mobile Companion Simplificado) & Persistencia de Sesión
-* **✨ Interfaz Minimalista en 1 Toque**:
-  * Pantalla principal limpia con estado del reloj Bluetooth, cuenta activa (`u/usuario`), botón directo **"Sincronizar con el Reloj Ahora"** y acceso a login/cambio de cuenta. Las herramientas técnicas (inspección de cookie/token) quedan recogidas bajo un desplegable opcional *"Opciones avanzadas"*.
-* **🔐 Sesión Persistente de Larga Duración (`reddit_session` — 6 a 12 meses)**:
-  * **Extracción Inteligente de Cookies**: Al iniciar sesión en `old.reddit.com/login`, la app companion fuerza automáticamente la casilla *"Remember Me"* (`rem = true`) y prioriza la cookie firmada de largo plazo `reddit_session` (válida de 6 a 12 meses) en lugar del JWT efímero `token_v2` (que caduca a las 24 horas).
-  * **Renovación Autónoma en el Reloj (0 dependencia del móvil)**: El reloj almacena `reddit_session` y su fecha real de expiración (`exp` decodificado del JWT) en `TokenStorage`, y refresca por sí mismo el `modhash` (`uh`) y los datos de sesión contra `https://old.reddit.com/api/me.json` sin necesitar conexión con el teléfono en los días o meses siguientes.
-  * **Auto-Recuperación y Sincronización Bluetooth**: Al abrir la app del móvil, recupera automáticamente la cookie activa del `CookieManager` del sistema y la sincroniza al reloj conectado vía `Wearable Data Layer API` (`/reddit/auth_sync`).
-* **🎨 Nuevo Icono Oficial**:
-  * Icono minimalista con la emblemática **`R` en blanco puro sobre fondo naranja Reddit (`#FF4500`)** de alta definición vectorial.
+Designed from scratch with **Jetpack Compose for Wear OS**, **rotary bezel/crown input**, native video player, continuous reading in **pure monochrome Always-on Display (AOD)**, and 1-tap account sync.
 
 ---
 
-## 📲 Instalación Rápida (Vía USB / Wireless ADB)
+## ✨ Features
 
-### 1. Activar Depuración Inalámbrica en tus dispositivos
-1. En tu **Galaxy Watch** y en tu **teléfono**, entra en **Ajustes** -> **Opciones de desarrollador**.
-2. Activa **Depuración ADB** y **Depuración inalámbrica**.
-3. Anota la IP y el puerto de 5 dígitos de cada dispositivo.
+### ⌚ On Watch (Wear OS)
+* **📱 Continuous Reading on Always-On Display (AOD)**:
+  * When lowering your wrist, **the exact post, news item, or feed you are reading remains on screen** without blur or intermediate standby screens.
+  * **Pure GPU Monochrome Mode**: The interface instantly switches to high-contrast grayscale on a pure black background (`#000000`) to preserve battery life on LTPO / Super AMOLED displays at 1 Hz.
+* **▶️ Native Video Player with HLS Audio (`WearVideoPlayer`)**:
+  * Smooth playback powered by ExoPlayer (Media3), prioritizing official **HLS streams (`HLSPlaylist.m3u8`)** with CMAF-muxed audio, with automatic fallback to progressive MP4.
+  * Tap-to-pause, infinite looping, and audio toggle (Mute/Unmute).
+* **🖼️ Photo Gallery Carousel (`PostImageCarousel`)**:
+  * Native multi-image album support (`gallery_data` + `media_metadata`) with `1 / N` feed badge and interactive viewer in post details.
+* **🕒 Relative Time Badges (`formatRelativeTime`)**:
+  * All post cards, detail screens, and comments display relative publish timestamps (`now`, `15m`, `4h`, `3d`) localized alongside subreddit and author (`r/subreddit • 3h • u/author`).
+* **✏️ Full Comment Management (Reply, Edit & Delete)**:
+  * Reply to posts or comments using voice input or on-screen keyboard; edit or delete your own comments with 2-tap safety confirmation.
+* **🔎 Search with Sort & Time Filters**:
+  * Search communities (`Feeds`) or submissions (`Posts`) with 1-tap filtering by **Sort** (*Relevance, New, Hot, Top, Comments*) and **Time Range** (*All Time, Year, Month, Week, Today*).
+* **⌚ 3 Interactive Wear OS Hero Tiles**:
+  * **🔥 Featured Post (`RedditTileService`)**: Single hero card with thumbnail image, title, subreddit, score badge, and tap-to-open deep link.
+  * **🔖 Saved Post (`SavedTileService`)**: Quick access to your latest saved post directly from your Tile carousel.
+  * **⚡ World News Flash (`NewsTileService`)**: Real-time breaking headlines with inline thumbnail.
+* **🔄 Quick Refresh Button**:
+  * Header shortcut to refresh the feed on demand without restarting or losing scroll position.
+* **👑 Fully Functional Personal Feed & Saved Posts**:
+  * Loads all your subreddit subscriptions, saved posts (with auto-username resolution and smart retry), and Popular / All / Home views.
+* **🎨 High-Contrast AMOLED Cards**:
+  * AMOLED-optimized cards (`#232326`) with subtle borders (`#38383E`) and dedicated score/comment pill badges.
+* **🌀 Rotary Bezel & Crown Support**:
+  * Haptic scrolling with smooth acceleration via Horologist Rotary.
+* **🌐 Multilingual Support**:
+  * Built-in support for English, Spanish, French, German, Italian, and Portuguese.
 
-### 2. Instalar en Teléfono y Reloj
+### 📱 On Phone (Mobile Companion & Session Persistence)
+* **✨ Clean 1-Tap Interface**:
+  * Minimalist dashboard showing Bluetooth watch status, active account (`u/username`), direct **"Sync to Watch Now"** button, and login controls. Advanced diagnostics (cookie/token inspect) are neatly tucked into expandable options.
+* **🔐 Persistent Long-Lived Session (`reddit_session` — 6 to 12 months)**:
+  * **Smart Cookie Extraction**: Mobile companion automatically flags *"Remember Me"* (`rem = true`) on `old.reddit.com/login` and extracts the long-term signed cookie `reddit_session` (valid 6-12 months) rather than the ephemeral 24-hour `token_v2`.
+  * **Autonomous Watch Renewal (Zero Phone Dependency)**: The watch stores `reddit_session` and real JWT expiration (`exp`) in `TokenStorage`, renewing `modhash` (`uh`) and session state independently against `https://old.reddit.com/api/me.json`.
+  * **Bluetooth Auto-Sync**: Automatically picks up active cookies from system `CookieManager` upon app launch and transfers them to the watch via Wearable Data Layer API (`/reddit/auth_sync`).
+* **🎨 Modern App Icon**:
+  * Crisp vector styling with bold white typography on vibrant Reddit orange (`#FF4500`).
+
+---
+
+## 📲 Quick Installation (Via USB / Wireless ADB)
+
+### 1. Enable Wireless Debugging
+1. On your **Galaxy Watch** and **Android Phone**, open **Settings** -> **Developer options**.
+2. Enable **ADB debugging** and **Wireless debugging**.
+3. Note the IP address and 5-digit port for each device.
+
+### 2. Install APKs
 
 ```powershell
-# En el Teléfono Android (por USB o Wi-Fi)
-adb -s <SERIAL_O_IP_MOVIL> install -r mobile\build\outputs\apk\debug\mobile-debug.apk
+# Android Phone (USB or Wi-Fi)
+adb -s <PHONE_IP_OR_SERIAL> install -r mobile\build\outputs\apk\debug\mobile-debug.apk
 
-# En el Galaxy Watch (Ultra / 6 / 5 / 4)
-adb connect 192.168.1.173:<PUERTO_RELOJ>
-adb -s 192.168.1.173:<PUERTO_RELOJ> install -r wear\build\outputs\apk\debug\wear-debug.apk
+# Galaxy Watch (Ultra / 7 / 6 / 5 / 4)
+adb connect 192.168.1.173:<WATCH_PORT>
+adb -s 192.168.1.173:<WATCH_PORT> install -r wear\build\outputs\apk\debug\wear-debug.apk
 ```
 
 ---
 
-## 🛠️ Compilación Local
+## 🛠️ Building from Source
 
-El proyecto incluye un entorno de compilación totalmente portátil y automatizado en PowerShell:
+A self-contained PowerShell build script is included:
 
 ```powershell
-# Compila los módulos Mobile y Wear OS generando los APKs
+# Build both Mobile and Wear OS modules and generate APKs
 .\build.ps1
 ```
 
 ---
 
-## 🏗️ Arquitectura Técnica
+## 🏗️ Tech Stack
 
-* **Lenguaje**: Kotlin 2.0
+* **Language**: Kotlin 2.0
 * **UI Toolkit**: Jetpack Compose for Wear OS + Wear Material + Horologist 0.6.x + Compose Material 3 (Mobile)
 * **Networking**: Ktor HTTP Client (CIO engine) + OkHttp + Kotlinx Serialization (`old.reddit.com` / `oauth.reddit.com` dual-mode)
-* **Autenticación Persistente**: Cookie firmada `reddit_session` + `modhash` (`uh`) CSRF + soporte dual OAuth2 `Bearer`
+* **Authentication**: Signed `reddit_session` cookie + CSRF `modhash` (`uh`) + OAuth2 `Bearer` support
 * **Video & Media**: Media3 ExoPlayer (`HlsMediaSource` + `ProgressiveMediaSource`) + Coil Compose
 * **Display Engine**: BlendMode GPU Grayscale Shader + AmbientModeSupport
-* **Almacenamiento Seguro**: `TokenStorage` (`SharedPreferences` con decodificación de expiración JWT `exp`)
+* **Secure Storage**: `TokenStorage` (`SharedPreferences` with JWT `exp` parsing)
 * **Inter-device Sync**: Google Play Services Wearable API (`MessageClient` + `DataClient` + `CapabilityClient`)
 
 ---
 
-## 📄 Licencia
+## 📄 License
 
-Este proyecto está protegido bajo la Licencia **GNU General Public License v3.0 (GPLv3)**. Consulta el archivo [LICENSE](LICENSE) para más detalles. Todo derivado o modificación de este software debe mantenerse de código abierto y bajo esta misma licencia.
+This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. See [LICENSE](LICENSE) for full details. Any derivative work or modification must remain free, open-source, and under this identical license.
