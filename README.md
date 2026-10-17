@@ -8,6 +8,24 @@ Designed from scratch with **Jetpack Compose for Wear OS**, **rotary bezel/crown
 
 ---
 
+## 📸 Screenshots
+
+### ⌚ Wear OS Smartwatch App
+
+| Home Feed & Search | Photo Gallery (`1/5`) | Native Video (`HLS`) | Feed & Sort Selector |
+| :---: | :---: | :---: | :---: |
+| <img src="screenshots/watch_1_home_feed.png" width="190" /> | <img src="screenshots/watch_2_gallery_post.png" width="190" /> | <img src="screenshots/watch_3_video_post.png" width="190" /> | <img src="screenshots/watch_3_subreddits_selector.png" width="190" /> |
+| **Post Detail Carousel** | **Reply, Save & Open on Phone** | **Full-Circle Glanceable Tile** | **Settings & In-App OTA** |
+| <img src="screenshots/watch_4_post_detail.png" width="190" /> | <img src="screenshots/watch_5_post_actions.png" width="190" /> | <img src="screenshots/watch_6_tile.png" width="190" /> | <img src="screenshots/watch_7_settings_ota.png" width="190" /> |
+
+### 📱 Android Phone Companion App (1-Tap Session Sync & Remote Watch OTA)
+
+<p align="center">
+  <img src="screenshots/mobile_companion_app.png" width="320" alt="Mobile Companion App" />
+</p>
+
+---
+
 ## ✨ Features
 
 ### ⌚ On Watch (Wear OS)
