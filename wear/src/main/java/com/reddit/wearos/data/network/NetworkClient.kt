@@ -25,7 +25,7 @@ object NetworkClient {
         return HttpClient(OkHttp) {
             engine {
                 config {
-                    protocols(listOf(Protocol.HTTP_1_1))
+                    protocols(listOf(Protocol.HTTP_2, Protocol.HTTP_1_1))
                     retryOnConnectionFailure(true)
                 }
             }
@@ -47,7 +47,7 @@ object NetworkClient {
         return HttpClient(OkHttp) {
             engine {
                 config {
-                    protocols(listOf(Protocol.HTTP_1_1))
+                    protocols(listOf(Protocol.HTTP_2, Protocol.HTTP_1_1))
                     retryOnConnectionFailure(true)
                 }
             }

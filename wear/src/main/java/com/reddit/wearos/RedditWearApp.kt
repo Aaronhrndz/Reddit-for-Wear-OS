@@ -7,7 +7,12 @@ import com.reddit.wearos.data.RedditRepository
 import com.reddit.wearos.data.network.NetworkClient
 import com.reddit.wearos.data.network.RedditApiService
 
-class RedditWearApp : Application() {
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
+
+class RedditWearApp : Application(), ImageLoaderFactory {
 
     lateinit var tokenStorage: TokenStorage
         private set
@@ -31,5 +36,22 @@ class RedditWearApp : Application() {
 
         // Programar comprobación periódica diaria ultra battery-friendly de actualizaciones
         com.reddit.wearos.util.UpdateJobService.schedule(this)
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .memoryCache {
+                MemoryCache.Builder(this)
+                    .maxSizePercent(0.15) // Max 15% RAM para imágenes en reloj
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(cacheDir.resolve("image_cache"))
+                    .maxSizeBytes(25L * 1024 * 1024) // 25 MB en disco flash
+                    .build()
+            }
+            .respectCacheHeaders(false) // Cachear agresivamente para evitar uso de radio
+            .build()
     }
 }

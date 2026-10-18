@@ -13,8 +13,8 @@ android {
         applicationId = "com.reddit.wearos"
         minSdk = 26
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.6.6"
+        versionCode = 10
+        versionName = "1.6.7"
     }
 
     buildTypes {

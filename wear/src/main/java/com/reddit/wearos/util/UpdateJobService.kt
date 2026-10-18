@@ -28,7 +28,8 @@ class UpdateJobService : JobService() {
             val builder = JobInfo.Builder(JOB_ID, component)
                 .setPeriodic(24 * 60 * 60 * 1000L) // Una vez cada 24 horas
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY) // Solo cuando el reloj tiene conexión
-                .setRequiresBatteryNotLow(true) // Battery-friendly: no despierta si la batería es baja
+                .setRequiresBatteryNotLow(true) // No despierta si la batería es baja (<15-20%)
+                .setRequiresCharging(true) // Battery-friendly óptimo: corre en la base de carga inalámbrica
                 .setPersisted(true) // Persistente tras reiniciar el reloj
 
             val result = scheduler.schedule(builder.build())
