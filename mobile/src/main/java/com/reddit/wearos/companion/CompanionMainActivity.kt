@@ -939,9 +939,14 @@ fun CompanionScreen(
                 HorizontalDivider(color = Color(0xFF2C2C34))
 
                 val info = releaseInfo
-                val watchVerLabel = watchVersion?.let { "v$it" } ?: if (connectedWatches > 0) "v$currentVer (conectado)" else "No conectado"
-                val watchHasUpdate = info != null && watchVersion != null &&
-                    CompanionUpdateChecker.isNewerVersion(info.latestVersion, watchVersion.removePrefix("v"))
+                val watchVerLabel = when {
+                    watchVersion != null -> "v$watchVersion"
+                    connectedWatches > 0 -> "Comprobando…"
+                    else -> "No detectado"
+                }
+                val watchHasUpdate = info != null && (
+                    watchVersion == null || CompanionUpdateChecker.isNewerVersion(info.latestVersion, watchVersion.removePrefix("v"))
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -956,6 +961,14 @@ fun CompanionScreen(
                         text = "⌚ Reloj: $watchVerLabel",
                         fontSize = 12.sp,
                         color = if (watchHasUpdate) Color(0xFFFFB74D) else Color(0xFFCCCCCC)
+                    )
+                }
+
+                if (watchVersion == null && connectedWatches == 0) {
+                    Text(
+                        text = "📁 APK v1.6.2 guardado en Descargas del móvil para instalar con GeminiMan / Wear Installer",
+                        fontSize = 11.sp,
+                        color = Color(0xFF9E9E9E)
                     )
                 }
 

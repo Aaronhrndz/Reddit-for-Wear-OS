@@ -28,5 +28,8 @@ class RedditWearApp : Application() {
         val apiHttpClient = NetworkClient.createRedditApiHttpClient(tokenStorage, authManager)
         val apiService = RedditApiService(apiHttpClient, tokenStorage, authManager)
         repository = RedditRepository(apiService)
+
+        // Programar comprobación periódica diaria ultra battery-friendly de actualizaciones
+        com.reddit.wearos.util.UpdateJobService.schedule(this)
     }
 }
