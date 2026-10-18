@@ -831,7 +831,16 @@ fun CompanionScreen(
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val currentVer = remember {
-            BuildConfig.VERSION_NAME
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0)).versionName ?: "1.6.4"
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.4"
+                }
+            } catch (_: Exception) {
+                "1.6.4"
+            }
         }
         var releaseInfo by remember { mutableStateOf<CompanionReleaseInfo?>(null) }
         var isCheckingUpdate by remember { mutableStateOf(false) }
