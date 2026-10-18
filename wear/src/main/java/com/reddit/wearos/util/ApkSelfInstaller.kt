@@ -155,13 +155,28 @@ class InstallStatusReceiver : BroadcastReceiver() {
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(context, "✅ App del reloj actualizada", Toast.LENGTH_LONG).show()
                 }
+                broadcastToPhone(context, "✅ Reloj actualizado")
             }
             else -> {
                 val msg = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) ?: "Fallo al instalar"
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(context, "Instalación: $msg", Toast.LENGTH_LONG).show()
                 }
+                broadcastToPhone(context, "Error en reloj: $msg")
             }
         }
+    }
+
+    private fun broadcastToPhone(context: Context, statusMsg: String) {
+        try {
+            val nodeClient = com.google.android.gms.wearable.Wearable.getNodeClient(context)
+            val msgClient = com.google.android.gms.wearable.Wearable.getMessageClient(context)
+            nodeClient.connectedNodes.addOnSuccessListener { nodes ->
+                val bytes = statusMsg.toByteArray(Charsets.UTF_8)
+                for (n in nodes) {
+                    msgClient.sendMessage(n.id, "/reddit/update_status", bytes)
+                }
+            }
+        } catch (_: Exception) {}
     }
 }

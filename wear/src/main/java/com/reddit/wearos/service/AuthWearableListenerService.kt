@@ -1,5 +1,6 @@
 package com.reddit.wearos.service
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
@@ -73,17 +74,29 @@ class AuthWearableListenerService : WearableListenerService() {
                         Toast.makeText(applicationContext, "Descargando actualización en el reloj...", Toast.LENGTH_LONG).show()
                     }
                     serviceScope.launch {
-                        ApkSelfInstaller.downloadAndInstallFromUrl(
-                            context = applicationContext,
-                            apkUrl = apkUrl,
-                            onStatus = { status ->
-                                Wearable.getMessageClient(applicationContext).sendMessage(
-                                    messageEvent.sourceNodeId,
-                                    "/reddit/update_status",
-                                    status.toByteArray(Charsets.UTF_8)
-                                )
-                            }
+                        val pm = getSystemService(Context.POWER_SERVICE) as? android.os.PowerManager
+                        val wakeLock = pm?.newWakeLock(
+                            android.os.PowerManager.PARTIAL_WAKE_LOCK,
+                            "redditwear:remote_update_wakelock"
                         )
+                        wakeLock?.acquire(5 * 60 * 1000L) // 5 minutos máximo
+                        try {
+                            ApkSelfInstaller.downloadAndInstallFromUrl(
+                                context = applicationContext,
+                                apkUrl = apkUrl,
+                                onStatus = { status ->
+                                    Wearable.getMessageClient(applicationContext).sendMessage(
+                                        messageEvent.sourceNodeId,
+                                        "/reddit/update_status",
+                                        status.toByteArray(Charsets.UTF_8)
+                                    )
+                                }
+                            )
+                        } finally {
+                            if (wakeLock?.isHeld == true) {
+                                wakeLock.release()
+                            }
+                        }
                     }
                 }
             }

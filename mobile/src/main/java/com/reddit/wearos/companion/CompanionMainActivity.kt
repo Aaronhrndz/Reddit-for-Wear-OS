@@ -124,10 +124,21 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
     override fun onMessageReceived(event: MessageEvent) {
         when (event.path) {
             "/reddit/version_response" -> {
-                watchInstalledVersion = String(event.data, Charsets.UTF_8).trim()
+                val ver = String(event.data, Charsets.UTF_8).trim()
+                watchInstalledVersion = ver
+                if (watchUpdateStatus?.contains("instalador", ignoreCase = true) == true) {
+                    watchUpdateStatus = "✅ Reloj actualizado a v$ver"
+                }
             }
             "/reddit/update_status" -> {
-                watchUpdateStatus = String(event.data, Charsets.UTF_8).trim()
+                val status = String(event.data, Charsets.UTF_8).trim()
+                watchUpdateStatus = status
+                if (status.contains("actualizada", ignoreCase = true)) {
+                    lifecycleScope.launch {
+                        kotlinx.coroutines.delay(2000)
+                        syncManager.requestWatchVersion()
+                    }
+                }
             }
         }
     }
