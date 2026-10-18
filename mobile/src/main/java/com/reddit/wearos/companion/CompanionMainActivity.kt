@@ -17,6 +17,11 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import java.security.MessageDigest
 import java.security.SecureRandom
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -89,13 +94,25 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
     companion object {
         const val USER_AGENT = "Mozilla/5.0 (Linux; Android 14; Mobile; rv:128.0) Gecko/128.0 Firefox/128.0"
         const val DEFAULT_CLIENT_ID = "pA-pE4qfVj5W_A"
+        private const val RC_BT = 1001
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == RC_BT) {
+            checkConnectedWatches(autoSyncIfReady = false)
+            lifecycleScope.launch { syncManager.requestWatchVersion() }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         Wearable.getMessageClient(this).addListener(this)
         lifecycleScope.launch {
-            syncManager.requestWatchVersion()
+            val sent = syncManager.requestWatchVersion()
+            if (!sent && watchInstalledVersion == null) {
+                watchUpdateStatus = "Reloj sin app instalada"
+            }
         }
     }
 
@@ -119,6 +136,12 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
         super.onCreate(savedInstanceState)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         syncManager = WatchSyncManager(this)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT), RC_BT)
+            }
+        }
 
         val prefs = getSharedPreferences("companion_prefs", Context.MODE_PRIVATE)
         redditUsername = prefs.getString("saved_username", "Aaronhrnndz") ?: "Aaronhrnndz"
@@ -219,8 +242,10 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
                                 lifecycleScope.launch {
                                     watchUpdateStatus = "Enviando orden de actualización al reloj..."
                                     val sent = syncManager.triggerWatchUpdate(wearApkUrl)
-                                    if (!sent) {
-                                        watchUpdateStatus = "No se detectó reloj conectado por Bluetooth"
+                                    if (sent) {
+                                        watchUpdateStatus = "✅ Orden enviada al reloj. Iniciando descarga..."
+                                    } else {
+                                        watchUpdateStatus = "Reloj no disponible (enciende pantalla o abre la app en el reloj)"
                                     }
                                 }
                             }
@@ -513,6 +538,8 @@ fun RedditWebLoginView(
     var detectedUser by remember { mutableStateOf(username) }
     var hasPersistentCookie by remember { mutableStateOf(false) }
 
+    var autoTriggered by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -533,36 +560,21 @@ fun RedditWebLoginView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("Login Reddit u/$detectedUser", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
+                        Text("Iniciar Sesión en Reddit", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color.White)
                         Text(
-                            text = if (hasPersistentCookie) "✅ Cookie reddit_session (1 año) lista" else "Inicia sesión abajo (Remember Me activo)",
+                            text = if (autoTriggered) "✅ Sesión detectada, sincronizando..." else "Introduce usuario y contraseña",
                             fontSize = 11.sp,
-                            color = if (hasPersistentCookie) Color(0xFF4CAF50) else Color(0xFFAAAAAA)
+                            color = if (autoTriggered) Color(0xFF4CAF50) else Color(0xFFAAAAAA)
                         )
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(
-                            onClick = {
-                                val cm = CookieManager.getInstance()
-                                cm.removeAllCookies { cm.flush() }
-                                hasPersistentCookie = false
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF442222)),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
-                        ) {
-                            Icon(Icons.Default.DeleteSweep, contentDescription = null, tint = Color(0xFFFF8888), modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Limpiar", fontSize = 11.sp, color = Color(0xFFFF8888))
-                        }
-                        Button(
-                            onClick = onCancel,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Volver", fontSize = 11.sp)
-                        }
+                    Button(
+                        onClick = onCancel,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Volver", fontSize = 11.sp)
                     }
                 }
             }
@@ -585,33 +597,16 @@ fun RedditWebLoginView(
                                 super.onPageFinished(view, url)
                                 CookieManager.getInstance().flush()
                                 val cookies = extractAllRedditCookies()
-                                hasPersistentCookie = cookies.contains("reddit_session=")
+                                val hasSession = cookies.contains("reddit_session=")
 
                                 view?.evaluateJavascript(
                                     """
                                     (function() {
                                         try {
-                                            // 1. Marcar siempre "remember me" (rem) para que reddit_session dure 1 año
                                             var rems = document.querySelectorAll('input[name="rem"], #rem-login-main, input[type="checkbox"]');
                                             for (var k = 0; k < rems.length; k++) {
                                                 rems[k].checked = true;
                                             }
-                                            // 2. Cerrar banners de cookies
-                                            var btns = document.querySelectorAll('button, a');
-                                            for (var i = 0; i < btns.length; i++) {
-                                                var text = (btns[i].innerText || '').toLowerCase();
-                                                if (text.includes('accept') || text.includes('agree') || text.includes('aceptar') || text.includes('got it')) {
-                                                    btns[i].click();
-                                                }
-                                            }
-                                            var overlays = document.querySelectorAll('#cookie-banner, .cookie-banner, [id*="cookie"], [class*="cookie"], [class*="overlay"], [class*="backdrop"]');
-                                            for (var j = 0; j < overlays.length; j++) {
-                                                if (overlays[j].tagName !== 'BODY' && overlays[j].tagName !== 'HTML') {
-                                                    overlays[j].style.display = 'none';
-                                                    overlays[j].style.pointerEvents = 'none';
-                                                }
-                                            }
-                                            // 3. Detectar usuario logueado en old.reddit.com
                                             var userLink = document.querySelector('.user a');
                                             if (userLink && userLink.innerText && !userLink.innerText.toLowerCase().includes('want to join')) {
                                                 return userLink.innerText.trim();
@@ -622,8 +617,13 @@ fun RedditWebLoginView(
                                     """.trimIndent()
                                 ) { result ->
                                     val cleanName = result?.trim()?.removeSurrounding("\"") ?: ""
-                                    if (cleanName.isNotEmpty() && cleanName != "null" && !cleanName.contains(" ")) {
-                                        detectedUser = cleanName
+                                    val user = if (cleanName.isNotEmpty() && cleanName != "null" && !cleanName.contains(" ")) cleanName else username
+
+                                    // Si hay sesión persistente real y no estamos en la pantalla inicial de login: auto-completar y cerrar
+                                    val isLoginPage = url?.contains("/login") == true || url?.contains("account/login") == true
+                                    if (!autoTriggered && hasSession && (!isLoginPage || cleanName.isNotEmpty())) {
+                                        autoTriggered = true
+                                        onSessionCaptured(cookies, user)
                                     }
                                 }
                             }
@@ -642,36 +642,6 @@ fun RedditWebLoginView(
                     }
                 }
             )
-
-            // Botón manual de confirmación
-            Surface(
-                color = Color(0xFF1A1A1A),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = {
-                        CookieManager.getInstance().flush()
-                        val token = extractAllRedditCookies()
-                        onSessionCaptured(token, detectedUser)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(14.dp)
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (hasPersistentCookie) Color(0xFF2E7D32) else Color(0xFFFF4500)
-                    ),
-                    shape = RoundedCornerShape(10.dp)
-                ) {
-                    Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (hasPersistentCookie) "✅ Sincronizar Sesión Persistente con el Reloj" else "Copiar y Sincronizar con el Reloj",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
         }
     }
 }
@@ -861,11 +831,7 @@ fun CompanionScreen(
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val currentVer = remember {
-            try {
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.1"
-            } catch (_: Exception) {
-                "1.6.1"
-            }
+            BuildConfig.VERSION_NAME
         }
         var releaseInfo by remember { mutableStateOf<CompanionReleaseInfo?>(null) }
         var isCheckingUpdate by remember { mutableStateOf(false) }
@@ -941,6 +907,7 @@ fun CompanionScreen(
                 val info = releaseInfo
                 val watchVerLabel = when {
                     watchVersion != null -> "v$watchVersion"
+                    connectedWatches > 0 && watchUpdateStatus == "Reloj sin app instalada" -> "No instalada"
                     connectedWatches > 0 -> "Comprobando…"
                     else -> "No detectado"
                 }
@@ -961,14 +928,6 @@ fun CompanionScreen(
                         text = "⌚ Reloj: $watchVerLabel",
                         fontSize = 12.sp,
                         color = if (watchHasUpdate) Color(0xFFFFB74D) else Color(0xFFCCCCCC)
-                    )
-                }
-
-                if (watchVersion == null && connectedWatches == 0) {
-                    Text(
-                        text = "📁 APK v1.6.2 guardado en Descargas del móvil para instalar con GeminiMan / Wear Installer",
-                        fontSize = 11.sp,
-                        color = Color(0xFF9E9E9E)
                     )
                 }
 
@@ -1017,6 +976,12 @@ fun CompanionScreen(
                             )
                         }
 
+                        val watchBtnText = when {
+                            watchVersion == null -> "Instalar en Reloj"
+                            watchHasUpdate -> "Actualizar Reloj"
+                            else -> "Reinstalar Reloj"
+                        }
+
                         Button(
                             onClick = {
                                 val url = info.wearApkUrl
@@ -1033,7 +998,7 @@ fun CompanionScreen(
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text(
-                                text = if (watchHasUpdate) "Actualizar Reloj" else "Actualizar Reloj",
+                                text = watchBtnText,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White

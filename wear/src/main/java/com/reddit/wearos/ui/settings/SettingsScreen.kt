@@ -326,7 +326,7 @@ fun SettingsScreen(
                         Text(
                             text = updateStatusText,
                             fontSize = 9.sp,
-                            color = if (hasNew) Color(0xFFFFEE58) else TextSecondary
+                            color = if (hasNew) Color.White.copy(alpha = 0.9f) else TextSecondary
                         )
                     },
                     colors = if (hasNew) {

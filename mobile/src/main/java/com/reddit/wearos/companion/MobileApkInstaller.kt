@@ -5,10 +5,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -22,30 +24,82 @@ object MobileApkInstaller {
         apkUrl: String,
         onStatus: (String) -> Unit
     ): Boolean = withContext(Dispatchers.IO) {
+        val appCtx = context.applicationContext
         try {
-            onStatus("Descargando APK móvil...")
-            val conn = URL(apkUrl).openConnection() as HttpURLConnection
-            conn.instanceFollowRedirects = true
-            conn.connectTimeout = 15000
-            conn.readTimeout = 60000
-            conn.setRequestProperty("User-Agent", "RedForReddit-Mobile-OTA")
+            onStatus("Descargando APK...")
+            var activeConn = URL(apkUrl).openConnection() as HttpURLConnection
+            activeConn.instanceFollowRedirects = true
+            activeConn.connectTimeout = 15000
+            activeConn.readTimeout = 60000
+            activeConn.setRequestProperty("User-Agent", "RedForReddit-Mobile-OTA")
 
-            val tempFile = File(context.cacheDir, "ota_update_mobile.apk")
-            if (tempFile.exists()) tempFile.delete()
-
-            conn.inputStream.use { input ->
-                tempFile.outputStream().use { output ->
-                    input.copyTo(output)
+            if (activeConn.responseCode in 300..399) {
+                val redirectUrl = activeConn.getHeaderField("Location")
+                if (!redirectUrl.isNullOrEmpty()) {
+                    activeConn.disconnect()
+                    activeConn = URL(redirectUrl).openConnection() as HttpURLConnection
+                    activeConn.connectTimeout = 15000
+                    activeConn.readTimeout = 60000
+                    activeConn.setRequestProperty("User-Agent", "RedForReddit-Mobile-OTA")
                 }
             }
 
+            val updatesDir = File(appCtx.cacheDir, "updates").apply { mkdirs() }
+            val tempFile = File(updatesDir, "reddit_mobile_update.apk")
+            if (tempFile.exists()) tempFile.delete()
+
+            val contentLength = activeConn.contentLengthLong
+            val buffer = ByteArray(8192)
+            var bytesRead: Int
+            var totalRead = 0L
+            var lastReportedPercent = -1
+
+            activeConn.inputStream.use { input ->
+                tempFile.outputStream().use { output ->
+                    while (input.read(buffer).also { bytesRead = it } != -1) {
+                        output.write(buffer, 0, bytesRead)
+                        totalRead += bytesRead
+                        if (contentLength > 0) {
+                            val percent = ((totalRead * 100) / contentLength).toInt()
+                            if (percent != lastReportedPercent && percent % 10 == 0) {
+                                lastReportedPercent = percent
+                                onStatus("Descargando: $percent%")
+                            }
+                        }
+                    }
+                }
+            }
+            activeConn.disconnect()
+
             if (tempFile.length() < 100_000L) {
-                onStatus("Error: APK descargado incompleto")
+                onStatus("Error: APK incompleto")
                 return@withContext false
             }
 
-            onStatus("Abriendo instalador...")
-            installApkFile(context, tempFile)
+            onStatus("Lanzando instalador...")
+
+            // Intento 1: FileProvider + Intent.ACTION_VIEW (nativo Android estándar y 100% visible)
+            var intentStarted = false
+            try {
+                val apkUri: Uri = FileProvider.getUriForFile(
+                    appCtx,
+                    "${appCtx.packageName}.fileprovider",
+                    tempFile
+                )
+                val installIntent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(apkUri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                appCtx.startActivity(installIntent)
+                intentStarted = true
+            } catch (e: Exception) {
+                android.util.Log.e("MobileApkInstaller", "FileProvider intent failed, trying Session fallback", e)
+            }
+
+            if (!intentStarted) {
+                installViaSession(appCtx, tempFile)
+            }
             true
         } catch (e: Exception) {
             onStatus("Error descarga móvil: ${e.localizedMessage ?: "red"}")
@@ -53,7 +107,7 @@ object MobileApkInstaller {
         }
     }
 
-    private fun installApkFile(context: Context, apkFile: File) {
+    private fun installViaSession(context: Context, apkFile: File) {
         val packageInstaller = context.packageManager.packageInstaller
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
         val sessionId = packageInstaller.createSession(params)

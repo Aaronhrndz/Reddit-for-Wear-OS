@@ -48,9 +48,25 @@ object ApkSelfInstaller {
             val tempFile = File(updatesDir, "reddit_wear_update.apk")
             if (tempFile.exists()) tempFile.delete()
 
+            val contentLength = activeConn.contentLengthLong
+            val buffer = ByteArray(8192)
+            var bytesRead: Int
+            var totalRead = 0L
+            var lastReportedPercent = -1
+
             activeConn.inputStream.use { input ->
                 tempFile.outputStream().use { output ->
-                    input.copyTo(output)
+                    while (input.read(buffer).also { bytesRead = it } != -1) {
+                        output.write(buffer, 0, bytesRead)
+                        totalRead += bytesRead
+                        if (contentLength > 0) {
+                            val percent = ((totalRead * 100) / contentLength).toInt()
+                            if (percent != lastReportedPercent && percent % 10 == 0) {
+                                lastReportedPercent = percent
+                                onStatus("Descargando: $percent%")
+                            }
+                        }
+                    }
                 }
             }
             activeConn.disconnect()

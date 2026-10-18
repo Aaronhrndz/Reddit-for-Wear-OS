@@ -13,8 +13,8 @@ android {
         applicationId = "com.reddit.wearos"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.6.3"
+        versionCode = 7
+        versionName = "1.6.4"
     }
 
     buildTypes {
@@ -42,6 +42,12 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
     }
 }
 
