@@ -5,10 +5,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -22,30 +24,67 @@ object ApkSelfInstaller {
         apkUrl: String,
         onStatus: (String) -> Unit
     ): Boolean = withContext(Dispatchers.IO) {
+        val appCtx = context.applicationContext
         try {
             onStatus("Descargando APK en reloj...")
-            val conn = URL(apkUrl).openConnection() as HttpURLConnection
-            conn.instanceFollowRedirects = true
-            conn.connectTimeout = 15000
-            conn.readTimeout = 60000
-            conn.setRequestProperty("User-Agent", "RedForReddit-WearOS-OTA")
+            var activeConn = URL(apkUrl).openConnection() as HttpURLConnection
+            activeConn.instanceFollowRedirects = true
+            activeConn.connectTimeout = 15000
+            activeConn.readTimeout = 60000
+            activeConn.setRequestProperty("User-Agent", "RedForReddit-WearOS-OTA")
 
-            val tempFile = File(context.cacheDir, "ota_update_watch.apk")
+            if (activeConn.responseCode in 300..399) {
+                val redirectUrl = activeConn.getHeaderField("Location")
+                if (!redirectUrl.isNullOrEmpty()) {
+                    activeConn.disconnect()
+                    activeConn = URL(redirectUrl).openConnection() as HttpURLConnection
+                    activeConn.connectTimeout = 15000
+                    activeConn.readTimeout = 60000
+                    activeConn.setRequestProperty("User-Agent", "RedForReddit-WearOS-OTA")
+                }
+            }
+
+            val updatesDir = File(appCtx.cacheDir, "updates").apply { mkdirs() }
+            val tempFile = File(updatesDir, "reddit_wear_update.apk")
             if (tempFile.exists()) tempFile.delete()
 
-            conn.inputStream.use { input ->
+            activeConn.inputStream.use { input ->
                 tempFile.outputStream().use { output ->
                     input.copyTo(output)
                 }
             }
+            activeConn.disconnect()
 
             if (tempFile.length() < 100_000L) {
                 onStatus("Error: APK incompleto")
                 return@withContext false
             }
 
-            onStatus("Instalando actualización...")
-            installApkFile(context, tempFile)
+            onStatus("Lanzando instalador...")
+
+            // Intento 1: Lanzador nativo via FileProvider (estilo UltraRemapper)
+            var intentStarted = false
+            try {
+                val apkUri: Uri = FileProvider.getUriForFile(
+                    appCtx,
+                    "${appCtx.packageName}.fileprovider",
+                    tempFile
+                )
+                val installIntent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(apkUri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                appCtx.startActivity(installIntent)
+                intentStarted = true
+            } catch (_: Exception) {
+                intentStarted = false
+            }
+
+            // Intento 2 / Fallback: PackageInstaller Session API
+            if (!intentStarted) {
+                installApkFile(appCtx, tempFile)
+            }
             true
         } catch (e: Exception) {
             onStatus("Error OTA: ${e.localizedMessage ?: "red"}")

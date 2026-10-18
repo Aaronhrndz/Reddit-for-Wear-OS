@@ -50,11 +50,15 @@ object UpdateChecker {
             assets?.forEach { elem ->
                 val obj = elem.jsonObject
                 val name = obj["name"]?.jsonPrimitive?.content ?: ""
-                val dl = obj["browser_download_url"]?.jsonPrimitive?.content
-                if (name.contains("WearOS", ignoreCase = true) && name.endsWith(".apk")) {
-                    wearUrl = dl
-                } else if (name.contains("Mobile", ignoreCase = true) && name.endsWith(".apk")) {
-                    mobileUrl = dl
+                val dl = obj["browser_download_url"]?.jsonPrimitive?.content ?: return@forEach
+                if (name.contains("wear", ignoreCase = true) && name.endsWith(".apk", ignoreCase = true)) {
+                    if (wearUrl == null || !name.contains("debug", ignoreCase = true)) {
+                        wearUrl = dl
+                    }
+                } else if (name.contains("mobile", ignoreCase = true) && name.endsWith(".apk", ignoreCase = true)) {
+                    if (mobileUrl == null || !name.contains("debug", ignoreCase = true)) {
+                        mobileUrl = dl
+                    }
                 }
             }
 

@@ -424,13 +424,14 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
                 val webCookies = extractAllRedditCookies()
                 val combined = if (webCookies.isNotEmpty()) "$sessionData; $webCookies" else sessionData
                 val sessionMatch = Regex("""reddit_session=([^;\s]+)""").find(combined)
-                val tokenV2Match = Regex("""token_v2=([^;\s]+)""").find(combined)
+                val tokenV2Match = Regex("""token_v2=([^;\s]+)""").find(combined)?.groupValues?.get(1)?.trim()?.takeIf { !isLoidJwt(it) }
 
                 val permanentCookie = sessionMatch?.let { "reddit_session=${it.groupValues[1].trim()}" }
                 val effectiveAccess = when {
                     permanentCookie != null -> permanentCookie
-                    tokenV2Match != null -> tokenV2Match.groupValues[1].trim()
-                    else -> sessionData.trim()
+                    tokenV2Match != null -> tokenV2Match
+                    !isLoidJwt(sessionData) -> sessionData.trim()
+                    else -> ""
                 }
 
                 val payload = AuthSyncPayload(
@@ -462,6 +463,18 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
     }
 }
 
+private fun isLoidJwt(raw: String): Boolean {
+    val clean = raw.trim().removePrefix("Bearer ")
+    if (!clean.startsWith("eyJ")) return false
+    return try {
+        val seg = clean.split(".")
+        if (seg.size == 3) {
+            val p = String(Base64.decode(seg[1], Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING), Charsets.UTF_8)
+            Regex(""""sub"\s*:\s*"loid"""").containsMatchIn(p)
+        } else false
+    } catch (_: Exception) { false }
+}
+
 fun extractAllRedditCookies(): String {
     return try {
         val cm = CookieManager.getInstance()
@@ -478,7 +491,7 @@ fun extractAllRedditCookies(): String {
         }
         Regex("""token_v2=([^;\s]+)""").find(combined)?.let {
             val v = it.groupValues[1].trim()
-            if (v.length > 50) parts.add("token_v2=$v")
+            if (v.length > 50 && !isLoidJwt(v)) parts.add("token_v2=$v")
         }
         Regex("""loid=([^;\s]+)""").find(combined)?.let {
             val v = it.groupValues[1].trim()

@@ -66,8 +66,23 @@ class TokenStorage(context: Context) {
         }
     }
 
+    private fun isLoidToken(raw: String): Boolean {
+        if (!raw.trim().startsWith("eyJ") && !raw.trim().startsWith("Bearer eyJ")) return false
+        return try {
+            val seg = raw.trim().removePrefix("Bearer ").split(".")
+            if (seg.size == 3) {
+                val p = String(Base64.decode(seg[1], Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING), Charsets.UTF_8)
+                Regex(""""sub"\s*:\s*"loid"""").containsMatchIn(p)
+            } else false
+        } catch (_: Exception) { false }
+    }
+
     fun getAccessToken(): String? {
-        return prefs.getString(KEY_ACCESS_TOKEN, null) ?: getSessionCookie()
+        val raw = prefs.getString(KEY_ACCESS_TOKEN, null)
+        if (!raw.isNullOrEmpty() && !isLoidToken(raw)) {
+            return raw
+        }
+        return getSessionCookie()
     }
 
     fun getRefreshToken(): String? {
@@ -111,6 +126,8 @@ class TokenStorage(context: Context) {
         val sessionMatch = Regex("""reddit_session=([^;\s]+)""").find(combinedSource)
         val tokenV2Match = Regex("""token_v2=([^;\s]+)""").find(combinedSource)
 
+        val isLoidJwt = isLoidToken(accessToken)
+
         val effectiveAccess: String
         val expiresAt: Long
 
@@ -118,10 +135,19 @@ class TokenStorage(context: Context) {
             effectiveAccess = extractCookieHeader(combinedSource)
             expiresAt = extractJwtExpiryMillis(sessionMatch.groupValues[1].trim())
                 ?: (System.currentTimeMillis() + (365L * 24L * 3600L * 1000L))
+        } else if (isLoidJwt) {
+            // Ignorar tokens anónimos loid que rompen oauth.reddit.com
+            effectiveAccess = ""
+            expiresAt = 0L
         } else if (tokenV2Match != null) {
             val jwt = tokenV2Match.groupValues[1].trim()
-            effectiveAccess = jwt
-            expiresAt = extractJwtExpiryMillis(jwt) ?: (System.currentTimeMillis() + 3600_000L)
+            if (!isLoidToken(jwt)) {
+                effectiveAccess = jwt
+                expiresAt = extractJwtExpiryMillis(jwt) ?: (System.currentTimeMillis() + 3600_000L)
+            } else {
+                effectiveAccess = ""
+                expiresAt = 0L
+            }
         } else if (accessToken.trim().startsWith("eyJ") && !accessToken.contains("=")) {
             val jwt = accessToken.trim()
             effectiveAccess = jwt

@@ -37,6 +37,17 @@ class RedditApiService(
     private suspend fun getAuthHeader(): Pair<String, String>? {
         val token = authManager.refreshTokenIfNeeded() ?: tokenStorage.getAccessToken() ?: tokenStorage.getSessionCookie() ?: return null
         val clean = token.trim()
+        if (clean.isEmpty()) return null
+        if (clean.startsWith("eyJ") || clean.startsWith("Bearer eyJ")) {
+            val seg = clean.removePrefix("Bearer ").split(".")
+            if (seg.size == 3) {
+                val isLoid = try {
+                    val p = String(android.util.Base64.decode(seg[1], android.util.Base64.URL_SAFE or android.util.Base64.NO_WRAP or android.util.Base64.NO_PADDING), Charsets.UTF_8)
+                    Regex(""""sub"\s*:\s*"loid"""").containsMatchIn(p)
+                } catch (_: Exception) { false }
+                if (isLoid) return null
+            }
+        }
         return if (clean.contains("reddit_session=") || clean.contains("=")) {
             Pair("Cookie", clean)
         } else if (clean.startsWith("Bearer ")) {
@@ -140,6 +151,11 @@ class RedditApiService(
                         responseText = response.bodyAsText()
                     } else if (!newToken.isNullOrEmpty()) {
                         currentAuthHeader = Pair("Cookie", newToken)
+                    } else {
+                        currentAuthHeader = null
+                    }
+                    if (status == 401 || status == 403) {
+                        currentAuthHeader = null
                     }
                 }
 
@@ -152,7 +168,8 @@ class RedditApiService(
                     }
                 }
 
-                if ((status == 403 || status == 401) && currentAuthHeader != null && !url.contains("oauth.reddit.com")) {
+                if ((status == 403 || status == 401) && !url.contains("oauth.reddit.com")) {
+                    currentAuthHeader = null
                     val publicUrl = if (url.endsWith(".json")) url else "$url.json"
                     val publicResp = httpClient.get(publicUrl) {
                         header("User-Agent", USER_AGENT)
