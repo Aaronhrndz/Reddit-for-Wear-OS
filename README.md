@@ -1,5 +1,8 @@
 # ⌚ Red for Reddit (Wear OS & Mobile Companion)
 
+[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Project-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white)](https://ko-fi.com/aaronhrndz)
+[![GitHub Release](https://img.shields.io/github/v/release/Aaronhrndz/Reddit-for-Wear-OS?style=for-the-badge&color=FF4500)](https://github.com/Aaronhrndz/Reddit-for-Wear-OS/releases/latest)
+
 > **Disclaimer**: *Red for Reddit is an unofficial, community-driven open-source client. It is not affiliated with, endorsed, sponsored, or associated with Reddit Inc. in any way.*
 
 Modern, smooth, and native Reddit client for **Wear OS** smartwatches (optimized for **Galaxy Watch Ultra / 7 / 6 / 5 / 4** and **Pixel Watch**) and its Android mobile companion app.
