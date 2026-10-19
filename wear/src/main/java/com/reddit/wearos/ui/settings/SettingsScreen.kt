@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -401,7 +402,7 @@ fun SettingsScreen(
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 6.dp)
-                        .androidx.compose.foundation.clickable {
+                        .clickable {
                             tapCount++
                             if (tapCount >= 7) {
                                 tapCount = 0
