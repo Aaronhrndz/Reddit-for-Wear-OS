@@ -404,18 +404,6 @@ fun SettingsScreen(
                             if (tapCount >= 7) {
                                 tapCount = 0
                                 showDevDialog = true
-                                android.widget.Toast.makeText(
-                                    context,
-                                    context.getString(R.string.dev_unlocked),
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
-                            } else if (tapCount >= 3) {
-                                val remaining = 7 - tapCount
-                                android.widget.Toast.makeText(
-                                    context,
-                                    context.getString(R.string.dev_steps_remaining, remaining),
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
                             }
                         },
                     horizontalAlignment = Alignment.CenterHorizontally

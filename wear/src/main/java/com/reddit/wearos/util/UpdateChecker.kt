@@ -97,8 +97,11 @@ object UpdateChecker {
     }
 
     private fun isNewerVersion(remote: String, local: String): Boolean {
-        val rParts = remote.split(".").map { it.toIntOrNull() ?: 0 }
-        val lParts = local.split(".").map { it.toIntOrNull() ?: 0 }
+        val rClean = remote.substringBefore("-").trim()
+        val lClean = local.substringBefore("-").trim()
+
+        val rParts = rClean.split(".").map { it.toIntOrNull() ?: 0 }
+        val lParts = lClean.split(".").map { it.toIntOrNull() ?: 0 }
         val maxLen = maxOf(rParts.size, lParts.size)
         for (i in 0 until maxLen) {
             val r = rParts.getOrElse(i) { 0 }
@@ -106,6 +109,15 @@ object UpdateChecker {
             if (r > l) return true
             if (r < l) return false
         }
+
+        if (remote.contains("-") && !local.contains("-")) return false
+        if (!remote.contains("-") && local.contains("-")) return true
+        if (remote.contains("-") && local.contains("-")) {
+            val rSuffix = remote.substringAfter("-")
+            val lSuffix = local.substringAfter("-")
+            return rSuffix.compareTo(lSuffix) > 0
+        }
+
         return false
     }
 }

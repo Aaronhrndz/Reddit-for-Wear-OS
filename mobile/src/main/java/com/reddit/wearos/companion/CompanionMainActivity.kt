@@ -959,10 +959,6 @@ fun CompanionScreen(
                             if (tapCount >= 7) {
                                 tapCount = 0
                                 showDevOptions = true
-                                Toast.makeText(context, context.getString(R.string.dev_unlocked), Toast.LENGTH_SHORT).show()
-                            } else if (tapCount >= 3) {
-                                val remaining = 7 - tapCount
-                                Toast.makeText(context, context.getString(R.string.dev_steps_remaining, remaining), Toast.LENGTH_SHORT).show()
                             }
                         },
                         shape = RoundedCornerShape(20.dp),
