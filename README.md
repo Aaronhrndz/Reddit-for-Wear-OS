@@ -1,19 +1,34 @@
-# ⌚ Red for Reddit (Wear OS & Mobile Companion)
+<p align="center">
+  <img src="docs/icon.png" width="110" height="110" alt="Red for Reddit Icon" />
+</p>
 
-[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Project-FF5E5B?style=for-the-badge&logo=kofi&logoColor=white)](https://ko-fi.com/aaronhrndz)
-[![GitHub Release](https://img.shields.io/github/v/release/Aaronhrndz/Reddit-for-Wear-OS?style=for-the-badge&color=FF4500)](https://github.com/Aaronhrndz/Reddit-for-Wear-OS/releases/latest)
+<h1 align="center">Red for Reddit</h1>
+
+<p align="center">
+  <b>Modern Reddit Client for Wear OS Smartwatches & Android Mobile Companion</b><br/>
+  <sub>Jetpack Compose · Pure Monochrome AOD · HLS Native Video · Rotary Bezel Input · 1-Tap Account Sync · Standalone OTA</sub>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Aaronhrndz/Reddit-for-Wear-OS/releases/latest">
+    <img src="https://img.shields.io/github/v/release/Aaronhrndz/Reddit-for-Wear-OS?color=FF4500&label=latest%20release&style=flat-square" alt="Latest Release" />
+  </a>
+  <a href="https://ko-fi.com/aaronhrndz">
+    <img src="https://img.shields.io/badge/Ko--fi-Donate%20%E2%98%95-FF5E5B?style=flat-square&logo=kofi&logoColor=white" alt="Support on Ko-fi" />
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square" alt="License: GPL-3.0" />
+  </a>
+  <img src="https://img.shields.io/badge/platform-Wear%20OS%204%2B-3DDC84?style=flat-square" alt="Wear OS" />
+</p>
 
 > **Disclaimer**: *Red for Reddit is an unofficial, community-driven open-source client. It is not affiliated with, endorsed, sponsored, or associated with Reddit Inc. in any way.*
 
-Modern, smooth, and native Reddit client for **Wear OS** smartwatches (optimized for **Galaxy Watch Ultra / 7 / 6 / 5 / 4** and **Pixel Watch**) and its Android mobile companion app.
-
-Designed from scratch with **Jetpack Compose for Wear OS**, **rotary bezel/crown input**, native video player, continuous reading in **pure monochrome Always-on Display (AOD)**, and 1-tap account sync.
-
 ---
 
-## 📸 Screenshots
+## Screenshots
 
-### ⌚ Wear OS Smartwatch App
+### Wear OS Smartwatch App
 
 | Home Feed & Search | Photo Gallery (`1/5`) | Native Video (`HLS`) | Feed & Sort Selector |
 | :---: | :---: | :---: | :---: |
@@ -21,10 +36,10 @@ Designed from scratch with **Jetpack Compose for Wear OS**, **rotary bezel/crown
 | **Post Detail Carousel** | **Reply, Save & Open on Phone** | **Full-Circle Glanceable Tile** | **Settings & In-App OTA** |
 | <img src="screenshots/watch_4_post_detail.png" width="190" /> | <img src="screenshots/watch_5_post_actions.png" width="190" /> | <img src="screenshots/watch_6_tile.png" width="190" /> | <img src="screenshots/watch_7_settings_ota.png" width="190" /> |
 
-### 📱 Android Phone Companion App (1-Tap Session Sync & Remote Watch OTA)
+### Android Phone Companion App (1-Tap Session Sync & Remote Watch OTA)
 
 <p align="center">
-  <img src="screenshots/mobile_companion_app.png" width="320" alt="Mobile Companion App" />
+  <img src="screenshots/mobile_companion_app.png" width="300" alt="Mobile Companion App" />
 </p>
 
 ---
