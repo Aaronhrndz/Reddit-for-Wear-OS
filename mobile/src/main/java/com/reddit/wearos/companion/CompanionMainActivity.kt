@@ -845,13 +845,13 @@ fun CompanionScreen(
         val currentVer = remember {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0)).versionName ?: "1.6.4"
+                    context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0)).versionName ?: "1.6.7"
                 } else {
                     @Suppress("DEPRECATION")
-                    context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.4"
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "1.6.7"
                 }
             } catch (_: Exception) {
-                "1.6.4"
+                "1.6.7"
             }
         }
         var releaseInfo by remember { mutableStateOf<CompanionReleaseInfo?>(null) }
@@ -947,7 +947,7 @@ fun CompanionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    val betaBadge = if (isBetaChannel) " (Beta)" else ""
+                    val isVersionBeta = currentVer.contains("beta", ignoreCase = true)
                     // Píldora botón Móvil (con soporte para 7 taps de desarrollador)
                     Surface(
                         onClick = {
@@ -962,10 +962,10 @@ fun CompanionScreen(
                             }
                         },
                         shape = RoundedCornerShape(20.dp),
-                        color = if (isBetaChannel) Color(0xFFFF4500).copy(alpha = 0.2f) else Color(0xFF26262D),
+                        color = if (isVersionBeta) Color(0xFFFF4500).copy(alpha = 0.2f) else Color(0xFF26262D),
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
-                            if (isBetaChannel) Color(0xFFFF4500) else Color(0xFF383842)
+                            if (isVersionBeta) Color(0xFFFF4500) else Color(0xFF383842)
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -974,21 +974,30 @@ fun CompanionScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "📱 Móvil v$currentVer$betaBadge",
+                                text = "📱 Móvil: v$currentVer",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (isBetaChannel) Color(0xFFFF4500) else Color.White
+                                color = if (isVersionBeta) Color(0xFFFF4500) else Color.White
                             )
                         }
                     }
 
                     // Píldora botón Reloj
+                    val isWatchBeta = watchVersion?.contains("beta", ignoreCase = true) == true
                     Surface(
                         shape = RoundedCornerShape(20.dp),
-                        color = if (watchHasUpdate) Color(0xFFFFB74D).copy(alpha = 0.15f) else Color(0xFF26262D),
+                        color = when {
+                            isWatchBeta -> Color(0xFFFF4500).copy(alpha = 0.2f)
+                            watchHasUpdate -> Color(0xFFFFB74D).copy(alpha = 0.15f)
+                            else -> Color(0xFF26262D)
+                        },
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
-                            if (watchHasUpdate) Color(0xFFFFB74D) else Color(0xFF383842)
+                            when {
+                                isWatchBeta -> Color(0xFFFF4500)
+                                watchHasUpdate -> Color(0xFFFFB74D)
+                                else -> Color(0xFF383842)
+                            }
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
@@ -1000,7 +1009,11 @@ fun CompanionScreen(
                                 text = "⌚ Reloj: $watchVerLabel",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (watchHasUpdate) Color(0xFFFFB74D) else Color.White
+                                color = when {
+                                    isWatchBeta -> Color(0xFFFF4500)
+                                    watchHasUpdate -> Color(0xFFFFB74D)
+                                    else -> Color.White
+                                }
                             )
                         }
                     }
@@ -1010,7 +1023,7 @@ fun CompanionScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF24242A))
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF251E1C))
                     ) {
                         Row(
                             modifier = Modifier
@@ -1020,12 +1033,28 @@ fun CompanionScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = context.getString(R.string.dev_beta_title),
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = context.getString(R.string.dev_beta_title),
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFFF4500)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(4.dp))
+                                            .background(if (isBetaChannel) Color(0xFFFF4500) else Color(0xFF444444))
+                                            .padding(horizontal = 4.dp, vertical = 1.dp)
+                                    ) {
+                                        Text(
+                                            text = if (isBetaChannel) "ACTIVO" else "OFF",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
                                 Text(
                                     text = context.getString(R.string.dev_beta_desc),
                                     fontSize = 11.sp,
