@@ -394,14 +394,11 @@ fun SettingsScreen(
             // Info de versión (7-tap Easter Egg)
             item {
                 val deviceName = "${android.os.Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${android.os.Build.MODEL}"
-                val verSuffix = if (isBetaChannel) " (Beta)" else ""
-                Text(
-                    text = "${stringResource(R.string.settings_version_title)} v$currentVer$verSuffix\n$deviceName",
-                    fontSize = 9.sp,
-                    color = if (isBetaChannel) RedditOrange else TextSecondary,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                val isVerBeta = currentVer.contains("beta", ignoreCase = true)
+                Column(
                     modifier = Modifier
-                        .padding(top = 6.dp)
+                        .fillMaxWidth()
+                        .padding(top = 10.dp, bottom = 16.dp)
                         .clickable {
                             tapCount++
                             if (tapCount >= 7) {
@@ -420,8 +417,24 @@ fun SettingsScreen(
                                     android.widget.Toast.LENGTH_SHORT
                                 ).show()
                             }
-                        }
-                )
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "${stringResource(R.string.settings_version_title)} v$currentVer",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (isVerBeta || isBetaChannel) RedditOrange else Color.White,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = deviceName,
+                        fontSize = 10.sp,
+                        color = TextSecondary,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                }
             }
         }
     }

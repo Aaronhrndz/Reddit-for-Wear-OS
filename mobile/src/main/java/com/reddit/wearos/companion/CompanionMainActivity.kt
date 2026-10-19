@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -944,8 +945,11 @@ fun CompanionScreen(
                 )
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     val isVersionBeta = currentVer.contains("beta", ignoreCase = true)
                     // Píldora botón Móvil (con soporte para 7 taps de desarrollador)
@@ -967,17 +971,22 @@ fun CompanionScreen(
                             1.dp,
                             if (isVersionBeta) Color(0xFFFF4500) else Color(0xFF383842)
                         ),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         Box(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "📱 Móvil: v$currentVer",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (isVersionBeta) Color(0xFFFF4500) else Color.White
+                                color = if (isVersionBeta) Color(0xFFFF4500) else Color.White,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         }
                     }
@@ -999,10 +1008,14 @@ fun CompanionScreen(
                                 else -> Color(0xFF383842)
                             }
                         ),
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     ) {
                         Box(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 12.dp, vertical = 8.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -1013,7 +1026,8 @@ fun CompanionScreen(
                                     isWatchBeta -> Color(0xFFFF4500)
                                     watchHasUpdate -> Color(0xFFFFB74D)
                                     else -> Color.White
-                                }
+                                },
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                         }
                     }
