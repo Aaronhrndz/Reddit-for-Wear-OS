@@ -945,14 +945,12 @@ fun CompanionScreen(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val betaBadge = if (isBetaChannel) " (Beta)" else ""
-                    Text(
-                        text = "📱 Móvil: v$currentVer$betaBadge",
-                        fontSize = 12.sp,
-                        color = if (isBetaChannel) Color(0xFFFF4500) else Color(0xFFCCCCCC),
-                        modifier = Modifier.clickable {
+                    // Píldora botón Móvil (con soporte para 7 taps de desarrollador)
+                    Surface(
+                        onClick = {
                             tapCount++
                             if (tapCount >= 7) {
                                 tapCount = 0
@@ -962,13 +960,50 @@ fun CompanionScreen(
                                 val remaining = 7 - tapCount
                                 Toast.makeText(context, context.getString(R.string.dev_steps_remaining, remaining), Toast.LENGTH_SHORT).show()
                             }
+                        },
+                        shape = RoundedCornerShape(20.dp),
+                        color = if (isBetaChannel) Color(0xFFFF4500).copy(alpha = 0.2f) else Color(0xFF26262D),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            if (isBetaChannel) Color(0xFFFF4500) else Color(0xFF383842)
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "📱 Móvil v$currentVer$betaBadge",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (isBetaChannel) Color(0xFFFF4500) else Color.White
+                            )
                         }
-                    )
-                    Text(
-                        text = "⌚ Reloj: $watchVerLabel",
-                        fontSize = 12.sp,
-                        color = if (watchHasUpdate) Color(0xFFFFB74D) else Color(0xFFCCCCCC)
-                    )
+                    }
+
+                    // Píldora botón Reloj
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = if (watchHasUpdate) Color(0xFFFFB74D).copy(alpha = 0.15f) else Color(0xFF26262D),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            if (watchHasUpdate) Color(0xFFFFB74D) else Color(0xFF383842)
+                        ),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "⌚ Reloj: $watchVerLabel",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (watchHasUpdate) Color(0xFFFFB74D) else Color.White
+                            )
+                        }
+                    }
                 }
 
                 if (isBetaChannel || showDevOptions) {
