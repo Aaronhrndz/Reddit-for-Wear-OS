@@ -117,6 +117,17 @@ A self-contained PowerShell build script is included:
 
 ---
 
+## ☕ Support & Donations
+
+If Red for Reddit made your smartwatch experience significantly better, consider supporting future development with a coffee:
+
+<p align="center">
+  <a href="https://ko-fi.com/aaronhrndz"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support on Ko-fi" /></a>
+</p>
+
+---
+
 ## 📄 License
 
 This project is licensed under the **GNU General Public License v3.0 (GPLv3)**. See [LICENSE](LICENSE) for full details. Any derivative work or modification must remain free, open-source, and under this identical license.
+
