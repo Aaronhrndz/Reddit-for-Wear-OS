@@ -857,16 +857,34 @@ fun CompanionScreen(
         var isCheckingUpdate by remember { mutableStateOf(false) }
         var isInstallingMobile by remember { mutableStateOf(false) }
         var updateLabel by remember { mutableStateOf("Comprobando actualizaciones en GitHub…") }
+        var isBetaChannel by remember { mutableStateOf(CompanionUpdateChecker.isBetaChannel(context)) }
+        var tapCount by remember { mutableStateOf(0) }
+        var showDevOptions by remember { mutableStateOf(false) }
+
+        val checkUpdates = {
+            scope.launch {
+                isCheckingUpdate = true
+                updateLabel = "Buscando en GitHub Releases…"
+                val info = CompanionUpdateChecker.checkLatestRelease(currentVer, isBeta = isBetaChannel)
+                isCheckingUpdate = false
+                releaseInfo = info
+                updateLabel = when {
+                    info == null -> "Error de red al consultar GitHub"
+                    info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible"
+                    else -> "✅ Última versión en GitHub: ${info.latestTag}${if (isBetaChannel) " (Beta)" else ""}"
+                }
+            }
+        }
 
         LaunchedEffect(Unit) {
             isCheckingUpdate = true
-            val info = CompanionUpdateChecker.checkLatestRelease(currentVer)
+            val info = CompanionUpdateChecker.checkLatestRelease(currentVer, isBeta = isBetaChannel)
             isCheckingUpdate = false
             releaseInfo = info
             updateLabel = when {
                 info == null -> "Error de red al consultar GitHub"
                 info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible"
-                else -> "✅ Última versión en GitHub: ${info.latestTag}"
+                else -> "✅ Última versión en GitHub: ${info.latestTag}${if (isBetaChannel) " (Beta)" else ""}"
             }
         }
 
@@ -903,18 +921,7 @@ fun CompanionScreen(
                         onClick = {
                             onRefreshWatches()
                             if (!isCheckingUpdate) {
-                                scope.launch {
-                                    isCheckingUpdate = true
-                                    updateLabel = "Buscando en GitHub Releases…"
-                                    val info = CompanionUpdateChecker.checkLatestRelease(currentVer)
-                                    isCheckingUpdate = false
-                                    releaseInfo = info
-                                    updateLabel = when {
-                                        info == null -> "Error de red al consultar GitHub"
-                                        info.isUpdateAvailable -> "⚡ Nueva versión ${info.latestTag} disponible"
-                                        else -> "✅ Última versión en GitHub: ${info.latestTag}"
-                                    }
-                                }
+                                checkUpdates()
                             }
                         }
                     ) {
@@ -939,16 +946,70 @@ fun CompanionScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    val betaBadge = if (isBetaChannel) " (Beta)" else ""
                     Text(
-                        text = "📱 Móvil: v$currentVer",
+                        text = "📱 Móvil: v$currentVer$betaBadge",
                         fontSize = 12.sp,
-                        color = Color(0xFFCCCCCC)
+                        color = if (isBetaChannel) Color(0xFFFF4500) else Color(0xFFCCCCCC),
+                        modifier = Modifier.clickable {
+                            tapCount++
+                            if (tapCount >= 7) {
+                                tapCount = 0
+                                showDevOptions = true
+                                Toast.makeText(context, context.getString(R.string.dev_unlocked), Toast.LENGTH_SHORT).show()
+                            } else if (tapCount >= 3) {
+                                val remaining = 7 - tapCount
+                                Toast.makeText(context, context.getString(R.string.dev_steps_remaining, remaining), Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     )
                     Text(
                         text = "⌚ Reloj: $watchVerLabel",
                         fontSize = 12.sp,
                         color = if (watchHasUpdate) Color(0xFFFFB74D) else Color(0xFFCCCCCC)
                     )
+                }
+
+                if (isBetaChannel || showDevOptions) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF24242A))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = context.getString(R.string.dev_beta_title),
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = context.getString(R.string.dev_beta_desc),
+                                    fontSize = 11.sp,
+                                    color = Color(0xFFAAAAAA)
+                                )
+                            }
+                            Switch(
+                                checked = isBetaChannel,
+                                onCheckedChange = { next ->
+                                    isBetaChannel = next
+                                    CompanionUpdateChecker.setBetaChannel(context, next)
+                                    checkUpdates()
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color(0xFFFF4500),
+                                    checkedTrackColor = Color(0xFFFF4500).copy(alpha = 0.5f)
+                                )
+                            )
+                        }
+                    }
                 }
 
                 if (!watchUpdateStatus.isNullOrEmpty()) {

@@ -19,12 +19,28 @@ data class CompanionReleaseInfo(
 )
 
 object CompanionUpdateChecker {
-    private const val REPO_API = "https://api.github.com/repos/Aaronhrndz/Reddit-for-Wear-OS/releases/latest"
+    private const val REPO_API_LATEST = "https://api.github.com/repos/Aaronhrndz/Reddit-for-Wear-OS/releases/latest"
+    private const val REPO_API_ALL = "https://api.github.com/repos/Aaronhrndz/Reddit-for-Wear-OS/releases?per_page=1"
+    private const val PREFS_NAME = "companion_ota_prefs"
+    private const val KEY_BETA_CHANNEL = "beta_channel_enabled"
     private val json = Json { ignoreUnknownKeys = true }
 
-    suspend fun checkLatestRelease(currentVersionName: String): CompanionReleaseInfo? = withContext(Dispatchers.IO) {
+    fun isBetaChannel(context: android.content.Context): Boolean {
+        return context.getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE)
+            .getBoolean(KEY_BETA_CHANNEL, false)
+    }
+
+    fun setBetaChannel(context: android.content.Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS_NAME, android.content.Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_BETA_CHANNEL, enabled)
+            .apply()
+    }
+
+    suspend fun checkLatestRelease(currentVersionName: String, isBeta: Boolean = false): CompanionReleaseInfo? = withContext(Dispatchers.IO) {
         try {
-            val conn = (URL(REPO_API).openConnection() as HttpURLConnection).apply {
+            val apiUrl = if (isBeta) REPO_API_ALL else REPO_API_LATEST
+            val conn = (URL(apiUrl).openConnection() as HttpURLConnection).apply {
                 requestMethod = "GET"
                 setRequestProperty("Accept", "application/vnd.github+json")
                 setRequestProperty("User-Agent", "RedForReddit-CompanionUpdateChecker")
@@ -35,7 +51,12 @@ object CompanionUpdateChecker {
             if (conn.responseCode != 200) return@withContext null
 
             val body = conn.inputStream.bufferedReader().use { it.readText() }
-            val root = json.parseToJsonElement(body).jsonObject
+            val root = if (isBeta) {
+                val arr = json.parseToJsonElement(body).jsonArray
+                if (arr.isNotEmpty()) arr[0].jsonObject else null
+            } else {
+                json.parseToJsonElement(body).jsonObject
+            } ?: return@withContext null
 
             val tagName = root["tag_name"]?.jsonPrimitive?.content ?: return@withContext null
             val htmlUrl = root["html_url"]?.jsonPrimitive?.content

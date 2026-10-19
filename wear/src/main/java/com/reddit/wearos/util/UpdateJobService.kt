@@ -46,7 +46,8 @@ class UpdateJobService : JobService() {
                     "1.6.0"
                 }
 
-                val info = UpdateChecker.checkLatestRelease(currentVersion)
+                val isBeta = UpdateChecker.isBetaChannel(applicationContext)
+                val info = UpdateChecker.checkLatestRelease(currentVersion, isBeta = isBeta)
                 if (info != null && info.isUpdateAvailable) {
                     val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                     val lastNotified = prefs.getString(KEY_LAST_NOTIFIED_TAG, null)

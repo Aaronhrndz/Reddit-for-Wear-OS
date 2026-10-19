@@ -7,4 +7,10 @@
     <string name="btn_sync">Sincronizar con Reloj</string>
     <string name="status_connected">Conectado con reloj</string>
     <string name="status_disconnected">Buscando reloj...</string>
+    <string name="dev_options_title">Opciones de Desarrollador</string>
+    <string name="dev_beta_title">Canal Beta</string>
+    <string name="dev_beta_desc">Recibir versiones beta de prueba para Móvil y Reloj</string>
+    <string name="dev_unlocked">¡Opciones de desarrollador activadas!</string>
+    <string name="dev_steps_remaining">Quedan %d toques para desarrollador</string>
+    <string name="close">Cerrar</string>
 </resources>

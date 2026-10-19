@@ -67,16 +67,34 @@ fun SettingsScreen(
     var releaseInfo by remember { mutableStateOf<GitHubReleaseInfo?>(null) }
     var isCheckingUpdate by remember { mutableStateOf(false) }
     var updateStatusText by remember { mutableStateOf("Comprobar en GitHub") }
+    var isBetaChannel by remember { mutableStateOf(UpdateChecker.isBetaChannel(context)) }
+    var tapCount by remember { mutableStateOf(0) }
+    var showDevDialog by remember { mutableStateOf(false) }
+
+    val checkUpdateAction = {
+        scope.launch {
+            isCheckingUpdate = true
+            updateStatusText = "Buscando en GitHub…"
+            val checked = UpdateChecker.checkLatestRelease(currentVer, isBeta = isBetaChannel)
+            isCheckingUpdate = false
+            releaseInfo = checked
+            updateStatusText = when {
+                checked == null -> "Sin conexión a GitHub"
+                checked.isUpdateAvailable -> "⚡ Toca para instalar ${checked.latestTag}"
+                else -> "✅ Estás en la última (v$currentVer${if (isBetaChannel) " Beta" else ""})"
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         isCheckingUpdate = true
-        val info = UpdateChecker.checkLatestRelease(currentVer)
+        val info = UpdateChecker.checkLatestRelease(currentVer, isBeta = isBetaChannel)
         isCheckingUpdate = false
         releaseInfo = info
         updateStatusText = when {
             info == null -> "Toca para comprobar"
             info.isUpdateAvailable -> "⚡ Nueva ${info.latestTag} disponible"
-            else -> "✅ Al día (v$currentVer)"
+            else -> "✅ Al día (v$currentVer${if (isBetaChannel) " Beta" else ""})"
         }
     }
 
@@ -292,18 +310,7 @@ fun SettingsScreen(
                                 RemotePhoneHelper.openUrlOnPhone(context, info.releaseHtmlUrl)
                             }
                         } else if (!isCheckingUpdate) {
-                            scope.launch {
-                                isCheckingUpdate = true
-                                updateStatusText = "Buscando en GitHub…"
-                                val checked = UpdateChecker.checkLatestRelease(currentVer)
-                                isCheckingUpdate = false
-                                releaseInfo = checked
-                                updateStatusText = when {
-                                    checked == null -> "Sin conexión a GitHub"
-                                    checked.isUpdateAvailable -> "⚡ Toca para instalar ${checked.latestTag}"
-                                    else -> "✅ Estás en la última (v$currentVer)"
-                                }
-                            }
+                            checkUpdateAction()
                         }
                     },
                     icon = {
@@ -338,15 +345,81 @@ fun SettingsScreen(
                 )
             }
 
-            // Info de versión
+            // Opciones de desarrollador desbloqueadas
+            if (isBetaChannel || showDevDialog) {
+                item {
+                    ToggleChip(
+                        checked = isBetaChannel,
+                        onCheckedChange = { next ->
+                            isBetaChannel = next
+                            UpdateChecker.setBetaChannel(context, next)
+                            checkUpdateAction()
+                        },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.dev_beta_title),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White
+                            )
+                        },
+                        secondaryLabel = {
+                            Text(
+                                text = stringResource(R.string.dev_beta_desc),
+                                fontSize = 9.sp,
+                                color = if (isBetaChannel) RedditOrange else TextSecondary
+                            )
+                        },
+                        toggleControl = {
+                            Switch(
+                                checked = isBetaChannel,
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = RedditOrange,
+                                    checkedTrackColor = RedditOrange.copy(alpha = 0.5f)
+                                )
+                            )
+                        },
+                        colors = ToggleChipDefaults.toggleChipColors(
+                            checkedStartBackgroundColor = Color(0xFF26262B),
+                            checkedEndBackgroundColor = Color(0xFF26262B),
+                            uncheckedStartBackgroundColor = Color(0xFF1C1C20),
+                            uncheckedEndBackgroundColor = Color(0xFF1C1C20)
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            // Info de versión (7-tap Easter Egg)
             item {
                 val deviceName = "${android.os.Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${android.os.Build.MODEL}"
+                val verSuffix = if (isBetaChannel) " (Beta)" else ""
                 Text(
-                    text = "${stringResource(R.string.settings_version_title)} v$currentVer\n$deviceName",
+                    text = "${stringResource(R.string.settings_version_title)} v$currentVer$verSuffix\n$deviceName",
                     fontSize = 9.sp,
-                    color = TextSecondary,
+                    color = if (isBetaChannel) RedditOrange else TextSecondary,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.padding(top = 6.dp)
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .androidx.compose.foundation.clickable {
+                            tapCount++
+                            if (tapCount >= 7) {
+                                tapCount = 0
+                                showDevDialog = true
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(R.string.dev_unlocked),
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            } else if (tapCount >= 3) {
+                                val remaining = 7 - tapCount
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(R.string.dev_steps_remaining, remaining),
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                 )
             }
         }

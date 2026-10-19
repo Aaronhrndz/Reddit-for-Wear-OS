@@ -7,4 +7,10 @@
     <string name="btn_sync">Sync with Watch</string>
     <string name="status_connected">Connected to watch</string>
     <string name="status_disconnected">Looking for watch...</string>
+    <string name="dev_options_title">Developer Options</string>
+    <string name="dev_beta_title">Beta Channel</string>
+    <string name="dev_beta_desc">Receive private beta pre-releases for Mobile and Wear</string>
+    <string name="dev_unlocked">Developer options unlocked!</string>
+    <string name="dev_steps_remaining">%d taps to developer options</string>
+    <string name="close">Close</string>
 </resources>

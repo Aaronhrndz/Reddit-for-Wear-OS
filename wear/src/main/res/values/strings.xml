@@ -53,4 +53,10 @@
     <string name="settings_saved_sub">Posts and comments</string>
     <string name="settings_open_mobile">Open Login on Phone</string>
     <string name="settings_version_title">Red for Reddit</string>
+    <string name="dev_options_title">Developer Options</string>
+    <string name="dev_beta_title">Beta Channel</string>
+    <string name="dev_beta_desc">Receive private beta pre-releases</string>
+    <string name="dev_unlocked">Developer options unlocked!</string>
+    <string name="dev_steps_remaining">%d taps to developer options</string>
+    <string name="close">Close</string>
 </resources>
