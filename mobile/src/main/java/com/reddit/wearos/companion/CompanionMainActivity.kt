@@ -31,6 +31,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -226,8 +227,6 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
                             onCopyToClipboard = {
                                 if (tokenOrCookieInput.isNotBlank()) {
                                     copyToClipboard(tokenOrCookieInput)
-                                } else {
-                                    Toast.makeText(this@CompanionMainActivity, "No hay token para copiar", Toast.LENGTH_SHORT).show()
                                 }
                             },
                             onSyncManualToken = {
@@ -242,8 +241,6 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
                                     prefs.edit().putString("saved_session_data", effectiveToken).apply()
                                     copyToClipboard(effectiveToken)
                                     syncSessionToWatch(effectiveToken, redditUsername)
-                                } else {
-                                    Toast.makeText(this@CompanionMainActivity, "Introduce un token o inicia sesión primero", Toast.LENGTH_SHORT).show()
                                 }
                             },
                             onLogout = { performLogout() },
@@ -400,11 +397,10 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
                     withContext(Dispatchers.Main) {
                         isSyncing = false
                         loginStatus = if (syncSuccess) {
-                            "✅ Sesión permanente vinculada (u/$detectedUsername) en tu Galaxy Watch"
+                            getString(R.string.companion_synced_session, detectedUsername)
                         } else {
-                            "✅ Token OAuth permanente obtenido. Conecta el reloj vía Bluetooth para sincronizar."
+                            getString(R.string.companion_session_saved_notice)
                         }
-                        Toast.makeText(this@CompanionMainActivity, "OAuth permanente configurado con éxito", Toast.LENGTH_LONG).show()
                     }
                 } else {
                     withContext(Dispatchers.Main) {
@@ -429,8 +425,7 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
         getSharedPreferences("companion_prefs", Context.MODE_PRIVATE)
             .edit().remove("saved_session_data").apply()
         tokenOrCookieInput = ""
-        loginStatus = "Sesión cerrada en el móvil"
-        Toast.makeText(this, "Sesión cerrada y cookies eliminadas", Toast.LENGTH_SHORT).show()
+        loginStatus = getString(R.string.companion_account_none)
     }
 
     private fun copyToClipboard(text: String) {
@@ -438,7 +433,6 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Reddit Token", text)
             clipboard.setPrimaryClip(clip)
-            Toast.makeText(this, "Token copiado al portapapeles", Toast.LENGTH_SHORT).show()
         } catch (_: Exception) {}
     }
 
@@ -454,7 +448,7 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
 
     private fun syncSessionToWatch(sessionData: String, username: String) {
         isSyncing = true
-        loginStatus = "Sincronizando sesión persistente de u/$username con Galaxy Watch..."
+        loginStatus = getString(R.string.companion_syncing_session, username)
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -484,11 +478,9 @@ class CompanionMainActivity : ComponentActivity(), MessageClient.OnMessageReceiv
                 withContext(Dispatchers.Main) {
                     isSyncing = false
                     if (syncSuccess) {
-                        val modeLabel = if (permanentCookie != null) "persistente (1 año)" else "activa"
-                        loginStatus = "✅ u/$username sincronizado con sesión $modeLabel en tu Galaxy Watch"
-                        Toast.makeText(this@CompanionMainActivity, "u/$username conectado en el reloj (Sesión Persistente)", Toast.LENGTH_LONG).show()
+                        loginStatus = getString(R.string.companion_synced_session, username)
                     } else {
-                        loginStatus = "Sesión persistente guardada. Conecta tu reloj por Bluetooth y pulsa Reenviar."
+                        loginStatus = getString(R.string.companion_session_saved_notice)
                     }
                 }
             } catch (e: Exception) {
@@ -698,13 +690,13 @@ fun CompanionScreen(
 
         // Cabecera limpia
         Text(
-            text = "Reddit for Wear OS",
+            text = stringResource(R.string.companion_header_title),
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
         Text(
-            text = "Sincronización automática con tu Galaxy Watch",
+            text = stringResource(R.string.companion_header_subtitle),
             fontSize = 13.sp,
             color = Color(0xFF9E9E9E)
         )
@@ -736,13 +728,13 @@ fun CompanionScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = if (connectedWatches > 0) "Galaxy Watch conectado" else "Buscando reloj Bluetooth…",
+                                text = if (connectedWatches > 0) stringResource(R.string.companion_watch_connected) else stringResource(R.string.companion_watch_searching),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
                                 color = Color.White
                             )
                             Text(
-                                text = if (hasActiveSession) "Cuenta activa: u/$username" else "Sin sesión iniciada",
+                                text = if (hasActiveSession) stringResource(R.string.companion_account_active, username) else stringResource(R.string.companion_account_none),
                                 fontSize = 12.sp,
                                 color = if (hasActiveSession) Color(0xFF4CAF50) else Color(0xFFAAAAAA)
                             )
@@ -751,7 +743,7 @@ fun CompanionScreen(
                     IconButton(onClick = onRefreshWatches) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refrescar relojes",
+                            contentDescription = stringResource(R.string.companion_refresh_watches),
                             tint = Color.White
                         )
                     }
@@ -791,7 +783,7 @@ fun CompanionScreen(
                     Icon(Icons.Default.Sync, contentDescription = null, tint = Color.White)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (isSyncing) "Sincronizando con el reloj…" else "Sincronizar con el Reloj Ahora",
+                        text = if (isSyncing) stringResource(R.string.companion_syncing) else stringResource(R.string.companion_sync_now),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -813,7 +805,7 @@ fun CompanionScreen(
                         Icon(Icons.Default.Language, contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (hasActiveSession) "Cambiar Cuenta" else "Iniciar Sesión",
+                            text = if (hasActiveSession) stringResource(R.string.companion_change_account) else stringResource(R.string.companion_login),
                             fontSize = 13.sp,
                             color = Color.White
                         )
@@ -828,12 +820,12 @@ fun CompanionScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                contentDescription = "Cerrar sesión",
+                                contentDescription = stringResource(R.string.companion_logout),
                                 tint = Color(0xFFFF8A80),
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Salir", fontSize = 13.sp, color = Color(0xFFFF8A80))
+                            Text(stringResource(R.string.companion_logout), fontSize = 13.sp, color = Color(0xFFFF8A80))
                         }
                     }
                 }
@@ -908,7 +900,7 @@ fun CompanionScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Actualizaciones (Móvil y Reloj)",
+                            text = stringResource(R.string.companion_updates_title),
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
                             color = Color.White
@@ -934,11 +926,14 @@ fun CompanionScreen(
                 HorizontalDivider(color = Color(0xFF2C2C34))
 
                 val info = releaseInfo
+                val notInstalledStr = stringResource(R.string.companion_watch_not_installed)
+                val checkingStr = stringResource(R.string.companion_watch_checking)
+                val notDetectedStr = stringResource(R.string.companion_watch_not_detected)
                 val watchVerLabel = when {
                     watchVersion != null -> "v$watchVersion"
-                    connectedWatches > 0 && watchUpdateStatus == "Reloj sin app instalada" -> "No instalada"
-                    connectedWatches > 0 -> "Comprobando…"
-                    else -> "No detectado"
+                    connectedWatches > 0 && watchUpdateStatus == stringResource(R.string.companion_watch_no_app) -> notInstalledStr
+                    connectedWatches > 0 -> checkingStr
+                    else -> notDetectedStr
                 }
                 val watchHasUpdate = info != null && (
                     watchVersion == null || CompanionUpdateChecker.isNewerVersion(info.latestVersion, watchVersion.removePrefix("v"))
@@ -978,7 +973,7 @@ fun CompanionScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "📱 Móvil: v$currentVer",
+                                text = stringResource(R.string.companion_phone_ver, currentVer),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = if (isVersionBeta) Color(0xFFFF4500) else Color.White,
@@ -1015,7 +1010,7 @@ fun CompanionScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "⌚ Reloj: $watchVerLabel",
+                                text = stringResource(R.string.companion_watch_ver, watchVerLabel),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = when {
@@ -1058,7 +1053,7 @@ fun CompanionScreen(
                                             .padding(horizontal = 4.dp, vertical = 1.dp)
                                     ) {
                                         Text(
-                                            text = if (isBetaChannel) "ACTIVO" else "OFF",
+                                            text = if (isBetaChannel) stringResource(R.string.companion_active_badge) else stringResource(R.string.companion_off_badge),
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = Color.White
@@ -1125,7 +1120,7 @@ fun CompanionScreen(
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text(
-                                text = if (info.isUpdateAvailable) "Actualizar Móvil" else "Reinstalar Móvil",
+                                text = if (info.isUpdateAvailable) stringResource(R.string.companion_update_phone) else stringResource(R.string.companion_reinstall_phone),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -1133,9 +1128,9 @@ fun CompanionScreen(
                         }
 
                         val watchBtnText = when {
-                            watchVersion == null -> "Instalar en Reloj"
-                            watchHasUpdate -> "Actualizar Reloj"
-                            else -> "Reinstalar Reloj"
+                            watchVersion == null -> stringResource(R.string.companion_install_watch)
+                            watchHasUpdate -> stringResource(R.string.companion_update_watch)
+                            else -> stringResource(R.string.companion_reinstall_watch)
                         }
 
                         Button(
@@ -1168,7 +1163,7 @@ fun CompanionScreen(
         // 4. Sección Avanzada Plegable (Oculta por defecto para no recargar la UI)
         TextButton(onClick = { showAdvanced = !showAdvanced }) {
             Text(
-                text = if (showAdvanced) "▲ Ocultar opciones avanzadas" else "▼ Opciones avanzadas (Token / Usuario)",
+                text = if (showAdvanced) stringResource(R.string.companion_hide_advanced) else stringResource(R.string.companion_show_advanced),
                 fontSize = 12.sp,
                 color = Color(0xFF888888)
             )
@@ -1184,7 +1179,7 @@ fun CompanionScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text("Usuario de Reddit", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 12.sp)
+                    Text(stringResource(R.string.companion_reddit_username), fontWeight = FontWeight.Bold, color = Color.White, fontSize = 12.sp)
                     OutlinedTextField(
                         value = username,
                         onValueChange = onUsernameChange,
@@ -1203,12 +1198,12 @@ fun CompanionScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Cookie / Token de Sesión", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.White)
+                        Text(stringResource(R.string.companion_cookie_token), fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Color.White)
                         if (tokenInput.isNotEmpty()) {
                             TextButton(onClick = onCopyToClipboard) {
                                 Icon(Icons.Default.ContentCopy, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Copiar", fontSize = 11.sp, color = Color.White)
+                                Text(stringResource(R.string.companion_copy), fontSize = 11.sp, color = Color.White)
                             }
                         }
                     }

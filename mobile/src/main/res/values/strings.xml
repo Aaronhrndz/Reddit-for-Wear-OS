@@ -13,4 +13,44 @@
     <string name="dev_unlocked">Developer options unlocked!</string>
     <string name="dev_steps_remaining">%d taps to developer options</string>
     <string name="close">Close</string>
+
+    <!-- Companion UI -->
+    <string name="companion_header_title">Red for Reddit</string>
+    <string name="companion_header_subtitle">Automatic sync with your smartwatch</string>
+    <string name="companion_watch_connected">Smartwatch connected</string>
+    <string name="companion_watch_searching">Searching for Bluetooth watch…</string>
+    <string name="companion_account_active">Active account: u/%1$s</string>
+    <string name="companion_account_none">No session active</string>
+    <string name="companion_refresh_watches">Refresh watches</string>
+    <string name="companion_sync_now">Sync with Watch Now</string>
+    <string name="companion_syncing">Syncing with watch…</string>
+    <string name="companion_change_account">Switch Account</string>
+    <string name="companion_login">Sign In</string>
+    <string name="companion_logout">Log Out</string>
+    <string name="companion_updates_title">Updates (Phone &amp; Watch)</string>
+    <string name="companion_checking_github">Checking updates on GitHub…</string>
+    <string name="companion_github_error">Network error checking GitHub</string>
+    <string name="companion_new_version_available">⚡ New version %1$s available</string>
+    <string name="companion_latest_version">✅ Latest version on GitHub: %1$s</string>
+    <string name="companion_phone_ver">📱 Phone: v%1$s</string>
+    <string name="companion_watch_ver">⌚ Watch: %1$s</string>
+    <string name="companion_watch_not_installed">Not installed</string>
+    <string name="companion_watch_checking">Checking…</string>
+    <string name="companion_watch_not_detected">Not detected</string>
+    <string name="companion_update_phone">Update Phone</string>
+    <string name="companion_reinstall_phone">Reinstall Phone</string>
+    <string name="companion_install_watch">Install on Watch</string>
+    <string name="companion_update_watch">Update Watch</string>
+    <string name="companion_reinstall_watch">Reinstall Watch</string>
+    <string name="companion_hide_advanced">▲ Hide advanced options</string>
+    <string name="companion_show_advanced">▼ Advanced options (Token / User)</string>
+    <string name="companion_reddit_username">Reddit Username</string>
+    <string name="companion_cookie_token">Session Cookie / Token</string>
+    <string name="companion_copy">Copy</string>
+    <string name="companion_active_badge">ACTIVE</string>
+    <string name="companion_off_badge">OFF</string>
+    <string name="companion_synced_session">✅ u/%1$s synced with persistent session on your smartwatch</string>
+    <string name="companion_syncing_session">Syncing persistent session for u/%1$s with smartwatch...</string>
+    <string name="companion_session_saved_notice">Persistent session saved. Connect your watch via Bluetooth and tap Resend.</string>
+    <string name="companion_watch_no_app">Watch without app installed</string>
 </resources>

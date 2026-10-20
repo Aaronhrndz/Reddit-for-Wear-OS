@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Red for Reddit Companion</string>
+    <string name="title_setup">Red for Reddit - Configuration</string>
+    <string name="client_id_hint">Entrez votre Client ID Reddit</string>
+    <string name="btn_login">Se connecter à Reddit</string>
+    <string name="btn_sync">Synchroniser avec la montre</string>
+    <string name="status_connected">Connecté à la montre</string>
+    <string name="status_disconnected">Recherche de la montre...</string>
+    <string name="dev_options_title">Options pour développeurs</string>
+    <string name="dev_beta_title">Canal Bêta</string>
+    <string name="dev_beta_desc">Recevoir les pré-versions bêta pour Téléphone et Wear OS</string>
+    <string name="dev_unlocked">Options pour développeurs débloquées !</string>
+    <string name="dev_steps_remaining">Encore %d étapes pour les options développeur</string>
+    <string name="close">Fermer</string>
+
+    <!-- Companion UI -->
+    <string name="companion_header_title">Reddit for Wear OS</string>
+    <string name="companion_header_subtitle">Synchronisation automatique avec votre montre</string>
+    <string name="companion_watch_connected">Montre connectée</string>
+    <string name="companion_watch_searching">Recherche de montre Bluetooth…</string>
+    <string name="companion_account_active">Compte actif : u/%1$s</string>
+    <string name="companion_account_none">Aucune session active</string>
+    <string name="companion_refresh_watches">Actualiser les montres</string>
+    <string name="companion_sync_now">Synchroniser avec la montre maintenant</string>
+    <string name="companion_syncing">Synchronisation avec la montre…</string>
+    <string name="companion_change_account">Changer de compte</string>
+    <string name="companion_login">Se connecter</string>
+    <string name="companion_logout">Se déconnecter</string>
+    <string name="companion_updates_title">Mises à jour (Téléphone &amp; Montre)</string>
+    <string name="companion_checking_github">Vérification des mises à jour sur GitHub…</string>
+    <string name="companion_github_error">Erreur réseau lors de la vérification GitHub</string>
+    <string name="companion_new_version_available">⚡ Nouvelle version %1$s disponible</string>
+    <string name="companion_latest_version">✅ Dernière version sur GitHub : %1$s</string>
+    <string name="companion_phone_ver">📱 Téléphone : v%1$s</string>
+    <string name="companion_watch_ver">⌚ Montre : %1$s</string>
+    <string name="companion_watch_not_installed">Non installée</string>
+    <string name="companion_watch_checking">Vérification…</string>
+    <string name="companion_watch_not_detected">Non détectée</string>
+    <string name="companion_update_phone">Mettre à jour le téléphone</string>
+    <string name="companion_reinstall_phone">Réinstaller sur le téléphone</string>
+    <string name="companion_install_watch">Installer sur la montre</string>
+    <string name="companion_update_watch">Mettre à jour la montre</string>
+    <string name="companion_reinstall_watch">Réinstaller sur la montre</string>
+    <string name="companion_hide_advanced">▲ Masquer les options avancées</string>
+    <string name="companion_show_advanced">▼ Options avancées (Jeton / Utilisateur)</string>
+    <string name="companion_reddit_username">Nom d\'utilisateur Reddit</string>
+    <string name="companion_cookie_token">Cookie de session / Jeton</string>
+    <string name="companion_copy">Copier</string>
+    <string name="companion_active_badge">ACTIF</string>
+    <string name="companion_off_badge">DÉSACTIVÉ</string>
+    <string name="companion_synced_session">✅ u/%1$s synchronisé avec votre montre</string>
+    <string name="companion_syncing_session">Synchronisation de session pour u/%1$s avec la montre...</string>
+    <string name="companion_session_saved_notice">Session sauvegardée. Connectez votre montre en Bluetooth et réessayez.</string>
+    <string name="companion_watch_no_app">Montre sans application installée</string>
+</resources>

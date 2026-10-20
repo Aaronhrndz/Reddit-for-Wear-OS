@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Red for Reddit Companion</string>
+    <string name="title_setup">Red for Reddit - Setup</string>
+    <string name="client_id_hint">Reddit-Client-ID eingeben</string>
+    <string name="btn_login">Bei Reddit anmelden</string>
+    <string name="btn_sync">Mit Smartwatch synchronisieren</string>
+    <string name="status_connected">Mit Smartwatch verbunden</string>
+    <string name="status_disconnected">Suche nach Smartwatch...</string>
+    <string name="dev_options_title">Entwickleroptionen</string>
+    <string name="dev_beta_title">Beta-Kanal</string>
+    <string name="dev_beta_desc">Private Beta-Versionen für Smartphone und Wear OS erhalten</string>
+    <string name="dev_unlocked">Entwickleroptionen freigeschaltet!</string>
+    <string name="dev_steps_remaining">Noch %d Tipps bis zu den Entwickleroptionen</string>
+    <string name="close">Schließen</string>
+
+    <!-- Companion UI -->
+    <string name="companion_header_title">Reddit for Wear OS</string>
+    <string name="companion_header_subtitle">Automatische Synchronisierung mit deiner Smartwatch</string>
+    <string name="companion_watch_connected">Smartwatch verbunden</string>
+    <string name="companion_watch_searching">Suche nach Bluetooth-Smartwatch…</string>
+    <string name="companion_account_active">Aktives Konto: u/%1$s</string>
+    <string name="companion_account_none">Nicht angemeldet</string>
+    <string name="companion_refresh_watches">Uhren aktualisieren</string>
+    <string name="companion_sync_now">Jetzt mit Smartwatch synchronisieren</string>
+    <string name="companion_syncing">Synchronisiere mit Smartwatch…</string>
+    <string name="companion_change_account">Konto wechseln</string>
+    <string name="companion_login">Anmelden</string>
+    <string name="companion_logout">Abmelden</string>
+    <string name="companion_updates_title">Updates (Smartphone &amp; Smartwatch)</string>
+    <string name="companion_checking_github">Suche nach Updates auf GitHub…</string>
+    <string name="companion_github_error">Netzwerkfehler beim Abrufen von GitHub</string>
+    <string name="companion_new_version_available">⚡ Neue Version %1$s verfügbar</string>
+    <string name="companion_latest_version">✅ Neueste Version auf GitHub: %1$s</string>
+    <string name="companion_phone_ver">📱 Smartphone: v%1$s</string>
+    <string name="companion_watch_ver">⌚ Smartwatch: %1$s</string>
+    <string name="companion_watch_not_installed">Nicht installiert</string>
+    <string name="companion_watch_checking">Wird überprüft…</string>
+    <string name="companion_watch_not_detected">Nicht erkannt</string>
+    <string name="companion_update_phone">Smartphone aktualisieren</string>
+    <string name="companion_reinstall_phone">Smartphone neu installieren</string>
+    <string name="companion_install_watch">Auf Smartwatch installieren</string>
+    <string name="companion_update_watch">Smartwatch aktualisieren</string>
+    <string name="companion_reinstall_watch">Smartwatch neu installieren</string>
+    <string name="companion_hide_advanced">▲ Erweiterte Optionen ausblenden</string>
+    <string name="companion_show_advanced">▼ Erweiterte Optionen (Token / Benutzer)</string>
+    <string name="companion_reddit_username">Reddit-Benutzername</string>
+    <string name="companion_cookie_token">Sitzungs-Cookie / Token</string>
+    <string name="companion_copy">Kopieren</string>
+    <string name="companion_active_badge">AKTIV</string>
+    <string name="companion_off_badge">AUS</string>
+    <string name="companion_synced_session">✅ u/%1$s mit Smartwatch synchronisiert</string>
+    <string name="companion_syncing_session">Synchronisiere Sitzung für u/%1$s mit Smartwatch...</string>
+    <string name="companion_session_saved_notice">Sitzung gespeichert. Smartwatch per Bluetooth verbinden und erneut senden.</string>
+    <string name="companion_watch_no_app">Smartwatch ohne installierte App</string>
+</resources>
